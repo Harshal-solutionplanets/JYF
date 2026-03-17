@@ -25,26 +25,34 @@ const AboutArea = () => {
                     <div className="about_area_main_text">
                         <div className="about_area_heading">
                             <img src={Img2} alt="img" />
-                            <h3>Welcome to Jago</h3>
+                            <h3>Welcome to JYF</h3>
                         </div>
                         <div className="about_area_heading_two">
-                            <h2>A world where <span className="color_big_heading">poverty</span> <br />
-                                will not exists</h2>
-                            <h3>We are the largest crowdfunding</h3>
+                            <h2>Serving Humanity Through <span className="color_big_heading">Compassion</span></h2>
                         </div>
                         <div className="about_area_para">
-                            <h5>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do
-                                eiusmod tempor incididunt ut labore.</h5>
-                            <p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do
-                                eiusmod tempor incididunt ut labore et simply free text dolore magna
-                                aliqua lonm andhn.</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do
-                                eiusmod tempor incididunt ut labore et simply.</p>
+                            <p>At Jain Youth Foundation (JYF), our volunteers are inspired by Jain values of Ahimsa (non-violence), compassion, service, and unity. While the foundation is run by members of the Jain community, our initiatives are dedicated to the welfare of society at large, helping people across communities.</p>
+                            <p>Through our various initiatives, we focus on healthcare, food support, education, and humanitarian services, impacting thousands of lives every year.</p>
                         </div>
                         <div className="about_vedio_area">
-                            <Link to="/about" className="btn btn_theme btn_md">Learn more</Link>
-                            <a href="#!" className="vedio_btn popup-vimeo"><i
-                                    className="fa fa-play"></i>How we work</a>
+                            <Link to="/contact" className="btn btn_theme btn_md">Contact us</Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="row mt-5">
+                <div className="col-lg-12">
+                    <div className="about_area_main_text">
+                        <div className="about_area_heading">
+                            <h3>Our Philosophy</h3>
+                        </div>
+                        <div className="about_area_heading_two">
+                            <h2>Unity in <span className="color_big_heading">CommUNITY</span></h2>
+                        </div>
+                        <div className="about_area_para">
+                            <p>At Jain Youth Foundation, we believe that true service transcends community boundaries.</p>
+                            <p>While our volunteers are rooted in Jain values, our mission is to serve humanity as a whole, guided by compassion, non-violence, and unity.</p>
+                            <p>Together, we strive to build a society where care, kindness, and community support uplift every life.</p>
                         </div>
                     </div>
                 </div>
