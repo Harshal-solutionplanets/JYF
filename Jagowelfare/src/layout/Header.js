@@ -1,11 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from ".././assets/img/logo.png";
+import { signOut } from "firebase/auth";
+import logo from ".././assets/img/logo.jpeg";
 import SearchIcon from ".././assets/img/icon/search_icon.png";
 // import logoBlack from ".././assets/img/logo_black.png";
 import { HeaderData } from "./HeaderData";
+import { useAuth } from "../auth/AuthProvider";
+import { auth } from "../firebase";
 
 const Header = () => {
+  const { user, isStaff } = useAuth();
   return (
     <>
        <header className="main_header_arae">
@@ -87,6 +91,35 @@ const Header = () => {
                                             alt="icon" /></Link>
                                 </div>
                                 <div className="option-item">
+                                    {user ? (
+                                        <Link to="/my-tickets" className="btn btn_navber" style={{ marginRight: 8 }}>
+                                            My tickets
+                                        </Link>
+                                    ) : (
+                                        <Link to="/login" className="btn btn_navber" style={{ marginRight: 8 }}>
+                                            Login
+                                        </Link>
+                                    )}
+                                </div>
+                                {isStaff ? (
+                                  <div className="option-item">
+                                      <Link to="/admin/dashboard" className="btn btn_navber" style={{ marginRight: 8 }}>
+                                          Admin
+                                      </Link>
+                                  </div>
+                                ) : null}
+                                {user ? (
+                                  <div className="option-item">
+                                      <button
+                                        type="button"
+                                        className="btn btn_navber"
+                                        onClick={() => signOut(auth)}
+                                      >
+                                        Logout
+                                      </button>
+                                  </div>
+                                ) : null}
+                                <div className="option-item">
                                     <Link to="/make-donation" className="btn btn_navber">Donate now</Link>
                                 </div>
                             </div>
@@ -110,6 +143,35 @@ const Header = () => {
                                     <Link to="#!" className="search-box"> <img src={SearchIcon}
                                             alt="icon" /></Link>
                                 </div>
+                                <div className="option-item">
+                                    {user ? (
+                                        <Link to="/my-tickets" className="btn btn_navber" style={{ marginRight: 8 }}>
+                                            My tickets
+                                        </Link>
+                                    ) : (
+                                        <Link to="/login" className="btn btn_navber" style={{ marginRight: 8 }}>
+                                            Login
+                                        </Link>
+                                    )}
+                                </div>
+                                {true ? (
+                                  <div className="option-item">
+                                      <Link to="/admin/dashboard" className="btn btn_navber" style={{ marginRight: 8 }}>
+                                          Admin
+                                      </Link>
+                                  </div>
+                                ) : null}
+                                {user ? (
+                                  <div className="option-item">
+                                      <button
+                                        type="button"
+                                        className="btn btn_navber"
+                                        onClick={() => signOut(auth)}
+                                      >
+                                        Logout
+                                      </button>
+                                  </div>
+                                ) : null}
                                 <div className="option-item">
                                     <Link to="/make-donation" className="btn btn_navber">Donate now</Link>
                                 </div>

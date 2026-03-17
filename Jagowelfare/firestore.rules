@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isStaff() {
+      return isSignedIn() && (request.auth.token.staff == true || request.auth.token.admin == true);
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    match /events/{eventId} {
+      allow read: if resource.data.status == "published" || isStaff();
+      allow create, update, delete: if isAdmin();
+
+      match /tickets/{ticketId} {
+        allow read: if (isSignedIn() && resource.data.uid == request.auth.uid) || isStaff();
+
+        // Ticket issuance should be done by Cloud Functions. Keep client writes locked down.
+        allow create, update, delete: if false;
+      }
+
+      match /checkins/{checkinId} {
+        allow read: if isStaff();
+        allow create, update, delete: if false;
+      }
+    }
+  }
+}
+

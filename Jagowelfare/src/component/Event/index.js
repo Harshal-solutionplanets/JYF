@@ -1,30 +1,62 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-// import Data
-import { EventsDatas } from './data'
-// Import Img
-import BigImg from '../../assets/img/event/event-big.png'
-// Import Icon
-import Iconclock from "../../assets/img/icon/clock.png"
-import IconMap from "../../assets/img/icon/map.png"
-import IconDate from "../../assets/img/icon/date.png"
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { apiFetch } from "../../api";
+import Iconclock from "../../assets/img/icon/clock.png";
+import IconMap from "../../assets/img/icon/map.png";
+import IconDate from "../../assets/img/icon/date.png";
+
+function toJsDate(value) {
+  if (!value) return null;
+  // Firestore Timestamp from Admin SDK (emulator/prod) often serializes as {_seconds,_nanoseconds}
+  if (typeof value === "object" && typeof value._seconds === "number") {
+    return new Date(value._seconds * 1000);
+  }
+  if (typeof value === "number") return new Date(value);
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatDayMonth(d) {
+  if (!d) return { day: "--", mon: "---" };
+  const day = String(d.getDate()).padStart(2, "0");
+  const mon = d.toLocaleString(undefined, { month: "short" });
+  return { day, mon };
+}
 
 
 const EventAreaPage = (props) => {
-    const  bigEvents =[
-        {
-            heading:"Healthy food and nutritions awreness campaign december",
-            category:"#FoodCamp",
-            img:BigImg,
-            para:`Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod
-            tempor. Lorem ipsum dolor sit amet, consectetur notted duber
-            adipisicing elit sed do eiusmod tempor.`,
-            IconClock:Iconclock,
-            IconMap:IconMap,
-            IconDate:IconDate
-        }
-        
-     ]
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    setError("");
+    apiFetch("/events")
+      .then((r) => {
+        if (!alive) return;
+        setEvents(r.events || []);
+      })
+      .catch((e) => {
+        if (!alive) return;
+        setError(e?.message || "Failed to load events");
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const [featured, rest] = useMemo(() => {
+    if (!events.length) return [null, []];
+    const [first, ...others] = events;
+    return [first, others];
+  }, [events]);
+
   return (
     <>
          <section id="upcoming_events" className={ props.padding === true ? "section_padding" : "section_padding_bottom"} >
@@ -43,114 +75,148 @@ const EventAreaPage = (props) => {
           <div className="row">
             {/* Event Leftside */}
             <div className="col-lg-6">
-                {bigEvents.map((data, index1)=>(
-                    <div className="event_left_side_wrapper" key={index1}>
+                {loading ? (
+                  <div className="event_left_side_wrapper">
+                    <div className="event_content_area big_content_padding">
+                      <p>Loading events...</p>
+                    </div>
+                  </div>
+                ) : error ? (
+                  <div className="event_left_side_wrapper">
+                    <div className="event_content_area big_content_padding">
+                      <p style={{ color: "#b00020" }}>{error}</p>
+                    </div>
+                  </div>
+                ) : featured ? (
+                    <div className="event_left_side_wrapper">
                     <div className="event_big_img" >
-                      <Link to="/event-details">
-                        <img src={data.img} alt="img" />
+                      <Link to={`/event/${featured.id}`}>
+                        <img src={featured.heroImageUrl || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                       </Link>
                     </div>
                     <div className="event_content_area big_content_padding">
                       <div className="event_tag_area">
-                        <Link to="/event-details">{data.category}</Link>
+                        <Link to={`/event/${featured.id}`}>{featured.tag || "#Event"}</Link>
                       </div>
                       <div className="event_heading_area">
                         <div className="event_heading">
                           <h3>
-                          <Link to="/event-details">{data.heading}</Link>
+                          <Link to={`/event/${featured.id}`}>{featured.title}</Link>
                           </h3>
                         </div>
                         <div className="event_date">
-                          <img src={data.IconDate} alt="icon" />
+                          <img src={IconDate} alt="icon" />
                           <h6>
-                            20 <span>Dec</span>
+                            {(() => {
+                              const d = toJsDate(featured.startAt);
+                              const { day, mon } = formatDayMonth(d);
+                              return (
+                                <>
+                                  {day} <span>{mon}</span>
+                                </>
+                              );
+                            })()}
                           </h6>
                         </div>
                       </div>
                       <div className="event_para">
-                        <p>{data.para}</p>
+                        <p>{featured.description}</p>
                       </div>
                       <div className="event_boxed_bottom_wrapper">
                         <div className="row">
                           <div className="col-lg-6 col-md-6 col-sm-6 col-6">
                             <div className="event_bottom_boxed">
                               <div className="event_bottom_icon">
-                                <img src={data.IconMap} alt="icon" />
+                                <img src={IconMap} alt="icon" />
                               </div>
                               <div className="event_bottom_content">
                                 <h5>Location:</h5>
-                                <p>Montgomery, Alabama.</p>
+                                <p>{featured.venue || "-"}</p>
                               </div>
                             </div>
                           </div>
                           <div className="col-lg-6 col-md-6 col-sm-6 col-6">
                             <div className="event_bottom_boxed">
                               <div className="event_bottom_icon">
-                                <img src={data.IconClock} alt="icon" />
+                                <img src={Iconclock} alt="icon" />
                               </div>
                               <div className="event_bottom_content">
                                 <h5>Starts at:</h5>
-                                <p>10 am</p>
+                                <p>{(() => {
+                                  const d = toJsDate(featured.startAt);
+                                  return d ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "-";
+                                })()}</p>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                       <div className="event_button">
-                      <Link to="/event"  className="btn btn_md btn_theme"> Join event </Link>
+                      <Link to={`/event/${featured.id}`}  className="btn btn_md btn_theme"> View details </Link>
                       </div>
                     </div>
               </div>
-                ))}
+                ) : null}
             </div>
 
              {/* Event Rightside */}
              <div className="col-lg-6">
-             {EventsDatas.map((datas, indexs)=>(
-               <div className="event_left_side_wrapper" key={indexs}>
+             {rest.map((ev)=>(
+               <div className="event_left_side_wrapper" key={ev.id}>
                      <div className="event_content_area small_content_padding">
                      <div className="event_tag_area">
-                       <Link to="/event-details">{datas.category}</Link>
+                       <Link to={`/event/${ev.id}`}>{ev.tag || "#Event"}</Link>
                      </div>
                      <div className="event_heading_area">
                        <div className="event_heading">
                          <h3>
-                           <Link to="/event-details">
-                            {datas.heading}
+                           <Link to={`/event/${ev.id}`}>
+                            {ev.title}
                            </Link>
                          </h3>
                        </div>
                        <div className="event_date">
-                         <img src={datas.IconDate} alt="icon" />
+                         <img src={IconDate} alt="icon" />
                          <h6>
-                           20 <span>Dec</span>
+                           {(() => {
+                             const d = toJsDate(ev.startAt);
+                             const { day, mon } = formatDayMonth(d);
+                             return (
+                               <>
+                                 {day} <span>{mon}</span>
+                               </>
+                             );
+                           })()}
                          </h6>
                        </div>
                      </div>
                      <div className="event_para">
-                       <p>{datas.para}</p>
+                       <p>{ev.description}</p>
                      </div>
                      <div className="event_boxed_bottom_wrapper">
                        <div className="row">
                          <div className="col-lg-6 col-md-6 col-sm-6 col-6">
                            <div className="event_bottom_boxed">
                              <div className="event_bottom_icon">
-                               <img src={datas.IconMap} alt="icon" />
+                               <img src={IconMap} alt="icon" />
                              </div>
                              <div className="event_bottom_content">
                                <h5>Location:</h5>
-                               <p>Montgomery, Alabama.</p>
+                               <p>{ev.venue || "-"}</p>
                              </div>
                            </div>
                          </div>
                          <div className="col-lg-6 col-md-6 col-sm-6 col-6">
                            <div className="event_bottom_boxed">
                              <div className="event_bottom_icon">
-                               <img src={datas.IconClock} alt="icon" />
+                               <img src={Iconclock} alt="icon" />
                              </div>
                              <div className="event_bottom_content">
                                <h5>Starts at:</h5>
-                               <p>10 am</p>
+                               <p>{(() => {
+                                 const d = toJsDate(ev.startAt);
+                                 return d ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "-";
+                               })()}</p>
                              </div>
                            </div>
                          </div>

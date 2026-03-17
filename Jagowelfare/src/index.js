@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from "./auth/AuthProvider";
 
 // import Css Files
 import "./assets/css/style.css"
@@ -13,7 +14,9 @@ import "./assets/css/responsive.css"
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </BrowserRouter>,
 );
 

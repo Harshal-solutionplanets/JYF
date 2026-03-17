@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 // Import CopyRight Page
 import CopyRight from "./layout/CopyRight";
 // Import Footer Page
@@ -29,6 +29,11 @@ import PrivacyPolicy from "./page/PrivacyPolicy";
 import TermsServicePage from "./page/TermsService";
 import ContactPage from "./page/Contact";
 import Error from "./page/Error";
+import MyTicketsPage from "./page/MyTickets";
+import RequireStaff from "./page/admin/RequireStaff";
+import AdminScanPage from "./page/admin/AdminScan";
+import AdminDashboardPage from "./page/admin/AdminDashboard";
+import AdminEventsPage from "./page/admin/AdminEvents";
 
 
 const App = () => {
@@ -39,7 +44,8 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/event" element={<EventMainPage />} />
-        <Route path="/event-details" element={<EventDetailsPage />} />
+        <Route path="/event/:eventId" element={<EventDetailsPage />} />
+        <Route path="/event-details" element={<Navigate to="/event" replace />} />
         <Route path="/make-donation" element={<MakeDonationPage />} />
         <Route path="/blog" element={<BlogMainPage />} />
         <Route path="/causes" element={<Causes />} />
@@ -51,6 +57,39 @@ const App = () => {
         <Route path="/team" element={<TeamPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/my-tickets" element={<MyTicketsPage />} />
+        <Route
+          path="/admin"
+          element={
+            <RequireStaff>
+              <Navigate to="/admin/dashboard" replace />
+            </RequireStaff>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <RequireStaff>
+              <AdminDashboardPage />
+            </RequireStaff>
+          }
+        />
+        <Route
+          path="/admin/events"
+          element={
+            <RequireStaff>
+              <AdminEventsPage />
+            </RequireStaff>
+          }
+        />
+        <Route
+          path="/admin/scan"
+          element={
+            <RequireStaff>
+              <AdminScanPage />
+            </RequireStaff>
+          }
+        />
         <Route path="/faqs" element={<FaqsPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-service" element={<TermsServicePage />} />

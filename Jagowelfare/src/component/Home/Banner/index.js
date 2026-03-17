@@ -14,9 +14,8 @@ const HomeBanner = () => {
             <div className="row align-items-center">
                 <div className="col-lg-6">
                     <div className="banner_one_text">
-                        <h1><span><span className="color_big">Share</span> your love to</span> make someone’s life better</h1>
-                        <p>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown
-                            printer took a type and scrambled.</p>
+                        <h1><span><span className="color_big">Unity</span> in</span> commUNITY</h1>
+                        <p>Jago Welfare Foundation (JYF) is dedicated to empowering lives through service and welfare. Join us in making a difference.</p>
                     </div>
                 </div>
                 <div className="col-lg-6">

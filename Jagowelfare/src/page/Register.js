@@ -8,7 +8,7 @@ import RegisterArea from '../component/Register'
 const RegisterPage = () => {
   return (
     <>
-     <CommonBanner heading="News Details" pagination="News Details"/>
+     <CommonBanner heading="Register" pagination="Register"/>
      <RegisterArea/>
     </>
   )
