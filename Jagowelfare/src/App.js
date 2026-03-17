@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 // Import CopyRight Page
 import CopyRight from "./layout/CopyRight";
 // Import Footer Page
@@ -37,9 +37,12 @@ import AdminEventsPage from "./page/admin/AdminEvents";
 
 
 const App = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
     <>
-      <Header/>
+      {!isAdminRoute && <Header/>}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -96,10 +99,13 @@ const App = () => {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="*" element={<Error />} />
       </Routes>
-    <CtaArea/>
-    <Footer/>
-    <CopyRight/>
-   
+      {!isAdminRoute && (
+        <>
+          <CtaArea/>
+          <Footer/>
+          <CopyRight/>
+        </>
+      )}
     </>
    
   );
