@@ -66,13 +66,26 @@ CREATE TABLE IF NOT EXISTS public.testimonials (
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Disable RLS for easy testing (Enable later for security)
+-- 7. Event Registrations Table
+CREATE TABLE IF NOT EXISTS public.event_registrations (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
+    full_name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    location TEXT,
+    is_checked_in BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Disable RLS for easy testing
 ALTER TABLE events DISABLE ROW LEVEL SECURITY;
 ALTER TABLE causes DISABLE ROW LEVEL SECURITY;
 ALTER TABLE news DISABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery DISABLE ROW LEVEL SECURITY;
 ALTER TABLE team DISABLE ROW LEVEL SECURITY;
 ALTER TABLE testimonials DISABLE ROW LEVEL SECURITY;
+ALTER TABLE event_registrations DISABLE ROW LEVEL SECURITY;
 
 -- IMPORTANT: STORAGE SETUP
 -- Go to 'Storage' in your Supabase Dashboard

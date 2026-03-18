@@ -38,6 +38,9 @@ import FoodSupportPage from "./page/FoodSupport";
 import EducationPage from "./page/Education";
 import HumanitarianServicesPage from "./page/HumanitarianServices";
 import AdminLoginPage from "./page/admin/AdminLogin";
+import EventRegistrationPage from "./page/EventRegistration";
+import QRScannerPage from "./page/QRScannerPage";
+
 
 
 const App = () => {
@@ -52,7 +55,10 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/event" element={<EventMainPage />} />
         <Route path="/event/:eventId" element={<EventDetailsPage />} />
+        <Route path="/event-registration/:eventId" element={<EventRegistrationPage />} />
+        <Route path="/check-in" element={<RequireStaff><QRScannerPage /></RequireStaff>} />
         <Route path="/event-details" element={<Navigate to="/event" replace />} />
+
         <Route path="/make-donation" element={<MakeDonationPage />} />
         <Route path="/blog" element={<BlogMainPage />} />
         <Route path="/causes" element={<Causes />} />
@@ -111,6 +117,7 @@ const App = () => {
       {!isAdminRoute && (
         <>
           <Footer/>
+
           <CopyRight/>
         </>
       )}

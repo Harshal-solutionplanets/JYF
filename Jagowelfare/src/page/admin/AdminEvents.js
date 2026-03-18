@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { supabase } from "../../supabase";
+import { formatDate } from "../../utils/dateFormatter";
 import CommonBanner from "../../component/Common/CommonBanner";
 
 const AdminEventsPage = () => {
@@ -52,13 +53,13 @@ const AdminEventsPage = () => {
                 const filePath = `event-images/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
-                    .from('jyf-assets')
+                    .from('JYF')
                     .upload(filePath, image);
 
                 if (uploadError) throw uploadError;
 
                 const { data } = supabase.storage
-                    .from('jyf-assets')
+                    .from('JYF')
                     .getPublicUrl(filePath);
                 
                 imageUrl = data.publicUrl;
@@ -165,7 +166,7 @@ const AdminEventsPage = () => {
                                                 {events.map((event) => (
                                                     <tr key={event.id}>
                                                         <td>{event.title}</td>
-                                                        <td>{event.start_at ? new Date(event.start_at).toLocaleDateString() : "No Date"}</td>
+                                                        <td>{formatDate(event.start_at)}</td>
                                                         <td><span className="badge bg-success">{event.status}</span></td>
                                                     </tr>
                                                 ))}

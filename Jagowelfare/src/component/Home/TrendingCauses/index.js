@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 // Import Link
 import { Link } from "react-router-dom";
 import { supabase } from "../../../supabase";
+import { formatDate } from "../../../utils/dateFormatter";
 
 // Fallback icons
 import DateIconFallback from "../../../assets/img/icon/date.png";
@@ -67,7 +68,7 @@ const TrendingCauses = () => {
                   <div className="case_boxed_wrapper">
                     <div className="case_boxed_img">
                       <Link to="/cause-details">
-                        <img src={data.imageUrl} alt="img" style={{height: "250px", objectFit: "cover", width: "100%"}} />
+                        <img src={data.image_url} alt="img" style={{height: "250px", objectFit: "cover", width: "100%"}} />
                       </Link>
                       <span className="causes_badge bg-theme">
                         {data.tag || "#Cause"}
@@ -102,7 +103,7 @@ const TrendingCauses = () => {
                               </div>
                               <div className="casuses_bottom_content">
                                 <h5>Date:</h5>
-                                <p>{new Date(data.created_at).toLocaleDateString()}</p>
+                                <p>{formatDate(data.created_at)}</p>
                               </div>
                             </div>
                           </div>

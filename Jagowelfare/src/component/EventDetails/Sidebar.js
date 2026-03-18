@@ -19,83 +19,99 @@ import rece1 from "../../assets/img/sidebar/rec-donet-1.png"
 import rece2 from "../../assets/img/sidebar/rec-donet-2.png"
 import rece3 from "../../assets/img/sidebar/rec-donet-3.png"
 
-const EventDetailSidebar = () => {
-    const OrganizerData =[
-        {
-            img:rece1,
-            name:"Mike richard",
-            desnation:"Managing director",
-            group:"Care NGO ltd."
-        },
-        {
-            img:rece2,
-            name:"Jenifar lawrence",
-            desnation:"Entrepreneur",
-            group:"Entrepreneur"
-        },
-        {
-            img:rece3,
-            name:"David jovan",
-            desnation:"Manager",
-            group:"ABC Company"
-        },
-    ]
+import { formatDate } from "../../utils/dateFormatter";
+
+const EventDetailSidebar = ({ event }) => {
+    if (!event) return null;
+
+    const formattedDate = formatDate(event.startAt || event.start_at);
+
+    const organizers = [];
+    if (event.organizerName) {
+        organizers.push({
+            img: event.organizerImageUrl || rece1,
+            name: event.organizerName,
+            desnation: event.organizerRole || "Organizer",
+            group: event.organizerCompany || ""
+        });
+    } else {
+        // Fallback or empty
+        organizers.push({
+            img: rece1,
+            name: "Mike richard",
+            desnation: "Managing director",
+            group: "Care NGO ltd."
+        });
+    }
+
   return (
     <>
-         <div class="col-lg-4">
-                    <div class="sidebar_first">
-                        <div class="sidebar_boxed">
-                            <div class="sidebar_heading_main">
-                                <h3>Event details</h3>
+         <div className="col-lg-4">
+                    <div className="sidebar_first">
+                        <div className="sidebar_boxed" style={{ borderRadius: "15px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+                            <div className="sidebar_heading_main">
+                                <h3 style={{ fontWeight: "800", fontSize: "22px" }}>Event details</h3>
                             </div>
-                            <div class="event_details_list">
+                            <div className="event_details_list">
                                 <ul>
-                                    <li><img src={Tags} alt="icon" /> Category: <span>Food and
-                                            nutrition</span>
+                                    <li>
+                                        <img src={Tags} alt="icon" /> 
+                                        <strong>Category:</strong> <span>{event.category || event.tag || "Charity"}</span>
                                     </li>
-                                    <li><img src={Map} alt="icon" /> Location: <span>990 Green Hill
-                                            Bronx, NY 10458.</span></li>
-                                    <li><img src={Cal} alt="icon" /> Date: <span>20 Dec, 2021</span>
+                                    <li>
+                                        <img src={Map} alt="icon" /> 
+                                        <strong>Location:</strong> <span>{event.venue || "Global"}</span>
                                     </li>
-                                    <li><img src={Mail} alt="icon" /> Mail:
-                                        <span>registermail@domain.com</span>
+                                    <li>
+                                        <img src={Cal} alt="icon" /> 
+                                        <strong>Date:</strong> <span>{formattedDate}</span>
                                     </li>
-                                    <li><img src={Phone} alt="icon" /> Phone: <span>+880 123 456
-                                            789</span>
-                                    </li>
+                                    {event.contactEmail && (
+                                        <li>
+                                            <img src={Mail} alt="icon" /> 
+                                            <strong>Mail:</strong> <span>{event.contactEmail}</span>
+                                        </li>
+                                    )}
+                                    {event.contactPhone && (
+                                        <li>
+                                            <img src={Phone} alt="icon" /> 
+                                            <strong>Phone:</strong> <span>{event.contactPhone}</span>
+                                        </li>
+                                    )}
                                 </ul>
-                                <div class="register_now_details">
-                                    <Link to="#!" class="btn btn_theme btn_md w-100">Register now</Link>
+                                <div className="register_now_details" style={{ marginTop: "20px" }}>
+                                    <Link to={`/event-registration/${event.id}`} className="btn btn_theme btn_md w-100" style={{ borderRadius: "10px", fontWeight: "700" }}>Register now</Link>
                                 </div>
+
                             </div>
                          </div>
 
-                        <div class="project_recentdonet_wrapper sidebar_boxed">
-                            <div class="sidebar_heading_main">
-                                <h3>Event organizer</h3>
+                        <div className="project_recentdonet_wrapper sidebar_boxed" style={{ borderRadius: "15px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", marginTop: "30px" }}>
+                            <div className="sidebar_heading_main">
+                                <h3 style={{ fontWeight: "800", fontSize: "22px" }}>Event organizer</h3>
                             </div>
-                            {OrganizerData.map((data, index)=>(
-                                <div class="recent_donet_item" key={index}>
-                                <div class="recent_donet_img">
-                                    <Link to="/cause-details"><img src={data.img} alt="img" /></Link>
+                            {organizers.map((data, index) => (
+                                <div className="recent_donet_item" key={index} style={{ borderBottom: index < organizers.length - 1 ? "1px solid #f0f0f0" : "none", paddingBottom: "15px", marginBottom: "15px" }}>
+                                <div className="recent_donet_img" style={{ width: "70px", height: "70px", borderRadius: "12px", overflow: "hidden" }}>
+                                    <img src={data.img} alt="img" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                 </div>
-                                <div class="recent_donet_text">
-                                    <div class="sidebar_inner_heading">
-                                        <h4><Link to="/cause-details">{data.name}</Link></h4>
+                                <div className="recent_donet_text">
+                                    <div className="sidebar_inner_heading">
+                                        <h4 style={{ margin: "0", fontWeight: "700" }}>{data.name}</h4>
                                     </div>
-                                    <p>{data.desnation}</p>
-                                    <h6>{data.group}</h6>
+                                    <p style={{ margin: "2px 0", color: "#666", fontSize: "14px" }}>{data.desnation}</p>
+                                    <h6 style={{ color: "#e33129", margin: "0", fontSize: "13px", fontWeight: "600" }}>{data.group}</h6>
                                 </div>
                             </div>
                             ))}
                             
                           
                         </div>
-                        <div class="share_causes_wrapper sidebar_boxed">
-                            <div class="sidebar_heading_main">
-                                <h3>Share causes</h3>
+                        <div className="share_causes_wrapper sidebar_boxed" style={{ borderRadius: "15px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", marginTop: "30px" }}>
+                            <div className="sidebar_heading_main">
+                                <h3 style={{ fontWeight: "800", fontSize: "22px" }}>Share event</h3>
                             </div>
-                            <div class="social_icon_sidebar">
+                            <div className="social_icon_sidebar">
                                 <ul>
                                     <li><Link to="#!"><img src={facebook} alt="icon" /></Link></li>
                                     <li><Link to="#!"><img src={instagram} alt="icon" /></Link></li>

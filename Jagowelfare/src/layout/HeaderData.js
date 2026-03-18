@@ -66,10 +66,7 @@ export const HeaderData = [
              linkL:"/about",
          },
         
-         {
-             subItem:"Make Donation",
-             linkL:"/make-donation",
-         },
+
          {
              subItem:"Testimonials",
              linkL:"/testimonial",
@@ -93,6 +90,10 @@ export const HeaderData = [
          {
              subItem:"404 Error",
              linkL:"*",
+         },
+         {
+             subItem:"Scanner",
+             linkL:"/check-in",
          },
         ]
      },

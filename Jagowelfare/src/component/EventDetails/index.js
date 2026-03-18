@@ -84,11 +84,11 @@ const EventDetailsArea = () => {
                   </div>
                 ) : event ? (
                   <>
-                    <div className="details_big_img">
+                    <div className="details_big_img" style={{ backgroundColor: "#fbfbfb", borderRadius: "15px", overflow: "hidden", textAlign: "center", border: "1px solid #eee" }}>
                       <img
-                        src={(event.heroImageUrl || "").split(",")[0]}
+                        src={(event.image_url || "").split(",")[0]}
                         alt="img"
-                        style={{ width: "100%", maxHeight: "400px", objectFit: "cover", borderRadius: "15px" }}
+                        style={{ width: "100%", height: "auto", maxHeight: "450px", objectFit: "contain", display: "block", margin: "0 auto" }}
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                         }}
@@ -105,21 +105,21 @@ const EventDetailsArea = () => {
                         <br />
                         <strong>Starts:</strong>{" "}
                         {(() => {
-                          const d = toJsDate(event.startAt);
+                          const d = toJsDate(event.startAt || event.start_at);
                           return d ? d.toLocaleString() : "-";
                         })()}
                         <br />
                         <strong>Ends:</strong>{" "}
                         {(() => {
-                          const d = toJsDate(event.endAt);
+                          const d = toJsDate(event.endAt || event.end_at);
                           return d ? d.toLocaleString() : "-";
                         })()}
                       </p>
-                      {event.heroImageUrl && event.heroImageUrl.split(",").length > 1 && (
+                      {event.image_url && event.image_url.split(",").length > 1 && (
                         <div style={{ marginTop: "30px" }}>
                           <h4 style={{ marginBottom: "15px", fontWeight: "700" }}>Event Gallery</h4>
                           <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
-                            {event.heroImageUrl.split(",").slice(1).map((imgUrl, i) => (
+                            {event.image_url.split(",").slice(1).map((imgUrl, i) => (
                                 <img
                                   key={i}
                                   src={imgUrl}
@@ -136,7 +136,7 @@ const EventDetailsArea = () => {
                 ) : null}
               </div>
             </div>
-            <EventDetailSidebar />
+            <EventDetailSidebar event={event} />
           </div>
         </div>
       </section>

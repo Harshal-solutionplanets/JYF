@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../../supabase'
+import { formatDate } from '../../../utils/dateFormatter'
 
 // Fallback icons
 import DateIconFallback from "../../../assets/img/icon/date.png"
@@ -58,7 +59,7 @@ const NewsAres = () => {
                     <div className="col-lg-4" key={data.id}>
                     <div className="blog_card_wrapper mb-30">
                         <div className="blog_card_img">
-                            <Link to="/news"><img src={data.imageUrl} alt="img" style={{height: "250px", objectFit: "cover", width: "100%"}} /></Link>
+                            <Link to="/news"><img src={data.image_url} alt="img" style={{height: "250px", objectFit: "cover", width: "100%"}} /></Link>
                         </div>
                         <div className="blog_card_text">
                             <div className="blog_card_tags">
@@ -77,7 +78,7 @@ const NewsAres = () => {
                                             </div>
                                             <div className="blog_bottom_content">
                                                 <h5>Date:</h5>
-                                                <p>{new Date(data.created_at).toLocaleDateString()}</p>
+                                                <p>{formatDate(data.created_at)}</p>
                                             </div>
                                         </div>
                                     </div>

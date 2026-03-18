@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase'
+import { formatDate } from '../../utils/dateFormatter'
 
 // Fallback icons
 import DateIconFallback from "../../assets/img/icon/date.png"
 import IconAdminFallback from "../../assets/img/icon/user.png"
-
 
 const CausesArea = () => {
     const [causes, setCauses] = useState([]);
@@ -82,7 +82,7 @@ const CausesArea = () => {
                                                         </div>
                                                         <div className="casuses_bottom_content">
                                                             <h5>Date:</h5>
-                                                            <p>{new Date(data.created_at).toLocaleDateString()}</p>
+                                                            <p>{formatDate(data.created_at)}</p>
                                                         </div>
                                                     </div>
                                                 </div>
