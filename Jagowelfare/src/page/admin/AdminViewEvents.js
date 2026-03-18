@@ -73,7 +73,7 @@ const AdminViewEvents = () => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "30px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "30px", fontWeight: "800" }}>Manage Events Detailed (Supabase)</h3>
+            <h3 style={{ marginBottom: "30px", fontWeight: "800" }}>Manage Events Detailed</h3>
             <div className="table-responsive">
                 <table className="table table-hover">
                     <thead style={{ backgroundColor: "#f8f9fa" }}>

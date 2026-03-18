@@ -40,7 +40,7 @@ const NewsArea = () => {
             <div className="row">
                 <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
                     <div className="section_heading">
-                        <h3>Our latest news (Supabase)</h3>
+                        <h3>Our latest news</h3>
                         <h2>Read and <span className="color_big_heading">explore</span> your
                             knowledge through our news
                         </h2>

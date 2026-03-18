@@ -62,7 +62,7 @@ const AboutArea = () => {
 
     <ReadyHelp/>
     <PartnerArea/>
-    <Newsletter/>
+    {/* <Newsletter/> */}
     <Testimonials/>
 
     </>

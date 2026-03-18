@@ -35,13 +35,13 @@ const AdminAddNews = ({ onPublish }) => {
                     const filePath = `news/${fileName}`;
 
                     const { error: uploadError } = await supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .upload(filePath, file);
 
                     if (uploadError) throw uploadError;
 
                     const { data: { publicUrl } } = supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .getPublicUrl(filePath);
                     
                     uploadedUrls.push(publicUrl);
@@ -57,7 +57,7 @@ const AdminAddNews = ({ onPublish }) => {
                     tag: tag.trim() || "#News",
                     summary: summary.trim(),
                     content: content.trim(),
-                    imageUrl: finalImageUrlStr
+                    image_url: finalImageUrlStr
                 }]);
 
             if (insertError) throw insertError;
@@ -94,7 +94,7 @@ const AdminAddNews = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed News (Supabase)</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed News</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
@@ -106,7 +106,7 @@ const AdminAddNews = ({ onPublish }) => {
                             placeholder="e.g. New Hospital Project Launched" 
                             value={title} 
                             onChange={(e) => setTitle(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
@@ -152,7 +152,7 @@ const AdminAddNews = ({ onPublish }) => {
                             placeholder="A brief sentence about the article..." 
                             value={summary} 
                             onChange={(e) => setSummary(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
@@ -165,7 +165,7 @@ const AdminAddNews = ({ onPublish }) => {
                             placeholder="Type the full details of the news article..." 
                             value={content} 
                             onChange={(e) => setContent(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required
                         ></textarea>

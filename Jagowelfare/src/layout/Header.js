@@ -50,7 +50,7 @@ const Header = () => {
                     <div className="main-responsive-menu">
                         <div className="logo">
                             <Link to="/">
-                                <img src={logo} alt="logo" />
+                                <img src={logo} alt="logo" style={{ maxWidth: "120px", height: "auto", marginLeft: "-10px" }} />
                             </Link>
                         </div>
                     </div>
@@ -60,10 +60,10 @@ const Header = () => {
                 <div className="container">
                     <nav className="navbar navbar-expand-md navbar-light">
                         <Link className="navbar-brand" to="/">
-                            <img src={logo} alt="logo" />
+                            <img src={logo} alt="logo" style={{ maxWidth: "120px", height: "auto", marginLeft: "-10px" }} />
                         </Link>
-                        <div className="collapse navbar-collapse mean-menu" id="navbarSupportedContent">
-                            <ul className="navbar-nav">
+                        <div className="collapse navbar-collapse mean-menu" id="navbarSupportedContent" style={{ justifyContent: "flex-end" }}>
+                            <ul className="navbar-nav ms-auto">
                             {HeaderData.map((data, index)=>(
                                 <li className="nav-item" key={index}>
                                     <Link to={data.link} className="nav-link">
@@ -84,10 +84,7 @@ const Header = () => {
                                
                             </ul>
                             <div className="others-options d-flex align-items-center">
-                                <div className="option-item">
-                                    <Link to="#!" className="search-box"> <img src={SearchIcon}
-                                            alt="icon" /></Link>
-                                </div>
+
 
 
                                 {user ? (
@@ -95,15 +92,18 @@ const Header = () => {
                                       <button
                                         type="button"
                                         className="btn btn_navber"
-                                        style={{ marginRight: 8 }}
-                                        onClick={() => supabase.auth.signOut()}
+                                        onClick={() => {
+                                          supabase.auth.signOut().then(() => {
+                                            window.location.href = "/";
+                                          });
+                                        }}
                                       >
                                         Logout
                                       </button>
                                   </div>
                                 ) : null}
                                 <div className="option-item">
-                                    <Link to="/make-donation" className="btn btn_navber">Donate now</Link>
+{/* <Link to="/make-donation" className="btn btn_navber">Donate now</Link> */}
                                 </div>
                             </div>
                         </div>
@@ -122,10 +122,7 @@ const Header = () => {
                     <div className="container">
                         <div className="option-inner">
                             <div className="others-options d-flex align-items-center">
-                            <div className="option-item">
-                                    <Link to="#!" className="search-box"> <img src={SearchIcon}
-                                            alt="icon" /></Link>
-                                </div>
+
 
 
                                 {user ? (
@@ -133,15 +130,18 @@ const Header = () => {
                                       <button
                                         type="button"
                                         className="btn btn_navber"
-                                        style={{ marginRight: 8 }}
-                                        onClick={() => supabase.auth.signOut()}
+                                        onClick={() => {
+                                          supabase.auth.signOut().then(() => {
+                                            window.location.href = "/";
+                                          });
+                                        }}
                                       >
                                         Logout
                                       </button>
                                   </div>
                                 ) : null}
                                 <div className="option-item">
-                                    <Link to="/make-donation" className="btn btn_navber">Donate now</Link>
+{/* <Link to="/make-donation" className="btn btn_navber">Donate now</Link> */}
                                 </div>
                             </div>
                         </div>

@@ -4,8 +4,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import CopyRight from "./layout/CopyRight";
 // Import Footer Page
 import Footer from "./layout/Footer";
-// Import CtaArea Page
-import CtaArea from "./layout/CtaArea";
+// import CtaArea from "./layout/CtaArea";
 // Import Header Page
 import Header from "./layout/Header";
 // Import Home Page
@@ -38,6 +37,7 @@ import HealthcarePage from "./page/Healthcare";
 import FoodSupportPage from "./page/FoodSupport";
 import EducationPage from "./page/Education";
 import HumanitarianServicesPage from "./page/HumanitarianServices";
+import AdminLoginPage from "./page/admin/AdminLogin";
 
 
 const App = () => {
@@ -65,6 +65,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/my-tickets" element={<MyTicketsPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route
           path="/admin"
           element={
@@ -109,7 +110,6 @@ const App = () => {
       </Routes>
       {!isAdminRoute && (
         <>
-          <CtaArea/>
           <Footer/>
           <CopyRight/>
         </>

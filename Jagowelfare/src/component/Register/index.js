@@ -16,20 +16,20 @@ const RegisterArea = () => {
     setError("");
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error: err } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: displayName,
             phone: phone,
-          }
-        }
+          },
+        },
       });
-      
-      if (error) throw error;
-      
-      alert("Registration successful! Please check your email for verification.");
+
+      if (err) throw err;
+
+      alert("Registration successful! Please check your email for confirmation.");
       navigate("/login");
     } catch (err) {
       setError(err?.message || "Registration failed");

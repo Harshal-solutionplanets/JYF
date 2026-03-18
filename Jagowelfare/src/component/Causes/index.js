@@ -40,7 +40,7 @@ const CausesArea = () => {
             <div className="row">
                 <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
                     <div className="section_heading">
-                        <h3>Trending causes (Supabase)</h3>
+                        <h3>Trending causes</h3>
                         <h2> We are always where other people <span className="color_big_heading">need</span> help</h2>
                     </div>
                 </div>

@@ -14,15 +14,24 @@ const LoginArea = () => {
     setError("");
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error: err } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
+
+      if (err) throw err;
+
+      const user = data.user;
+      const isAdmin = user?.app_metadata?.role === 'admin' || user?.user_metadata?.role === 'admin';
+      const isStaff = isAdmin || user?.app_metadata?.role === 'staff' || user?.user_metadata?.role === 'staff';
       
-      // For now, let's assume any logged-in user can access admin for the demo
-      // In a real app, you'd check a 'profiles' table or use custom claims
-      navigate("/admin/dashboard");
+      if (isAdmin || isStaff) {
+        // Sign out immediately and deny login here
+        await supabase.auth.signOut();
+        setError("Access Restricted: Please login through the Admin Portal for administrator access.");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err?.message || "Login failed");
     } finally {

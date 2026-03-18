@@ -36,13 +36,13 @@ const AdminAddCause = ({ onPublish }) => {
                     const filePath = `causes/${fileName}`;
 
                     const { error: uploadError } = await supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .upload(filePath, file);
 
                     if (uploadError) throw uploadError;
 
                     const { data: { publicUrl } } = supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .getPublicUrl(filePath);
                     
                     uploadedUrls.push(publicUrl);
@@ -60,7 +60,8 @@ const AdminAddCause = ({ onPublish }) => {
                     content: content.trim(),
                     goal: parseFloat(goal),
                     raised: 0,
-                    imageUrl: finalImageUrlStr
+                    image_url: finalImageUrlStr,
+                    status: "published"
                 }]);
 
             if (insertError) throw insertError;
@@ -97,7 +98,7 @@ const AdminAddCause = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed Cause (Supabase)</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed Cause</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
@@ -109,7 +110,7 @@ const AdminAddCause = ({ onPublish }) => {
                             placeholder="e.g. Support Children's Education" 
                             value={title} 
                             onChange={(e) => setTitle(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
@@ -155,7 +156,7 @@ const AdminAddCause = ({ onPublish }) => {
                             placeholder="e.g. 5000" 
                             value={goal} 
                             onChange={(e) => setGoal(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
@@ -169,7 +170,7 @@ const AdminAddCause = ({ onPublish }) => {
                             placeholder="A concise overview of the cause..." 
                             value={description} 
                             onChange={(e) => setDescription(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />

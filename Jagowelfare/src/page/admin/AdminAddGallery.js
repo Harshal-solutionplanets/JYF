@@ -32,13 +32,13 @@ const AdminAddGallery = ({ onPublish }) => {
                     const filePath = `gallery/${fileName}`;
 
                     const { error: uploadError } = await supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .upload(filePath, file);
 
                     if (uploadError) throw uploadError;
 
                     const { data: { publicUrl } } = supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .getPublicUrl(filePath);
                     
                     uploadedUrls.push(publicUrl);
@@ -47,7 +47,7 @@ const AdminAddGallery = ({ onPublish }) => {
 
             const insertData = uploadedUrls.map(url => ({
                 title: title, 
-                imageUrl: url
+                image_url: url
             }));
 
             if (insertData.length > 0) {
@@ -58,7 +58,7 @@ const AdminAddGallery = ({ onPublish }) => {
                 if (insertError) throw insertError;
             }
 
-            alert("Images added to gallery (Supabase)!");
+            alert("Images added to gallery!");
             if (onPublish) onPublish();
         } catch (error) {
             console.error("Error adding to gallery: ", error);
@@ -90,7 +90,7 @@ const AdminAddGallery = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Media Gallery Uploa (Supabase)</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Media Gallery Upload</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
@@ -102,7 +102,7 @@ const AdminAddGallery = ({ onPublish }) => {
                             placeholder="e.g. Community Meeting 2024" 
                             value={title} 
                             onChange={(e) => setTitle(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />

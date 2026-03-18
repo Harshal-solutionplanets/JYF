@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/img/logo.jpeg";
+
 import { supabase } from "../../supabase";
 import CommonBanner from "../../component/Common/CommonBanner";
 
@@ -8,6 +8,7 @@ const AdminEventsPage = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
+    const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
 
@@ -17,12 +18,12 @@ const AdminEventsPage = () => {
             const { data, error } = await supabase
                 .from('events')
                 .select('*')
-                .order('startAt', { ascending: false });
+                .order('start_at', { ascending: false });
             
             if (error) throw error;
             setEvents(data || []);
         } catch (error) {
-            console.error("Error fetching events: ", error);
+            console.error("Error fetching events from Supabase: ", error);
         } finally {
             setFetching(false);
         }
@@ -32,29 +33,60 @@ const AdminEventsPage = () => {
         fetchEvents();
     }, []);
 
+    const handleImageChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setImage(e.target.files[0]);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
+            let imageUrl = null;
+
+            // Optional: Image upload logic
+            if (image) {
+                const fileExt = image.name.split('.').pop();
+                const fileName = `${Math.random()}.${fileExt}`;
+                const filePath = `event-images/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('jyf-assets')
+                    .upload(filePath, image);
+
+                if (uploadError) throw uploadError;
+
+                const { data } = supabase.storage
+                    .from('jyf-assets')
+                    .getPublicUrl(filePath);
+                
+                imageUrl = data.publicUrl;
+            }
+
             const { error } = await supabase
                 .from('events')
-                .insert([{
-                    title,
-                    description,
-                    startAt: new Date(date).toISOString(),
-                    status: "published"
-                }]);
-            
+                .insert([
+                    {
+                        title,
+                        description,
+                        start_at: new Date(date).toISOString(),
+                        status: "published",
+                        image_url: imageUrl
+                    }
+                ]);
+
             if (error) throw error;
 
             setTitle("");
             setDescription("");
             setDate("");
+            setImage(null);
             await fetchEvents();
             alert("Event added successfully to Supabase!");
         } catch (error) {
-            console.error("Error adding event: ", error);
-            alert("Failed to add event: " + error.message);
+            console.error("Error adding event to Supabase: ", error);
+            alert(`Failed: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -99,8 +131,17 @@ const AdminEventsPage = () => {
                                             required
                                         />
                                     </div>
+                                    <div className="form-group mb-3">
+                                        <label className="form-label">Event Image (Optional)</label>
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
                                     <button type="submit" className="btn btn_theme btn_md" disabled={loading}>
-                                        {loading ? "Adding..." : "Add Event"}
+                                        {loading ? "Uploading..." : "Add Event"}
                                     </button>
                                 </form>
                             </div>
@@ -124,7 +165,7 @@ const AdminEventsPage = () => {
                                                 {events.map((event) => (
                                                     <tr key={event.id}>
                                                         <td>{event.title}</td>
-                                                        <td>{event.startAt ? new Date(event.startAt).toLocaleDateString() : "No Date"}</td>
+                                                        <td>{event.start_at ? new Date(event.start_at).toLocaleDateString() : "No Date"}</td>
                                                         <td><span className="badge bg-success">{event.status}</span></td>
                                                     </tr>
                                                 ))}

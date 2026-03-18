@@ -38,13 +38,13 @@ const AdminAddEvent = ({ onPublish }) => {
                     const filePath = `events/${fileName}`;
 
                     const { error: uploadError } = await supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .upload(filePath, file);
 
                     if (uploadError) throw uploadError;
 
                     const { data: { publicUrl } } = supabase.storage
-                        .from('JYF')
+                        .from('jyf-assets')
                         .getPublicUrl(filePath);
                     
                     uploadedUrls.push(publicUrl);
@@ -60,10 +60,10 @@ const AdminAddEvent = ({ onPublish }) => {
                     tag: tag.trim() || "#Event",
                     description: description.trim(),
                     content: content.trim(),
-                    venue: venue.trim(),
-                    heroImageUrl: finalImageUrlStr,
-                    startAt: startDate ? new Date(startDate).toISOString() : new Date().toISOString(),
-                    endAt: endDate ? new Date(endDate).toISOString() : null,
+                    location: venue.trim(),
+                    image_url: finalImageUrlStr,
+                    start_at: startDate ? new Date(startDate).toISOString() : new Date().toISOString(),
+                    end_at: endDate ? new Date(endDate).toISOString() : null,
                     status: "published"
                 }])
                 .select();
@@ -79,9 +79,6 @@ const AdminAddEvent = ({ onPublish }) => {
             } else if (onPublish) {
                 onPublish();
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Submission failed: " + error.message);
         } finally {
             setLoading(false);
         }
@@ -109,7 +106,7 @@ const AdminAddEvent = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed Event (Supabase)</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed Event</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
@@ -121,7 +118,7 @@ const AdminAddEvent = ({ onPublish }) => {
                             placeholder="e.g. Annual Charity Gala" 
                             value={title} 
                             onChange={(e) => setTitle(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
@@ -206,7 +203,7 @@ const AdminAddEvent = ({ onPublish }) => {
                             placeholder="A brief sentence about the event..." 
                             value={description} 
                             onChange={(e) => setDescription(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />

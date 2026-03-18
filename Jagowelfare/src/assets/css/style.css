@@ -580,7 +580,7 @@ section {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 240px;
+  height: 0;
   background-color: var(--white-color);
 }
 
@@ -1108,13 +1108,19 @@ section {
 
 /* --Footer Area-- */
 #footer_area {
-  padding: 195px 0 100px 0;
-  background: #f4f7fc;
-  margin-top: -95px;
+  padding: 80px 0 60px 0;
+  background: #f8fafd;
+  margin-top: 0;
 }
 
 .footer_area_about {
-  padding-right: 100px;
+  padding-right: 50px;
+}
+
+.footer_area_about img {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: 20px;
 }
 
 .footer_area_about p {

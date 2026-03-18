@@ -68,7 +68,7 @@ const AdminViewNews = () => {
         setEditForm({ title: item.title, summary: item.summary });
     };
 
-    if (loading) return <div className="text-center p-5"><h4>Fetching News (Supabase)...</h4></div>;
+    if (loading) return <div className="text-center p-5"><h4>Fetching News...</h4></div>;
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "30px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>

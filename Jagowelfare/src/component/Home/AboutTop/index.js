@@ -12,7 +12,6 @@ const AboutTopArea = () => {
     const AboutData =[
         {
             img:img3,
-            para:"Support our",
             heading:"Healthcare",
             roundImg:RoundImg,
             class:"about_top_boxed bg_three",
@@ -20,7 +19,6 @@ const AboutTopArea = () => {
         },
         {
             img:img4,
-            para:"Support our",
             heading:"Food support",
             roundImg:RoundImg,
             class:"about_top_boxed bg_four",
@@ -28,7 +26,6 @@ const AboutTopArea = () => {
         },
         {
             img:img1,
-            para:"Support our",
             heading:"Education",
             roundImg:RoundImg,
             class:"about_top_boxed bg_one",
@@ -36,7 +33,6 @@ const AboutTopArea = () => {
         },
         {
             img:img2,
-            para:"Support our",
             heading:"Humanitarian services",
             roundImg:RoundImg,
             class:"about_top_boxed bg_two",

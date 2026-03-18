@@ -29,25 +29,32 @@ const AdminAddTestimonial = ({ onPublish }) => {
                 const filePath = `testimonials/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
-                    .from('JYF')
+                    .from('jyf-assets')
                     .upload(filePath, imageFile);
 
                 if (uploadError) throw uploadError;
 
-                const { data: { publicUrl } } = supabase.storage
-                    .from('JYF')
+                const { data } = supabase.storage
+                    .from('jyf-assets')
                     .getPublicUrl(filePath);
                 
-                imageUrl = publicUrl;
+                imageUrl = data.publicUrl;
             }
 
-            const { error: insertError } = await supabase
+            const { error } = await supabase
                 .from('testimonials')
-                .insert([{ name, role, comment, imageUrl }]);
+                .insert([
+                    {
+                        name,
+                        role,
+                        comment,
+                        image_url: imageUrl
+                    }
+                ]);
 
-            if (insertError) throw insertError;
+            if (error) throw error;
 
-            alert("Testimonial Published successfully to Supabase!");
+            alert("Testimonial Published successfully on Supabase!");
             if (onPublish) onPublish();
         } catch (error) {
             console.error("Error adding testimonial: ", error);
@@ -79,7 +86,7 @@ const AdminAddTestimonial = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Testimonial (Supabase)</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Testimonial Submission</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
@@ -91,7 +98,7 @@ const AdminAddTestimonial = ({ onPublish }) => {
                             placeholder="e.g. Alice Smith" 
                             value={name} 
                             onChange={(e) => setName(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
@@ -105,7 +112,7 @@ const AdminAddTestimonial = ({ onPublish }) => {
                             placeholder="e.g. Volunteer / Donor" 
                             value={role} 
                             onChange={(e) => setRole(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
@@ -135,7 +142,7 @@ const AdminAddTestimonial = ({ onPublish }) => {
                             placeholder="Share their experience with the organization..." 
                             value={comment} 
                             onChange={(e) => setComment(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onFocus={(e) => e.target.style.borderBottomColor = "#ca1e14"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required
                         ></textarea>

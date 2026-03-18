@@ -4,35 +4,40 @@ import { supabase } from "../supabase";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
+    // 1. Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      setSession(session);
       setLoading(false);
     });
 
-    // Listen for auth changes
+    // 2. Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+      setSession(session);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const value = useMemo(
-    () => ({
-      user,
-      loading,
-      // In Supabase, you might want to use metadata or a separate profile table for roles
-      // For now, let's just make the authenticated user an admin for the demo
-      isAdmin: !!user, 
-      isStaff: !!user
-    }),
-    [user, loading]
+    () => {
+      const user = session?.user;
+      // In Supabase, you can store roles in user_metadata or app_metadata
+      const isAdmin = user?.app_metadata?.role === 'admin' || user?.user_metadata?.role === 'admin' || false;
+      const isStaff = isAdmin || user?.app_metadata?.role === 'staff' || user?.user_metadata?.role === 'staff' || false;
+
+      return {
+        user,
+        session,
+        loading,
+        isAdmin,
+        isStaff
+      };
+    },
+    [session, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
