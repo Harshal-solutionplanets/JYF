@@ -1,39 +1,38 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, maybeConnectEmulators } from "../firebase";
+import { supabase } from "../supabase";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [claims, setClaims] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    maybeConnectEmulators();
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (!u) {
-        setClaims(null);
-        setLoading(false);
-        return;
-      }
-      const tokenResult = await u.getIdTokenResult(true);
-      setClaims(tokenResult.claims || {});
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
       setLoading(false);
     });
-    return () => unsub();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const value = useMemo(
     () => ({
       user,
-      claims,
       loading,
-      isAdmin: !!claims?.admin,
-      isStaff: !!claims?.staff || !!claims?.admin
+      // In Supabase, you might want to use metadata or a separate profile table for roles
+      // For now, let's just make the authenticated user an admin for the demo
+      isAdmin: !!user, 
+      isStaff: !!user
     }),
-    [user, claims, loading]
+    [user, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -42,4 +41,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-

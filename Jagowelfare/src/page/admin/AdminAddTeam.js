@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import { supabase } from "../../supabase";
 
 const AdminAddTeam = ({ onPublish }) => {
     const [name, setName] = useState("");
@@ -25,19 +23,30 @@ const AdminAddTeam = ({ onPublish }) => {
         try {
             let imageUrl = "";
             if (imageFile) {
-                const imageRef = ref(storage, `team/${Date.now()}_${imageFile.name}`);
-                const uploadResult = await uploadBytes(imageRef, imageFile);
-                imageUrl = await getDownloadURL(uploadResult.ref);
+                const fileExt = imageFile.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `team/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('JYF')
+                    .upload(filePath, imageFile);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('JYF')
+                    .getPublicUrl(filePath);
+                
+                imageUrl = publicUrl;
             }
 
-            await addDoc(collection(db, "team"), {
-                name,
-                role,
-                imageUrl,
-                createdAt: serverTimestamp()
-            });
+            const { error: insertError } = await supabase
+                .from('team')
+                .insert([{ name, role, imageUrl }]);
 
-            alert("Team member added successfully!");
+            if (insertError) throw insertError;
+
+            alert("Team member added successfully to Supabase!");
             if (onPublish) onPublish();
         } catch (error) {
             console.error("Error adding member: ", error);
@@ -69,7 +78,7 @@ const AdminAddTeam = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Team Enrollment</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Team Enrollment (Supabase)</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">

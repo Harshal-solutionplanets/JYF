@@ -1,21 +1,23 @@
 import React, { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import { supabase } from "../../supabase";
 
 const AdminAddCause = ({ onPublish }) => {
     const [title, setTitle] = useState("");
+    const [tag, setTag] = useState("");
     const [description, setDescription] = useState("");
+    const [content, setContent] = useState("");
     const [goal, setGoal] = useState("");
-    const [imageFile, setImageFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState("");
+    const [imageFiles, setImageFiles] = useState([]);
+    const [previewUrls, setPreviewUrls] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-            setPreviewUrl(URL.createObjectURL(file));
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            setImageFiles(filesArray);
+            
+            const urls = filesArray.map(file => URL.createObjectURL(file));
+            setPreviewUrls(urls);
         }
     };
 
@@ -24,23 +26,46 @@ const AdminAddCause = ({ onPublish }) => {
         setLoading(true);
 
         try {
-            let imageUrl = "";
-            if (imageFile) {
-                const imageRef = ref(storage, `causes/${Date.now()}_${imageFile.name}`);
-                const uploadResult = await uploadBytes(imageRef, imageFile);
-                imageUrl = await getDownloadURL(uploadResult.ref);
+            let uploadedUrls = [];
+            
+            if (imageFiles.length > 0) {
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const file = imageFiles[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${i}.${fileExt}`;
+                    const filePath = `causes/${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('JYF')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('JYF')
+                        .getPublicUrl(filePath);
+                    
+                    uploadedUrls.push(publicUrl);
+                }
             }
+            
+            const finalImageUrlStr = uploadedUrls.join(",");
 
-            await addDoc(collection(db, "causes"), {
-                title,
-                description,
-                goal: parseFloat(goal),
-                raised: 0,
-                imageUrl,
-                createdAt: serverTimestamp()
-            });
+            const { error: insertError } = await supabase
+                .from('causes')
+                .insert([{
+                    title: title.trim(),
+                    tag: tag.trim() || "#Cause",
+                    description: description.trim(),
+                    content: content.trim(),
+                    goal: parseFloat(goal),
+                    raised: 0,
+                    imageUrl: finalImageUrlStr
+                }]);
 
-            alert("New Cause Published successfully!");
+            if (insertError) throw insertError;
+
+            alert("New Cause Published successfully to Supabase!");
             if (onPublish) onPublish();
         } catch (error) {
             console.error("Error adding cause: ", error);
@@ -72,16 +97,16 @@ const AdminAddCause = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Cause Information</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed Cause (Supabase)</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
-                    <div className="col-lg-12 mb-5">
+                    <div className="col-lg-8 mb-5">
                         <label style={labelStyle}>Cause Title</label>
                         <input 
                             type="text" 
                             style={inputStyle}
-                            placeholder="Help Poor People" 
+                            placeholder="e.g. Support Children's Education" 
                             value={title} 
                             onChange={(e) => setTitle(e.target.value)} 
                             onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
@@ -89,30 +114,45 @@ const AdminAddCause = ({ onPublish }) => {
                             required 
                         />
                     </div>
+                    <div className="col-lg-4 mb-5">
+                        <label style={labelStyle}>Category / Tag</label>
+                        <input 
+                            type="text" 
+                            style={inputStyle}
+                            placeholder="#Cause" 
+                            value={tag} 
+                            onChange={(e) => setTag(e.target.value)} 
+                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
+                        />
+                    </div>
 
                     <div className="col-lg-12 mb-5">
-                        <label style={labelStyle}>Cause Banner Image</label>
+                        <label style={labelStyle}>Cause Image (Banner)</label>
                         <input 
                             type="file" 
                             style={{ ...inputStyle, borderBottom: "none" }}
                             accept="image/*"
+                            multiple
                             onChange={handleImageChange}
                             required 
                         />
                         <div style={{ width: "100%", height: "2px", backgroundColor: "#ddd" }}></div>
-                        {previewUrl && (
-                            <div style={{ marginTop: "20px" }}>
-                                <img src={previewUrl} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
+                        {previewUrls && previewUrls.length > 0 && (
+                            <div style={{ marginTop: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                                {previewUrls.map((url, i) => (
+                                    <img key={i} src={url} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
+                                ))}
                             </div>
                         )}
                     </div>
 
                     <div className="col-lg-12 mb-5">
-                        <label style={labelStyle}>Target Donation Amount ($)</label>
+                        <label style={labelStyle}>Funding Goal (Amount in $)</label>
                         <input 
                             type="number" 
                             style={inputStyle}
-                            placeholder="5000" 
+                            placeholder="e.g. 5000" 
                             value={goal} 
                             onChange={(e) => setGoal(e.target.value)} 
                             onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
@@ -122,12 +162,26 @@ const AdminAddCause = ({ onPublish }) => {
                     </div>
 
                     <div className="col-lg-12 mb-5">
-                        <label style={labelStyle}>Detailed Description</label>
-                        <textarea 
-                            style={{ ...inputStyle, minHeight: "100px" }}
-                            placeholder="Explain the importance of this cause..." 
+                        <label style={labelStyle}>Short Description (Summary)</label>
+                        <input 
+                            type="text" 
+                            style={inputStyle}
+                            placeholder="A concise overview of the cause..." 
                             value={description} 
                             onChange={(e) => setDescription(e.target.value)} 
+                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
+                            required 
+                        />
+                    </div>
+
+                    <div className="col-lg-12 mb-5">
+                        <label style={labelStyle}>Cause Detailed Content (The Story)</label>
+                        <textarea 
+                            style={{ ...inputStyle, minHeight: "150px" }}
+                            placeholder="Tell the full story here..." 
+                            value={content} 
+                            onChange={(e) => setContent(e.target.value)} 
                             onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required

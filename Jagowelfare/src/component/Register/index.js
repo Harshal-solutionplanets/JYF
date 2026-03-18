@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
+import { supabase } from "../../supabase";
 
 const RegisterArea = () => {
   const navigate = useNavigate();
@@ -17,11 +16,21 @@ const RegisterArea = () => {
     setError("");
     setSubmitting(true);
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(cred.user, { displayName });
-      // Phone is stored later in Firestore profile if you want; Firebase Auth email/password doesn't store it.
-      void phone;
-      navigate("/");
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: displayName,
+            phone: phone,
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      alert("Registration successful! Please check your email for verification.");
+      navigate("/login");
     } catch (err) {
       setError(err?.message || "Registration failed");
     } finally {

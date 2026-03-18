@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import EventDetailSidebar from "./Sidebar";
 import { apiFetch } from "../../api";
 import { useAuth } from "../../auth/AuthProvider";
+import { supabase } from "../../supabase";
 
 function toJsDate(value) {
   if (!value) return null;
@@ -27,19 +28,26 @@ const EventDetailsArea = () => {
     let alive = true;
     setLoading(true);
     setError("");
-    apiFetch(`/events/${eventId}`)
-      .then((r) => {
-        if (!alive) return;
-        setEvent(r.event || null);
-      })
-      .catch((e) => {
-        if (!alive) return;
-        setError(e?.message || "Failed to load event");
-      })
-      .finally(() => {
-        if (!alive) return;
-        setLoading(false);
-      });
+
+    const fetchEvent = async () => {
+      try {
+        const { data, error: sbError } = await supabase
+          .from("events")
+          .select("*")
+          .eq("id", eventId)
+          .single();
+
+        if (sbError) throw sbError;
+        if (alive) setEvent(data || null);
+      } catch (err) {
+        if (alive) setError(err?.message || "Failed to load event");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    };
+
+    fetchEvent();
+
     return () => {
       alive = false;
     };
@@ -78,8 +86,9 @@ const EventDetailsArea = () => {
                   <>
                     <div className="details_big_img">
                       <img
-                        src={event.heroImageUrl || ""}
+                        src={(event.heroImageUrl || "").split(",")[0]}
                         alt="img"
+                        style={{ width: "100%", maxHeight: "400px", objectFit: "cover", borderRadius: "15px" }}
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                         }}
@@ -106,26 +115,22 @@ const EventDetailsArea = () => {
                           return d ? d.toLocaleString() : "-";
                         })()}
                       </p>
-
-                      <div className="event_button" style={{ marginTop: 16 }}>
-                        {!user ? (
-                          <Link to="/login" className="btn btn_md btn_theme">
-                            Login to register
-                          </Link>
-                        ) : (
-                          <button className="btn btn_md btn_theme" onClick={onRegister} disabled={registering}>
-                            {registering ? "Registering..." : "Register & get QR"}
-                          </button>
-                        )}
-                      </div>
-
-                      {registerResult?.error ? (
-                        <p style={{ color: "#b00020", marginTop: 10 }}>{registerResult.error}</p>
-                      ) : registerResult?.qrPayload ? (
-                        <p style={{ marginTop: 10 }}>
-                          Registered. View your QR in <Link to="/my-tickets">My Tickets</Link>.
-                        </p>
-                      ) : null}
+                      {event.heroImageUrl && event.heroImageUrl.split(",").length > 1 && (
+                        <div style={{ marginTop: "30px" }}>
+                          <h4 style={{ marginBottom: "15px", fontWeight: "700" }}>Event Gallery</h4>
+                          <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
+                            {event.heroImageUrl.split(",").slice(1).map((imgUrl, i) => (
+                                <img
+                                  key={i}
+                                  src={imgUrl}
+                                  alt={`event-gallery-${i}`}
+                                  style={{ width: "160px", height: "120px", objectFit: "cover", borderRadius: "10px", boxShadow: "0 4px 10px rgba(0,0,0,0.1)" }}
+                                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                                />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : null}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { supabase } from "../../supabase";
 
 const LoginArea = () => {
   const navigate = useNavigate();
@@ -15,14 +14,16 @@ const LoginArea = () => {
     setError("");
     setSubmitting(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const tokenResult = await userCredential.user.getIdTokenResult();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       
-      if (tokenResult.claims.admin || tokenResult.claims.staff) {
-        navigate("/admin/scan"); // Redirect to admin panel
-      } else {
-        navigate("/"); // Regular user redirect
-      }
+      if (error) throw error;
+      
+      // For now, let's assume any logged-in user can access admin for the demo
+      // In a real app, you'd check a 'profiles' table or use custom claims
+      navigate("/admin/dashboard");
     } catch (err) {
       setError(err?.message || "Login failed");
     } finally {

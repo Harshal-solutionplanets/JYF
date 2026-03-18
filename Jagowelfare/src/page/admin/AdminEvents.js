@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "firebase/firestore";
-import { db } from "../../firebase";
+import logo from "../../assets/img/logo.jpeg";
+import { supabase } from "../../supabase";
 import CommonBanner from "../../component/Common/CommonBanner";
 
 const AdminEventsPage = () => {
@@ -14,10 +14,13 @@ const AdminEventsPage = () => {
     const fetchEvents = async () => {
         setFetching(true);
         try {
-            const q = query(collection(db, "events"), orderBy("startAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            const eventsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setEvents(eventsData);
+            const { data, error } = await supabase
+                .from('events')
+                .select('*')
+                .order('startAt', { ascending: false });
+            
+            if (error) throw error;
+            setEvents(data || []);
         } catch (error) {
             console.error("Error fetching events: ", error);
         } finally {
@@ -33,21 +36,25 @@ const AdminEventsPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await addDoc(collection(db, "events"), {
-                title,
-                description,
-                startAt: new Date(date),
-                status: "published",
-                createdAt: serverTimestamp()
-            });
+            const { error } = await supabase
+                .from('events')
+                .insert([{
+                    title,
+                    description,
+                    startAt: new Date(date).toISOString(),
+                    status: "published"
+                }]);
+            
+            if (error) throw error;
+
             setTitle("");
             setDescription("");
             setDate("");
             await fetchEvents();
-            alert("Event added successfully!");
+            alert("Event added successfully to Supabase!");
         } catch (error) {
             console.error("Error adding event: ", error);
-            alert("Failed to add event.");
+            alert("Failed to add event: " + error.message);
         } finally {
             setLoading(false);
         }
@@ -117,7 +124,7 @@ const AdminEventsPage = () => {
                                                 {events.map((event) => (
                                                     <tr key={event.id}>
                                                         <td>{event.title}</td>
-                                                        <td>{event.startAt?.seconds ? new Date(event.startAt.seconds * 1000).toLocaleDateString() : "No Date"}</td>
+                                                        <td>{event.startAt ? new Date(event.startAt).toLocaleDateString() : "No Date"}</td>
                                                         <td><span className="badge bg-success">{event.status}</span></td>
                                                     </tr>
                                                 ))}

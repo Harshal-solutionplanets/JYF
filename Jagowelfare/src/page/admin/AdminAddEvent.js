@@ -1,67 +1,87 @@
 import React, { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import { supabase } from "../../supabase";
 
 const AdminAddEvent = ({ onPublish }) => {
     const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [date, setDate] = useState("");
-    const [location, setLocation] = useState("");
-    const [imageFile, setImageFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState("");
+    const [tag, setTag] = useState("");
+    const [description, setDescription] = useState(""); // Short summary
+    const [content, setContent] = useState("");     // Detailed article body
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [venue, setVenue] = useState("");
+    const [imageFiles, setImageFiles] = useState([]);
+    const [previewUrls, setPreviewUrls] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-            setPreviewUrl(URL.createObjectURL(file));
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            setImageFiles(filesArray);
+            
+            const urls = filesArray.map(file => URL.createObjectURL(file));
+            setPreviewUrls(urls);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Submit clicked. Title:", title);
         setLoading(true);
 
-        // Safety timeout - if it takes more than 15 seconds, something is wrong
-        const timeout = setTimeout(() => {
-            if (loading) {
-                setLoading(false);
-                alert("Upload taking too long. Please check your internet connection or firestore/storage rules.");
-            }
-        }, 15000);
-
         try {
-            let imageUrl = "";
-            if (imageFile) {
-                console.log("Step 1: Uploading image...");
-                const imageRef = ref(storage, `events/${Date.now()}_${imageFile.name}`);
-                const snapshot = await uploadBytes(imageRef, imageFile);
-                imageUrl = await getDownloadURL(snapshot.ref);
-                console.log("Step 1 Complete: URL is", imageUrl);
+            let uploadedUrls = [];
+            
+            if (imageFiles.length > 0) {
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const file = imageFiles[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${i}.${fileExt}`;
+                    const filePath = `events/${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('JYF')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('JYF')
+                        .getPublicUrl(filePath);
+                    
+                    uploadedUrls.push(publicUrl);
+                }
             }
 
-            console.log("Step 2: Saving to Firestore...");
-            await addDoc(collection(db, "events"), {
-                title: title.trim(),
-                description: description.trim(),
-                location: location.trim(),
-                imageUrl,
-                startAt: date ? new Date(date) : serverTimestamp(),
-                status: "published",
-                createdAt: serverTimestamp()
-            });
-            console.log("Step 2 Complete: Saved!");
+            const finalImageUrlStr = uploadedUrls.join(",");
 
-            clearTimeout(timeout);
-            alert("Success! The event is now live.");
-            if (onPublish) onPublish();
+            const { data: insertedEvent, error: insertError } = await supabase
+                .from('events')
+                .insert([{
+                    title: title.trim(),
+                    tag: tag.trim() || "#Event",
+                    description: description.trim(),
+                    content: content.trim(),
+                    venue: venue.trim(),
+                    heroImageUrl: finalImageUrlStr,
+                    startAt: startDate ? new Date(startDate).toISOString() : new Date().toISOString(),
+                    endAt: endDate ? new Date(endDate).toISOString() : null,
+                    status: "published"
+                }])
+                .select();
+
+
+            if (insertError) throw insertError;
+
+            alert("Event and Details published successfully to Supabase!");
+            
+            if (insertedEvent && insertedEvent.length > 0) {
+                // Redirect user to the event details page to view the newly created event
+                window.location.href = `/event/${insertedEvent[0].id}`;
+            } else if (onPublish) {
+                onPublish();
+            }
         } catch (error) {
-            clearTimeout(timeout);
-            console.error("CRITICAL ERROR during publishing:", error);
-            alert("Publication ERR: " + error.code + " - " + error.message);
+            console.error("Error:", error);
+            alert("Submission failed: " + error.message);
         } finally {
             setLoading(false);
         }
@@ -89,11 +109,11 @@ const AdminAddEvent = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Event Registration</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Detailed Event (Supabase)</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
-                    <div className="col-lg-12 mb-5">
+                    <div className="col-lg-8 mb-4">
                         <label style={labelStyle}>Event Title</label>
                         <input 
                             type="text" 
@@ -106,58 +126,99 @@ const AdminAddEvent = ({ onPublish }) => {
                             required 
                         />
                     </div>
+                    <div className="col-lg-4 mb-4">
+                        <label style={labelStyle}>Tag (e.g. #Charity)</label>
+                        <input 
+                            type="text" 
+                            style={inputStyle}
+                            placeholder="#Event" 
+                            value={tag} 
+                            onChange={(e) => setTag(e.target.value)} 
+                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
+                        />
+                    </div>
 
-                    <div className="col-lg-12 mb-5">
+                    <div className="col-lg-12 mb-4">
                         <label style={labelStyle}>Event Banner Image</label>
                         <input 
                             type="file" 
                             style={{ ...inputStyle, borderBottom: "none" }}
                             accept="image/*"
+                            multiple
                             onChange={handleImageChange}
                             required 
                         />
                         <div style={{ width: "100%", height: "2px", backgroundColor: "#ddd" }}></div>
-                        {previewUrl && (
-                            <div style={{ marginTop: "20px" }}>
-                                <img src={previewUrl} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
+                        {previewUrls && previewUrls.length > 0 && (
+                            <div style={{ marginTop: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                                {previewUrls.map((url, i) => (
+                                    <img key={i} src={url} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
+                                ))}
                             </div>
                         )}
                     </div>
 
-                    <div className="col-lg-6 mb-5">
-                        <label style={labelStyle}>Date & Time</label>
-                        <input 
-                            type="datetime-local" 
-                            style={inputStyle}
-                            value={date} 
-                            onChange={(e) => setDate(e.target.value)} 
-                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
-                            onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
-                            required 
-                        />
-                    </div>
-
-                    <div className="col-lg-6 mb-5">
-                        <label style={labelStyle}>Location</label>
+                    <div className="col-lg-6 mb-4">
+                        <label style={labelStyle}>Venue / Location</label>
                         <input 
                             type="text" 
                             style={inputStyle}
                             placeholder="e.g. Grand Ballroom, NY" 
-                            value={location} 
-                            onChange={(e) => setLocation(e.target.value)} 
+                            value={venue} 
+                            onChange={(e) => setVenue(e.target.value)} 
                             onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required 
                         />
                     </div>
 
-                    <div className="col-lg-12 mb-5">
-                        <label style={labelStyle}>Event Description</label>
-                        <textarea 
-                            style={{ ...inputStyle, minHeight: "100px" }}
-                            placeholder="What is this event about? Mention key highlights..." 
+                    <div className="col-lg-3 mb-4">
+                        <label style={labelStyle}>Starts At</label>
+                        <input 
+                            type="datetime-local" 
+                            style={inputStyle}
+                            value={startDate} 
+                            onChange={(e) => setStartDate(e.target.value)} 
+                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
+                            required 
+                        />
+                    </div>
+
+                    <div className="col-lg-3 mb-4">
+                        <label style={labelStyle}>Ends At (Optional)</label>
+                        <input 
+                            type="datetime-local" 
+                            style={inputStyle}
+                            value={endDate} 
+                            onChange={(e) => setEndDate(e.target.value)} 
+                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
+                        />
+                    </div>
+
+                    <div className="col-lg-12 mb-4">
+                        <label style={labelStyle}>Short Description (Summary)</label>
+                        <input 
+                            type="text" 
+                            style={inputStyle}
+                            placeholder="A brief sentence about the event..." 
                             value={description} 
                             onChange={(e) => setDescription(e.target.value)} 
+                            onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
+                            onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
+                            required 
+                        />
+                    </div>
+
+                    <div className="col-lg-12 mb-4">
+                        <label style={labelStyle}>Event Detailed Content (Long Body)</label>
+                        <textarea 
+                            style={{ ...inputStyle, minHeight: "150px" }}
+                            placeholder="Explain the event in full detail..." 
+                            value={content} 
+                            onChange={(e) => setContent(e.target.value)} 
                             onFocus={(e) => e.target.style.borderBottomColor = "#e33129"}
                             onBlur={(e) => e.target.style.borderBottomColor = "#ddd"}
                             required

@@ -3,7 +3,7 @@ import HomeBanner from '../component/Home/Banner'
 import AboutTopArea from '../component/Home/AboutTop'
 import AboutAres from '../component/Home/AboutArea'
 import TrendingCauses from '../component/Home/TrendingCauses'
-import EventArea from '../component/Home/EventArea'
+import EventAreaPage from '../component/Event';
 import DonationArea from '../component/Home/Donation'
 import PartnerArea from '../component/Home/Partner'
 import CounterArea from '../component/Home/Counter'
@@ -15,7 +15,7 @@ const Home = () => {
        <AboutTopArea/>
        <AboutAres/>
        <TrendingCauses/>
-       <EventArea/>
+       <EventAreaPage/>
        <DonationArea/>
        <PartnerArea/>
        <CounterArea/>

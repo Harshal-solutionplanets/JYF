@@ -1,17 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { apiFetch } from "../../api";
+import { supabase } from "../../supabase";
 import Iconclock from "../../assets/img/icon/clock.png";
 import IconMap from "../../assets/img/icon/map.png";
 import IconDate from "../../assets/img/icon/date.png";
 
 function toJsDate(value) {
   if (!value) return null;
-  // Firestore Timestamp from Admin SDK (emulator/prod) often serializes as {_seconds,_nanoseconds}
-  if (typeof value === "object" && typeof value._seconds === "number") {
-    return new Date(value._seconds * 1000);
-  }
-  if (typeof value === "number") return new Date(value);
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
 }
@@ -23,7 +18,6 @@ function formatDayMonth(d) {
   return { day, mon };
 }
 
-
 const EventAreaPage = (props) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,24 +25,25 @@ const EventAreaPage = (props) => {
 
   useEffect(() => {
     let alive = true;
-    setLoading(true);
-    setError("");
-    apiFetch("/events")
-      .then((r) => {
-        if (!alive) return;
-        setEvents(r.events || []);
-      })
-      .catch((e) => {
-        if (!alive) return;
-        setError(e?.message || "Failed to load events");
-      })
-      .finally(() => {
-        if (!alive) return;
-        setLoading(false);
-      });
-    return () => {
-      alive = false;
+    const fetchEvents = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .order('startAt', { ascending: false });
+        
+        if (error) throw error;
+        if (alive) setEvents(data || []);
+      } catch (e) {
+        if (alive) setError(e?.message || "Failed to load events");
+      } finally {
+        if (alive) setLoading(false);
+      }
     };
+    fetchEvents();
+    return () => { alive = false; };
   }, []);
 
   const [featured, rest] = useMemo(() => {
@@ -64,7 +59,7 @@ const EventAreaPage = (props) => {
           <div className="row">
             <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
               <div className="section_heading">
-                <h3>Upcoming events</h3>
+                <h3>Upcoming events (Supabase)</h3>
                 <h2>
                   Join our upcoming
                   <span className="color_big_heading">events</span> for contribution
@@ -156,13 +151,13 @@ const EventAreaPage = (props) => {
                       </div>
                     </div>
               </div>
-                ) : null}
+                ) : <p className="text-center w-100">No events found.</p>}
             </div>
 
              {/* Event Rightside */}
              <div className="col-lg-6">
              {rest.map((ev)=>(
-               <div className="event_left_side_wrapper" key={ev.id}>
+               <div className="event_left_side_wrapper mb-4" key={ev.id}>
                      <div className="event_content_area small_content_padding">
                      <div className="event_tag_area">
                        <Link to={`/event/${ev.id}`}>{ev.tag || "#Event"}</Link>

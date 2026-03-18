@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import { supabase } from "../../supabase";
 
 const AdminAddGallery = ({ onPublish }) => {
     const [title, setTitle] = useState("");
-    const [imageFile, setImageFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState("");
+    const [imageFiles, setImageFiles] = useState([]);
+    const [previewUrls, setPreviewUrls] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-            setPreviewUrl(URL.createObjectURL(file));
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            setImageFiles(filesArray);
+            
+            const urls = filesArray.map(file => URL.createObjectURL(file));
+            setPreviewUrls(urls);
         }
     };
 
@@ -22,20 +22,43 @@ const AdminAddGallery = ({ onPublish }) => {
         setLoading(true);
 
         try {
-            let imageUrl = "";
-            if (imageFile) {
-                const imageRef = ref(storage, `gallery/${Date.now()}_${imageFile.name}`);
-                const uploadResult = await uploadBytes(imageRef, imageFile);
-                imageUrl = await getDownloadURL(uploadResult.ref);
+            let uploadedUrls = [];
+            
+            if (imageFiles.length > 0) {
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const file = imageFiles[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${i}.${fileExt}`;
+                    const filePath = `gallery/${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('JYF')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('JYF')
+                        .getPublicUrl(filePath);
+                    
+                    uploadedUrls.push(publicUrl);
+                }
             }
 
-            await addDoc(collection(db, "gallery"), {
-                title,
-                imageUrl,
-                createdAt: serverTimestamp()
-            });
+            const insertData = uploadedUrls.map(url => ({
+                title: title, 
+                imageUrl: url
+            }));
 
-            alert("Image added to gallery!");
+            if (insertData.length > 0) {
+                const { error: insertError } = await supabase
+                    .from('gallery')
+                    .insert(insertData);
+
+                if (insertError) throw insertError;
+            }
+
+            alert("Images added to gallery (Supabase)!");
             if (onPublish) onPublish();
         } catch (error) {
             console.error("Error adding to gallery: ", error);
@@ -67,7 +90,7 @@ const AdminAddGallery = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Media Gallery Upload</h3>
+            <h3 style={{ marginBottom: "40px", fontWeight: "800", color: "#222", fontSize: "26px", textAlign: "center" }}>Media Gallery Uploa (Supabase)</h3>
             
             <form onSubmit={handleSubmit}>
                 <div className="row">
@@ -86,18 +109,21 @@ const AdminAddGallery = ({ onPublish }) => {
                     </div>
 
                     <div className="col-lg-12 mb-5">
-                        <label style={labelStyle}>Gallery Image File</label>
+                        <label style={labelStyle}>Gallery Image File(s)</label>
                         <input 
                             type="file" 
                             style={{ ...inputStyle, borderBottom: "none" }}
                             accept="image/*"
+                            multiple
                             onChange={handleImageChange}
                             required 
                         />
                         <div style={{ width: "100%", height: "2px", backgroundColor: "#ddd" }}></div>
-                        {previewUrl && (
-                            <div style={{ marginTop: "20px" }}>
-                                <img src={previewUrl} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
+                        {previewUrls && previewUrls.length > 0 && (
+                            <div style={{ marginTop: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                                {previewUrls.map((url, i) => (
+                                    <img key={i} src={url} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} />
+                                ))}
                             </div>
                         )}
                     </div>

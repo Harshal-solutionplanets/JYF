@@ -79,14 +79,6 @@ export const HeaderData = [
              linkL:"/team",
          },
          {
-             subItem:"Login",
-             linkL:"/login",
-         },
-         {
-             subItem:"Register",
-             linkL:"/register",
-         },
-         {
              subItem:"FAQ",
              linkL:"/faqs",
          },
