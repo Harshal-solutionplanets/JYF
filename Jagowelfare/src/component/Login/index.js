@@ -19,7 +19,7 @@ const LoginArea = () => {
       const tokenResult = await userCredential.user.getIdTokenResult();
       
       if (tokenResult.claims.admin || tokenResult.claims.staff) {
-        navigate("/admin/scan"); // Redirect to admin panel
+        navigate("/admin/dashboard"); // Redirect to admin panel
       } else {
         navigate("/"); // Regular user redirect
       }
