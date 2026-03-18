@@ -18,7 +18,6 @@ const LoginArea = () => {
         email,
         password,
       });
-      
       if (error) throw error;
       
       // For now, let's assume any logged-in user can access admin for the demo

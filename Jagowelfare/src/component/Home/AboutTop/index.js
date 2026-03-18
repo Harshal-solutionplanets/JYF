@@ -11,32 +11,36 @@ import img4 from "../../../assets/img/icon/restaurant.png"
 const AboutTopArea = () => {
     const AboutData =[
         {
-            img:img1,
-            para:"Donate for",
-            heading:"Children education",
-            roundImg:RoundImg,
-            class:"about_top_boxed bg_one"
-        },
-        {
-            img:img2,
-            para:"Donate for",
-            heading:"Clean mineral water",
-            roundImg:RoundImg,
-            class:"about_top_boxed bg_two"
-        },
-        {
             img:img3,
-            para:"Donate for",
-            heading:"Surgery & treatment",
+            para:"Support our",
+            heading:"Healthcare",
             roundImg:RoundImg,
-            class:"about_top_boxed bg_three"
+            class:"about_top_boxed bg_three",
+            link: "/healthcare"
         },
         {
             img:img4,
-            para:"Donate for",
-            heading:"Children education",
+            para:"Support our",
+            heading:"Food support",
             roundImg:RoundImg,
-            class:"about_top_boxed bg_four"
+            class:"about_top_boxed bg_four",
+            link: "/food-support"
+        },
+        {
+            img:img1,
+            para:"Support our",
+            heading:"Education",
+            roundImg:RoundImg,
+            class:"about_top_boxed bg_one",
+            link: "/education"
+        },
+        {
+            img:img2,
+            para:"Support our",
+            heading:"Humanitarian services",
+            roundImg:RoundImg,
+            class:"about_top_boxed bg_two",
+            link: "/humanitarian-services"
         },
   
     ]
@@ -47,19 +51,20 @@ const AboutTopArea = () => {
             <div className="row">
                 {AboutData.map((data, index) =>  (
                     <div className="col-lg-3 col-md-6 col-sm-12 col-12"  key={index}>
-                    <div className={data.class}>
-                        <div className="about_top_boxed_icon">
-                            <img src={data.img} alt="img" />
+                    <Link to={data.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <div className={data.class}>
+                            <div className="about_top_boxed_icon">
+                                <img src={data.img} alt="img" />
+                            </div>
+                            <div className="about_top_boxed_text">
+                                <p>{data.para}</p>
+                                <h3>{data.heading}</h3>
+                            </div>
+                            <div className="about_top_boxed_vector">
+                                <img src={data.roundImg} alt="img" />
+                            </div>
                         </div>
-                        <div className="about_top_boxed_text">
-                            <p>{data.para}</p>
-                            <h3>{data.heading}</h3>
-                            <Link to="/about">More details...</Link>
-                        </div>
-                        <div className="about_top_boxed_vector">
-                            <img src={data.roundImg} alt="img" />
-                        </div>
-                    </div>
+                    </Link>
                 </div>
                )
                 )}

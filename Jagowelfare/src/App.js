@@ -34,6 +34,10 @@ import RequireStaff from "./page/admin/RequireStaff";
 import AdminScanPage from "./page/admin/AdminScan";
 import AdminDashboardPage from "./page/admin/AdminDashboard";
 import AdminEventsPage from "./page/admin/AdminEvents";
+import HealthcarePage from "./page/Healthcare";
+import FoodSupportPage from "./page/FoodSupport";
+import EducationPage from "./page/Education";
+import HumanitarianServicesPage from "./page/HumanitarianServices";
 
 
 const App = () => {
@@ -96,6 +100,10 @@ const App = () => {
         <Route path="/faqs" element={<FaqsPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-service" element={<TermsServicePage />} />
+        <Route path="/healthcare" element={<HealthcarePage />} />
+        <Route path="/food-support" element={<FoodSupportPage />} />
+        <Route path="/education" element={<EducationPage />} />
+        <Route path="/humanitarian-services" element={<HumanitarianServicesPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="*" element={<Error />} />
       </Routes>
