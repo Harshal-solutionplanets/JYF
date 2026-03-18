@@ -65,10 +65,6 @@ export const HeaderData = [
              subItem:" About",
              linkL:"/about",
          },
-         {
-             subItem:"Admin",
-             linkL:"/admin",
-         },
         
          {
              subItem:"Make Donation",
