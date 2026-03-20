@@ -32,7 +32,7 @@ const EventAreaPage = (props) => {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .order('startAt', { ascending: false });
+          .order('startAt', { ascending: true });
         
         if (error) throw error;
         if (alive) setEvents(data || []);
@@ -86,7 +86,7 @@ const EventAreaPage = (props) => {
                     <div className="event_left_side_wrapper">
                     <div className="event_big_img" >
                       <Link to={`/event/${featured.id}`}>
-                        <img src={featured.heroImageUrl || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                        <img src={featured.image_url || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ width: '100%', borderRadius: '10px' }} />
                       </Link>
                     </div>
                     <div className="event_content_area big_content_padding">
@@ -96,7 +96,7 @@ const EventAreaPage = (props) => {
                       <div className="event_heading_area">
                         <div className="event_heading">
                           <h3>
-                          <Link to={`/event/${featured.id}`}>{featured.title}</Link>
+                          <Link to={`/event/${featured.id}`} style={{ lineHeight: '1.2', display: 'block' }}>{featured.title}</Link>
                           </h3>
                         </div>
                         <div className="event_date">
@@ -159,6 +159,11 @@ const EventAreaPage = (props) => {
              {rest.map((ev)=>(
                <div className="event_left_side_wrapper mb-4" key={ev.id}>
                      <div className="event_content_area small_content_padding">
+                     <div className="event_big_img" style={{ marginBottom: '15px' }}>
+                       <Link to={`/event/${ev.id}`}>
+                         <img src={ev.image_url || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ width: '100%', borderRadius: '10px' }} />
+                       </Link>
+                     </div>
                      <div className="event_tag_area">
                        <Link to={`/event/${ev.id}`}>{ev.tag || "#Event"}</Link>
                      </div>
@@ -185,7 +190,13 @@ const EventAreaPage = (props) => {
                          </h6>
                        </div>
                      </div>
-                     <div className="event_para">
+                     <div className="event_para" style={{ 
+                       display: '-webkit-box', 
+                       WebkitBoxOrient: 'vertical', 
+                       WebkitLineClamp: 3, 
+                       overflow: 'hidden',
+                       marginBottom: '15px'
+                     }}>
                        <p>{ev.description}</p>
                      </div>
                      <div className="event_boxed_bottom_wrapper">

@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS public.event_registrations (
     phone_number TEXT NOT NULL,
     location TEXT,
     is_checked_in BOOLEAN DEFAULT false,
+    selected_section TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 

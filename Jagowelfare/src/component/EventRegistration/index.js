@@ -21,16 +21,15 @@ const EventRegistrationArea = () => {
 
     // Seat and participant states
     const [numSeats, setNumSeats] = useState(1);
+    const [selectedSection, setSelectedSection] = useState("");
+    const [availableSections, setAvailableSections] = useState([]);
+    const [sectionsList, setSectionsList] = useState([]); // Defined sections {name, seats}
+    const [sectionBookedCounts, setSectionBookedCounts] = useState({}); // { 'Gold': 5 }
+    const [sectionError, setSectionError] = useState(""); // Immediate feedback error
+
     const [currentStep, setCurrentStep] = useState(0); // 0 to numSeats-1
     const [participants, setParticipants] = useState([]);
 
-    // Form fields for current participant
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phoneNo: "",
-        location: ""
-    });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
     const [registeredParticipants, setRegisteredParticipants] = useState([]);
@@ -49,17 +48,52 @@ const EventRegistrationArea = () => {
                 if (sbError) throw sbError;
                 setEvent(data);
 
-                // 2. Fetch booked count from backend API
-                try {
-                    const countRes = await apiFetch(`/events/${eventId}/count`);
-                    const count = countRes.bookedCount || 0;
-                    setBookedCount(count);
-                    
-                    if (data.seatsAvailable && count >= data.seatsAvailable) {
-                        setIsSoldOut(true);
+                // Extract sections from description
+                const desc = data.description || "";
+                if (desc.startsWith("SECTIONS:")) {
+                    try {
+                        const parts = desc.split(" | CONTENT: ");
+                        const sectionsJson = parts[0].replace("SECTIONS: ", "");
+                        const parsed = JSON.parse(sectionsJson);
+                        
+                        let names = [];
+                        let fullList = [];
+                        if (Array.isArray(parsed)) {
+                            names = parsed.map(s => s.name);
+                            fullList = parsed;
+                        } else {
+                             // legacy support for old object format
+                             names = Object.keys(parsed).filter(k => parsed[k].enabled);
+                             fullList = Object.keys(parsed).map(k => ({ name: k, seats: parsed[k].seats, enabled: parsed[k].enabled }));
+                        }
+                        
+                        setAvailableSections(names);
+                        setSectionsList(fullList);
+                        if (names.length > 0) setSelectedSection(names[0]);
+                    } catch (e) {
+                        console.error("Failed to parse sections", e);
                     }
-                } catch (countErr) {
-                    console.error("Failed to fetch booked count:", countErr);
+                }
+
+                // 2. Fetch all registrations for this event safely
+                const { data: regList, error: countError } = await supabase
+                    .from('event_registrations')
+                    .select('selected_section')
+                    .eq('event_id', eventId);
+                
+                if (countError) throw countError;
+                
+                const currentCounts = {};
+                (regList || []).forEach(r => {
+                    const s = r.selected_section || "General";
+                    currentCounts[s] = (currentCounts[s] || 0) + 1;
+                });
+                
+                setSectionBookedCounts(currentCounts);
+                setBookedCount(regList?.length || 0);
+                
+                if (data.seatsAvailable && (regList?.length || 0) >= data.seatsAvailable) {
+                    setIsSoldOut(true);
                 }
 
             } catch (err) {
@@ -72,90 +106,124 @@ const EventRegistrationArea = () => {
         if (eventId) fetchEvent();
     }, [eventId]);
 
+    useEffect(() => {
+        if (sectionsList.length === 0) return;
+
+        // Auto-select the first available section that has at least 1 seat left
+        const autoFindSection = () => {
+            for (const section of sectionsList) {
+                const limit = parseInt(section.seats) || 0;
+                const booked = sectionBookedCounts[section.name] || 0;
+                if (limit > 0 && booked < limit) {
+                    return section.name;
+                }
+            }
+            return sectionsList[0]?.name || "";
+        };
+
+        const autoSection = autoFindSection();
+        setSelectedSection(autoSection);
+
+        if (!autoSection) {
+            setSectionError("No sections available.");
+            return;
+        }
+
+        const targetSection = sectionsList.find(s => s.name === autoSection);
+        const sectionLimit = targetSection ? parseInt(targetSection.seats) : 0;
+        const currentBooked = sectionBookedCounts[autoSection] || 0;
+        
+        if (sectionLimit > 0 && (currentBooked + parseInt(numSeats)) > sectionLimit) {
+            // Check if there's any section that can hold ALL requested seats
+            const sectionWithSpace = sectionsList.find(s => {
+                const booked = sectionBookedCounts[s.name] || 0;
+                return (booked + parseInt(numSeats)) <= parseInt(s.seats);
+            });
+
+            if (!sectionWithSpace) {
+                // If no single section can hold all, we might have to split, 
+                // but for now let's just show a warning that the remaining seats in this section are low.
+                // Or find the section with MOST space.
+                setSectionError(`Only ${sectionLimit - currentBooked} seats left in the current available section (${autoSection}). Please reduce the number of seats.`);
+            } else {
+                setSelectedSection(sectionWithSpace.name);
+                setSectionError("");
+            }
+        } else {
+            setSectionError("");
+        }
+    }, [numSeats, sectionsList, sectionBookedCounts]);
+
+
     const handleStartRegistration = () => {
+        if (availableSections.length > 0 && !selectedSection) {
+            setError("Please select a seat section");
+            return;
+        }
+
+        if (sectionError) {
+             setError(sectionError);
+             return;
+        }
+
+        setError("");
+
         // Initialize empty participants array
-        const emptyParticipants = Array(numSeats).fill(null).map(() => ({
+        const pArr = Array(parseInt(numSeats)).fill(null).map(() => ({
             name: "",
             email: "",
             phoneNo: "",
-            location: ""
+            location: "",
+            section: selectedSection
         }));
-        setParticipants(emptyParticipants);
-        setPageStatus('form');
-        setCurrentStep(0);
-        // Pre-fill first one if user info available
+
+        // Pre-fill first participant if user logged in
         if (user && user.user_metadata) {
-            setFormData({
+            pArr[0] = {
                 name: user.user_metadata.full_name || "",
                 email: user.email || "",
                 phoneNo: user.user_metadata.phone || "",
-                location: ""
-            });
-        }
-    };
-
-
-    const handleNext = () => {
-        // Validation for unique phone number
-        if (!formData.phoneNo) {
-            setError("Phone number is required");
-            return;
+                location: "",
+                section: selectedSection
+            };
         }
 
-        // Save current form data into participants array
-        const updatedParticipants = [...participants];
-
-        // Local Check for duplicate phone in current registration session
-        const phoneExists = updatedParticipants.some((p, idx) => idx !== currentStep && p.phoneNo === formData.phoneNo);
-        if (phoneExists) {
-            setError("Same phone number is not allowed for different seats!");
-            return;
-        }
-
-        updatedParticipants[currentStep] = formData;
-        setParticipants(updatedParticipants);
-        setError("");
-
-        if (currentStep < numSeats - 1) {
-            setCurrentStep(currentStep + 1);
-            // Pre-fill next form if it was already filled (if going back/forth) or reset
-            setFormData(updatedParticipants[currentStep + 1].name ? updatedParticipants[currentStep + 1] : {
-                name: "",
-                email: "",
-                phoneNo: "",
-                location: ""
-            });
-        } else {
-            // Last form filled, trigger submit
-            handleSubmit(updatedParticipants);
-        }
+        setParticipants(pArr);
+        setPageStatus('form');
+        setCurrentStep(0);
     };
 
     const handleSubmit = async (finalParticipants) => {
         setIsSubmitting(true);
         setError("");
         try {
-            // Save each participant to Supabase seriously
             const inserts = finalParticipants.map(v => ({
                 event_id: eventId,
                 full_name: v.name,
                 email: v.email,
                 phone_number: v.phoneNo,
-                location: v.location
+                location: v.location,
+                selected_section: selectedSection, // Use real column
             }));
 
             const { data, error: sbError } = await supabase
                 .from('event_registrations')
                 .insert(inserts)
-                .select(); // Get data back with IDs
+                .select();
 
             if (sbError) throw sbError;
 
-            setRegisteredParticipants(data || []);
+            // Enrich the data for GoldenTicket display
+            const enrichedData = data.map(d => ({
+                ...d,
+                section: selectedSection
+            }));
+
+            setRegisteredParticipants(enrichedData || []);
             setPageStatus('success');
             setSuccessMsg("Your registration is successful! Your Golden Ticket has been generated.");
         } catch (err) {
-            setError(err?.message || "Registration failed. One of the numbers might already be registered.");
+            setError(err?.message || "Registration failed.");
         } finally {
             setIsSubmitting(false);
         }
@@ -235,89 +303,181 @@ const EventRegistrationArea = () => {
                                         </div>
                                     </div>
 
-                                    <div className="text-center">
+                                    {sectionError && (
+                                        <div className="section_selector text-center mb-5">
+                                            <div style={{ color: "#e33129", marginTop: "15px", fontWeight: "800", fontSize: "14px", padding: "12px", backgroundColor: "#fff5f5", borderRadius: "10px", maxWidth: "450px", margin: "15px auto", border: "1px solid #ffcccc" }}>
+                                                ⚠️ {sectionError}
+                                            </div>
+                                        </div>
+                                    )}
+
+
+                                    <div className="text-center d-flex justify-content-center gap-3">
+                                        <button 
+                                            className="btn btn-outline-dark btn_md" 
+                                            style={{ width: "200px", borderRadius: "10px" }}
+                                            onClick={() => navigate(-1)}
+                                        >
+                                            Back
+                                        </button>
                                         <button 
                                             className="btn btn_theme btn_md" 
-                                            style={{ width: "200px", backgroundColor: isSoldOut ? "#777" : "#e33129" }} 
+                                            style={{ width: "200px", backgroundColor: (isSoldOut || sectionError) ? "#ccc" : "#e33129", cursor: (isSoldOut || sectionError) ? "not-allowed" : "pointer" }} 
                                             onClick={handleStartRegistration}
-                                            disabled={isSoldOut}
+                                            disabled={isSoldOut || !!sectionError}
                                         >
-                                            {isSoldOut ? "SOLDOUT" : "Register Now"}
+                                            {isSoldOut ? "SOLDOUT" : sectionError ? "FULL" : "Register Now"}
                                         </button>
                                     </div>
                                 </div>
                             )}
+
+
 
                             {pageStatus === 'form' && (
                                 <div className="form_step">
                                     <h3 className="text-center mb-4" style={{ fontWeight: "700" }}>Register for Bhakti Sandhya</h3>
-                                    <div className="progress_header mb-4 text-center">
-                                        <span className="badge bg-danger p-2" style={{ fontSize: "14px" }}>Person {currentStep + 1} of {numSeats}</span>
-                                    </div>
+                                    
+                                    <div className="participants_scroll_area mb-4" style={{ maxHeight: "65vh", overflowY: "auto", paddingRight: "10px" }}>
+                                        {[0, 1].map(offset => {
+                                            const pIdx = currentStep + offset;
+                                            if (pIdx >= numSeats) return null;
+                                            const p = participants[pIdx];
 
-                                    <div className="form-group mb-3">
-                                        <label className="mb-2">Full Name</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="Enter Name"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group mb-3">
-                                        <label className="mb-2">Email Address</label>
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            placeholder="Enter Email"
-                                            value={formData.email}
-                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group mb-3">
-                                        <label className="mb-2">Phone Number</label>
-                                        <input
-                                            type="tel"
-                                            className="form-control"
-                                            placeholder="Enter Phone Number"
-                                            value={formData.phoneNo}
-                                            onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            <div className="form-group mb-3">
-                                                <label className="mb-2">Location</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    placeholder="e.g. Mulund West"
-                                                    value={formData.location}
-                                                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
+                                            return (
+                                                <div key={pIdx} className="participant_block mb-4 p-4" style={{ backgroundColor: "#fff", borderRadius: "15px", border: "1px solid #eee", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
+                                                    <h5 className="mb-4 text-start" style={{ fontWeight: "800", color: "#e33129" }}>Person {pIdx + 1} of {numSeats}</h5>
+                                                    
+                                                    {/* Row 1: Name & Email */}
+                                                    <div className="row g-3 mb-3">
+                                                        <div className="col-md-6 text-start">
+                                                            <label className="mb-2 small fw-bold">Full Name</label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                style={{ borderRadius: "10px", padding: "12px", border: (error && !p.name.trim()) ? "1px solid red" : "1px solid #ced4da" }}
+                                                                placeholder="Enter Name"
+                                                                value={p.name}
+                                                                onChange={(e) => {
+                                                                    const up = [...participants];
+                                                                    up[pIdx].name = e.target.value;
+                                                                    setParticipants(up);
+                                                                }}
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div className="col-md-6 text-start">
+                                                            <label className="mb-2 small fw-bold">Email Address</label>
+                                                            <input
+                                                                type="email"
+                                                                className="form-control"
+                                                                style={{ borderRadius: "10px", padding: "12px", border: (error && !p.email.trim()) ? "1px solid red" : "1px solid #ced4da" }}
+                                                                placeholder="Enter Email"
+                                                                value={p.email}
+                                                                onChange={(e) => {
+                                                                    const up = [...participants];
+                                                                    up[pIdx].email = e.target.value;
+                                                                    setParticipants(up);
+                                                                }}
+                                                                required
+                                                            />
+                                                        </div>
+                                                    </div>
 
+                                                    {/* Row 2: Phone & Location */}
+                                                    <div className="row g-3">
+                                                        <div className="col-md-6 text-start">
+                                                            <label className="mb-2 small fw-bold">Phone Number</label>
+                                                            <input
+                                                                type="tel"
+                                                                className="form-control"
+                                                                style={{ borderRadius: "10px", padding: "12px", border: (error && !/^\d{10}$/.test(p.phoneNo)) ? "1px solid red" : "1px solid #ced4da" }}
+                                                                placeholder="10 digit number"
+                                                                value={p.phoneNo}
+                                                                onChange={(e) => {
+                                                                    const up = [...participants];
+                                                                    up[pIdx].phoneNo = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                                    setParticipants(up);
+                                                                }}
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div className="col-md-6 text-start">
+                                                            <label className="mb-2 small fw-bold">Location</label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                style={{ borderRadius: "10px", padding: "12px" }}
+                                                                placeholder="e.g. Mulund West"
+                                                                value={p.location}
+                                                                onChange={(e) => {
+                                                                    const up = [...participants];
+                                                                    up[pIdx].location = e.target.value;
+                                                                    setParticipants(up);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
 
                                     {error && <div className="alert alert-danger mt-3">{error}</div>}
 
-                                    <div className="text-center mt-4">
+                                    <div className="text-center mt-4 d-flex justify-content-center gap-3">
+                                        <button 
+                                            type="button"
+                                            className="btn btn-outline-dark btn_md px-5"
+                                            style={{ borderRadius: "10px" }}
+                                            onClick={() => {
+                                                if (currentStep === 0) {
+                                                    setPageStatus('landing');
+                                                } else {
+                                                    setCurrentStep(prev => Math.max(0, prev - 2));
+                                                }
+                                                setError("");
+                                            }}
+                                        >
+                                            Back
+                                        </button>
                                         <button
+                                            type="button"
                                             className="btn btn_theme btn_md px-5"
-                                            onClick={handleNext}
+                                            onClick={async () => {
+                                                setError("");
+                                                // Validate CURRENT page forms
+                                                for (let i = currentStep; i < Math.min(currentStep + 2, numSeats); i++) {
+                                                    const p = participants[i];
+                                                    if (!p.name.trim()) { setError(`Person ${i+1}: Name is required`); return; }
+                                                    if (!p.email.trim()) { setError(`Person ${i+1}: Email is required`); return; }
+                                                    if (!/^\d{10}$/.test(p.phoneNo)) { setError(`Person ${i+1}: Valid 10-digit number required`); return; }
+                                                    
+                                                    // Local check
+                                                    const dup = participants.some((dp, idx) => idx !== i && dp.phoneNo === p.phoneNo && p.phoneNo.length > 0);
+                                                    if (dup) { setError(`Phone numbers must be unique! (Check Person ${i+1})`); return; }
+
+                                                    // DB check
+                                                    try {
+                                                        const { count } = await supabase.from('event_registrations').select('*', { count: 'exact', head: true }).eq('event_id', eventId).eq('phone_number', p.phoneNo);
+                                                        if (count > 0) { setError(`Number ${p.phoneNo} (Person ${i+1}) is already registered.`); return; }
+                                                    } catch (e) {}
+                                                }
+
+                                                if (currentStep + 2 < numSeats) {
+                                                    setCurrentStep(prev => prev + 2);
+                                                    window.scrollTo(0,0);
+                                                } else {
+                                                    handleSubmit(participants);
+                                                }
+                                            }}
                                             disabled={isSubmitting}
                                         >
-                                            {isSubmitting ? "Processing..." : (currentStep < numSeats - 1 ? "Next" : "Submit")}
+                                            {isSubmitting ? "Processing..." : (currentStep + 2 < numSeats ? "Next" : "Submit")}
                                         </button>
                                     </div>
                                 </div>
                             )}
-
                             {pageStatus === 'success' && (
                                 <div className="success_step text-center py-5">
                                     <div className="success_icon mb-4" style={{ fontSize: "60px", color: "#28a745" }}>
@@ -329,10 +489,33 @@ const EventRegistrationArea = () => {
                                     <div className="tickets_container d-flex flex-column gap-5">
                                         {registeredParticipants.map((reg) => (
                                             <div key={reg.id}>
-                                                <GoldenTicket registration={reg} event={event} />
+                                                <div id={`ticket-area-${reg.id}`} style={{ padding: "10px", backgroundColor: "#fff" }}>
+                                                    <GoldenTicket registration={reg} event={event} />
+                                                </div>
                                                 <div className="mt-3">
                                                     <p className="text-muted small">An email with this ticket has been simulated and sent to <strong>{reg.email}</strong></p>
-                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => window.print()}>Download / Print Ticket</button>
+                                                    <button 
+                                                        className="btn btn-outline-dark btn-sm" 
+                                                        onClick={() => {
+                                                            const area = document.getElementById(`ticket-area-${reg.id}`);
+                                                            import('html2canvas').then(html2canvas => {
+                                                                html2canvas.default(area, {
+                                                                    scale: 3,
+                                                                    backgroundColor: "#fff",
+                                                                    useCORS: true,
+                                                                    logging: false
+                                                                }).then(canvas => {
+                                                                    const ticketName = (reg.name || "Ticket").replace(/\s+/g, '-');
+                                                                    const link = document.createElement('a');
+                                                                    link.download = `JYF-Ticket-${ticketName}.png`;
+                                                                    link.href = canvas.toDataURL("image/png");
+                                                                    link.click();
+                                                                });
+                                                            });
+                                                        }}
+                                                    >
+                                                        Download Ticket (PNG)
+                                                    </button>
                                                 </div>
                                             </div>
                                         ))}

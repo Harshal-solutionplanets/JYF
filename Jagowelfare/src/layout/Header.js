@@ -61,7 +61,7 @@ const Header = () => {
                                                 {data.submenu && (
                                                     <ul className="dropdown-menu">
                                                                 {data.subMenuitem
-                                                                    .filter(sub => sub.subItem !== "Scanner" || isStaff)
+                                                                    .filter(sub => sub.subItem !== "Scanner")
                                                                     .map((data1, index1) => (
                                                                         <li className="nav-item" key={index1}>
                                                                             <Link to={data1.linkL} className="nav-link">{data1.subItem}</Link>
@@ -116,13 +116,6 @@ const Header = () => {
                             <div className="container">
                                 <div className="option-inner">
                                     <div className="others-options d-flex align-items-center">
-                                        {isStaff && (
-                                            <div className="option-item">
-                                                <Link to="/check-in" style={{ backgroundColor: "#333", border: "none", color: "#fff", padding: "10px 20px", borderRadius: "10px", fontSize: "14px", fontWeight: "bold", textDecoration: "none" }}>
-                                                    <i className="fas fa-qrcode mr-2"></i> Scanner
-                                                </Link>
-                                            </div>
-                                        )}
                                         {user ? (
                                             <div className="option-item">
                                                 <button

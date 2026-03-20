@@ -18,7 +18,7 @@ const EventArea = (props) => {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .order('startAt', { ascending: false })
+          .order('startAt', { ascending: true })
           .limit(4); // Fetch top 4 events
         
         if (error) throw error;
@@ -146,6 +146,11 @@ const EventArea = (props) => {
                 {rest.map((datas) => (
                   <div className="event_left_side_wrapper mb-3" key={datas.id}>
                     <div className="event_content_area small_content_padding">
+                      <div className="event_big_img" style={{ marginBottom: '15px' }}>
+                        <Link to={`/event/${datas.id}`}>
+                          <img src={datas.image_url?.split(',')[0]} alt="img" style={{height: "150px", objectFit: "cover", width: "100%", borderRadius: "10px"}} />
+                        </Link>
+                      </div>
                       <div className="event_tag_area">
                         <Link to={`/event/${datas.id}`}>{datas.tag || "#Event"}</Link>
                       </div>

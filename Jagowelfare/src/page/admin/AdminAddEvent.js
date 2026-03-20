@@ -18,13 +18,20 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
     const [contactPhone, setContactPhone] = useState("");
     const [seatsAvailable, setSeatsAvailable] = useState("");
 
+    // Dynamic Sections State
+    const [sections, setSections] = useState([]);
+
     const [organizerName, setOrganizerName] = useState("");
     const [organizerRole, setOrganizerRole] = useState("");
     const [organizerCompany, setOrganizerCompany] = useState("");
     const [organizerImageFile, setOrganizerImageFile] = useState(null);
     const [organizerPreview, setOrganizerPreview] = useState("");
 
+    const [categoryMasters, setCategoryMasters] = useState([]);
+    const [seatTierMasters, setSeatTierMasters] = useState([]);
+
     const fileInputRef = React.useRef(null);
+
     const organizerInputRef = React.useRef(null);
 
     // Format date for datetime-local input (YYYY-MM-DDTHH:MM)
@@ -40,11 +47,52 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
         return `${y}-${m}-${d}T${h}:${min}`;
     };
 
+    const fetchMasters = async () => {
+        try {
+            const { data, error } = await supabase.from('masters').select('*');
+            if (error) throw error;
+            setCategoryMasters(data.filter(m => m.type === 'event_category').map(m => m.value));
+            setSeatTierMasters(data.filter(m => m.type === 'seat_tier').map(m => m.value));
+        } catch (e) {
+            console.error("Error fetching masters:", e);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchMasters();
+    }, []);
+
+
     React.useEffect(() => {
         if (eventData) {
             setTitle(eventData.title || "");
             setTag(eventData.tag || "");
-            setDescription(eventData.description || "");
+
+            // Extract sections from description if exists
+            let desc = eventData.description || "";
+            if (desc.startsWith("SECTIONS:")) {
+                try {
+                    const parts = desc.split(" | CONTENT: ");
+                    const sectionsJson = parts[0].replace("SECTIONS: ", "");
+                    const parsedSections = JSON.parse(sectionsJson);
+
+                    // Convert old object format to new array format if needed
+                    if (!Array.isArray(parsedSections)) {
+                        const arr = Object.keys(parsedSections)
+                            .filter(k => parsedSections[k].enabled)
+                            .map((k, i) => ({ id: Date.now() + i, name: k, seats: parsedSections[k].seats }));
+                        setSections(arr);
+                    } else {
+                        setSections(parsedSections);
+                    }
+                    setDescription(parts[1] || "");
+                } catch (e) {
+                    setDescription(desc);
+                }
+            } else {
+                setDescription(desc);
+            }
+
             setContent(eventData.content || "");
             setStartDate(formatDateTime(eventData.startAt || eventData.start_at));
             setEndDate(formatDateTime(eventData.endAt || eventData.end_at));
@@ -57,7 +105,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
             setOrganizerRole(eventData.organizerRole || "");
             setOrganizerCompany(eventData.organizerCompany || "");
             setOrganizerPreview(eventData.organizerImageUrl || "");
-            
+
             if (eventData.image_url) {
                 setPreviewUrls(eventData.image_url.split(','));
             }
@@ -93,8 +141,77 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
         }
     };
 
+    // New Dynamic Sections Helpers
+    const [showTierDropdown, setShowTierDropdown] = useState(false);
+    const [tempSelectedTiers, setTempSelectedTiers] = useState([]);
+
+    const standardTiers = ['Gold', 'Silver', 'Platinum', 'Diamond', 'VIP', 'VVIP'];
+
+    const toggleTempTier = (name) => {
+        setTempSelectedTiers(prev =>
+            prev.includes(name) ? prev.filter(t => t !== name) : [...prev, name]
+        );
+    };
+
+    const addSectionWithName = (name) => {
+        const totalSeatsInput = parseInt(seatsAvailable) || 0;
+        const currentSum = sections.reduce((acc, s) => acc + (parseInt(s.seats) || 0), 0);
+
+        if (currentSum >= totalSeatsInput && totalSeatsInput > 0) {
+            alert("Cannot add more sections. Total seats already matched!");
+            return;
+        }
+
+        setSections(prev => [
+            ...prev,
+            { id: Date.now(), name: name || "", seats: "" }
+        ]);
+    };
+
+    const updateSection = (id, field, value) => {
+        setSections(prev => {
+            const newSections = prev.map(s => {
+                if (s.id === id) {
+                    if (field === 'seats') {
+                        const parsed = parseInt(value);
+                        if (value !== "" && parsed < 0) return s;
+                        
+                        // Validation: sum of other sections + this new value
+                        const otherSectionsSum = prev.filter(sec => sec.id !== id).reduce((acc, sec) => acc + (parseInt(sec.seats) || 0), 0);
+                        const totalAllowed = parseInt(seatsAvailable) || 0;
+                        
+                        if (totalAllowed > 0 && otherSectionsSum + (parsed || 0) > totalAllowed) {
+                            alert(`Cannot allocate more than ${totalAllowed} seats in total!`);
+                            return s; // Don't update if it exceeds
+                        }
+                        
+                        return { ...s, seats: value === "" ? "" : parsed };
+                    }
+                    return { ...s, [field]: value };
+                }
+                return s;
+            });
+            return newSections;
+        });
+    };
+
+
+    const removeSection = (id) => {
+        setSections(prev => prev.filter(s => s.id !== id));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validation: Sum of section seats must match total seats
+        const totalSeatsInput = seatsAvailable ? parseInt(seatsAvailable) : 0;
+        const sumSectionSeats = sections.reduce((acc, s) => acc + (s.seats || 0), 0);
+
+        if (totalSeatsInput > 0 && sumSectionSeats !== totalSeatsInput) {
+            alert(`number is not matched! Total seats is ${totalSeatsInput}, but sections sum to ${sumSectionSeats}.`);
+            return;
+        }
+
         if (previewUrls.length === 0) {
             alert("Please select at least one banner image.");
             return;
@@ -116,7 +233,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                 }
             }
 
-            let organizerImageUrl = organizerPreview; 
+            let organizerImageUrl = organizerPreview;
             if (organizerImageFile) {
                 const fileExt = organizerImageFile.name.split('.').pop();
                 const fileName = `${Date.now()}_organizer.${fileExt}`;
@@ -128,10 +245,12 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
             }
 
             const finalImageUrlStr = uploadedUrls.join(",");
+            const finalDescription = `SECTIONS: ${JSON.stringify(sections)} | CONTENT: ${description.trim()}`;
+
             const eventPayload = {
                 title: title.trim(),
                 tag: tag.trim() || "#Event",
-                description: description.trim(),
+                description: finalDescription,
                 content: content.trim(),
                 venue: venue.trim(),
                 image_url: finalImageUrlStr,
@@ -141,7 +260,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                 category: category.trim(),
                 contactEmail: contactEmail.trim(),
                 contactPhone: contactPhone.trim(),
-                seatsAvailable: seatsAvailable ? parseInt(seatsAvailable) : null,
+                seatsAvailable: totalSeatsInput,
                 organizerName: organizerName.trim(),
                 organizerRole: organizerRole.trim(),
                 organizerCompany: organizerCompany.trim(),
@@ -208,6 +327,18 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
 
     return (
         <div style={{ backgroundColor: "#f4f6f9", padding: "40px 20px", borderRadius: "15px", boxSizing: "border-box" }}>
+            <style>
+                {`
+                    input::-webkit-outer-spin-button,
+                    input::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                    }
+                    input[type=number] {
+                        -moz-appearance: textfield;
+                    }
+                `}
+            </style>
             <div style={{ maxWidth: "1000px", margin: "0 auto", backgroundColor: "#fff", padding: "40px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)", boxSizing: "border-box" }}>
                 <h3 style={{ marginBottom: "50px", fontWeight: "800", color: "#222", fontSize: "32px", textAlign: "center" }}>
                     {eventData ? "Edit Event" : "Publish New Event"}
@@ -222,17 +353,136 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                                 <input type="text" style={inputStyle} placeholder="e.g. Annual Charity Gala" value={title} onChange={(e) => setTitle(e.target.value)} required />
                             </div>
                             <div>
-                                <label style={labelStyle}>Category</label>
-                                <input type="text" style={inputStyle} placeholder="e.g. Education" value={category} onChange={(e) => setCategory(e.target.value)} />
+                                <label style={labelStyle}>Event Category</label>
+                                <select 
+                                    style={{ ...inputStyle, appearance: "none", cursor: "pointer", padding: "12px 0" }} 
+                                    value={category} 
+                                    onChange={(e) => setCategory(e.target.value)}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categoryMasters.map((cat, i) => (
+                                        <option key={i} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
                             </div>
+
                             <div>
                                 <label style={labelStyle}>Tag (e.g. #Charity)</label>
                                 <input type="text" style={inputStyle} placeholder="#Event" value={tag} onChange={(e) => setTag(e.target.value)} />
                             </div>
                             <div>
                                 <label style={labelStyle}>Seats Available (Quantity)</label>
-                                <input type="number" style={inputStyle} placeholder="e.g. 100" value={seatsAvailable} onChange={(e) => setSeatsAvailable(e.target.value)} />
+                                <input type="number" style={inputStyle} placeholder="e.g. 1700" value={seatsAvailable} onChange={(e) => setSeatsAvailable(e.target.value)} />
+                                <p className="small text-muted mt-1">Total sum of all sections must match this number.</p>
                             </div>
+                        </div>
+
+                        <div style={{ width: "100%", marginTop: "30px", boxSizing: "border-box" }}>
+                            <label style={labelStyle}>Section of Seats (Add & Manage)</label>
+
+                            <div style={{ display: "flex", gap: "10px", alignItems: "flex-start", marginBottom: "25px", flexWrap: "wrap", position: "relative" }}>
+                                <div style={{ minWidth: "250px", position: "relative" }}>
+                                    <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "5px" }}>Choose Seat Type</label>
+                                    <div
+                                        onClick={() => setShowTierDropdown(!showTierDropdown)}
+                                        style={{ ...inputStyle, padding: "12px", borderRadius: "8px", border: "1px solid #ddd", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#fff" }}
+                                    >
+                                        <span style={{ color: "#999" }}>
+                                            Select Tiers...
+                                        </span>
+                                        <span>{showTierDropdown ? "▲" : "▼"}</span>
+                                    </div>
+
+                                    {showTierDropdown && (
+                                        <div style={{ position: "absolute", top: "100%", left: "0", right: "0", zIndex: "1000", backgroundColor: "#fff", border: "1px solid #ddd", borderRadius: "8px", marginTop: "5px", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", padding: "10px", maxHeight: "300px", overflowY: "auto" }}>
+                                            {seatTierMasters.length === 0 ? (
+                                                <div style={{ padding: "10px", color: "#999", fontSize: "13px" }}>No seat types found. Add them from the 'Master' sidebar.</div>
+                                            ) : (
+                                                seatTierMasters.map(name => {
+                                                    const isAlreadyAdded = sections.find(s => s.name === name);
+                                                    return (
+                                                        <div
+                                                            key={name}
+                                                            onClick={() => {
+                                                                if (!isAlreadyAdded) {
+                                                                    addSectionWithName(name);
+                                                                    setShowTierDropdown(false);
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                padding: "10px",
+                                                                cursor: isAlreadyAdded ? "not-allowed" : "pointer",
+                                                                borderRadius: "6px",
+                                                                marginBottom: "5px",
+                                                                backgroundColor: "transparent",
+                                                                color: isAlreadyAdded ? "#ccc" : "#000",
+                                                                fontWeight: "400",
+                                                                display: "flex",
+                                                                justifyContent: "space-between",
+                                                                border: "1px solid #eee"
+                                                            }}
+                                                        >
+                                                            {name}
+                                                            {isAlreadyAdded && <span style={{ fontSize: "10px" }}>Added</span>}
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "15px", marginTop: "10px" }}>
+                                {sections.map((s) => (
+                                    <div key={s.id} style={{
+                                        padding: "15px",
+                                        borderRadius: "12px",
+                                        border: "2px solid #e33129",
+                                        backgroundColor: "#fff5f5",
+                                        position: "relative"
+                                    }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeSection(s.id)}
+                                            style={{ position: "absolute", top: "5px", right: "5px", border: "none", background: "none", color: "#e33129", cursor: "pointer", fontSize: "16px", fontWeight: "bold" }}
+                                        >
+                                            ×
+                                        </button>
+                                        <div style={{ marginBottom: "10px" }}>
+                                            <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "5px" }}>Section Name</label>
+                                            <input
+                                                type="text"
+                                                style={{ ...inputStyle, padding: "5px", fontSize: "16px", fontWeight: "700", color: "#000", borderBottom: "1px solid #e33129" }}
+                                                value={s.name}
+                                                onChange={(e) => updateSection(s.id, 'name', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "5px" }}>Seat Allocation</label>
+                                            <input
+                                                type="number"
+                                                placeholder="Enter seats"
+                                                style={{ ...inputStyle, padding: "5px", fontSize: "14px", borderBottom: "1px solid #ddd" }}
+                                                value={s.seats}
+                                                onChange={(e) => updateSection(s.id, 'seats', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            {sections.length > 0 && (
+                                <div style={{ marginTop: "15px", textAlign: "right", padding: "10px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
+                                    <span style={{ 
+                                        fontSize: "15px", 
+                                        fontWeight: "800", 
+                                        color: sections.reduce((acc, s) => acc + (parseInt(s.seats) || 0), 0) > (parseInt(seatsAvailable) || 0) ? "red" : "#e33129" 
+                                    }}>
+                                        Allocated: {sections.reduce((acc, s) => acc + (parseInt(s.seats) || 0), 0)} / {seatsAvailable || 0}
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                         <div style={{ width: "100%", marginTop: "30px", boxSizing: "border-box" }}>

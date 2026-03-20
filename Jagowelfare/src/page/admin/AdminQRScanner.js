@@ -9,29 +9,38 @@ const AdminQRScanner = () => {
     const [loading, setLoading] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [msg, setMsg] = useState({ text: "", type: "" });
+    const [scannerKey, setScannerKey] = useState(0);
 
     useEffect(() => {
-        const scanner = new Html5QrcodeScanner("reader", {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-        });
+        const timer = setTimeout(() => {
+            const readerEl = document.getElementById("reader");
+            if (!readerEl) return;
 
-        scanner.render(onScanSuccess, onScanError);
+            const scanner = new Html5QrcodeScanner("reader", {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+            });
 
-        function onScanSuccess(decodedText) {
-            setScanResult(decodedText);
-            fetchUserData(decodedText);
-            scanner.clear(); // Stop scanning after success
-        }
+            scanner.render(
+                (decodedText) => {
+                    setScanResult(decodedText);
+                    fetchUserData(decodedText);
+                    scanner.clear(); 
+                },
+                (err) => {
+                    // noise
+                }
+            );
 
-        function onScanError(err) {
-            // Silence errors as they happen on every non-qr frame
-        }
+            return () => {
+                try {
+                    scanner.clear();
+                } catch (e) {}
+            };
+        }, 100);
 
-        return () => {
-            scanner.clear();
-        };
-    }, []);
+        return () => clearTimeout(timer);
+    }, [scannerKey]);
 
     const fetchUserData = async (regId) => {
         setLoading(true);
@@ -46,12 +55,15 @@ const AdminQRScanner = () => {
             if (error) throw error;
             setUserData(data);
 
-            // Fetch event info too
+            if (data.is_checked_in) {
+                setMsg({ text: "ENTRY REJECTED: ALREADY SCANNED! ❌", type: "danger" });
+            }
+
             const { data: ev } = await supabase.from('events').select('title').eq('id', data.event_id).single();
             setEventData(ev);
 
         } catch (err) {
-            setMsg({ text: "Error fetching user data: " + err.message, type: "danger" });
+            setMsg({ text: "Pass not found in system", type: "danger" });
         } finally {
             setLoading(false);
         }
@@ -81,86 +93,163 @@ const AdminQRScanner = () => {
         setUserData(null);
         setEventData(null);
         setMsg({ text: "", type: "" });
-        // Need to re-initialize scanner logic? Actually, we'll just window.location.reload() or re-render
-        window.location.reload(); 
+        setScannerKey(prev => prev + 1);
     };
 
     return (
-        <div style={{ backgroundColor: "#fff", padding: "30px", borderRadius: "15px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", maxWidth: "600px", margin: "0 auto" }}>
-            <h3 style={{ marginBottom: "30px", fontWeight: "800", textAlign: "center" }}>Entry Pass Scanner</h3>
-            
-            {!scanResult ? (
-                <div id="reader" style={{ borderRadius: "10px", overflow: "hidden" }}></div>
-            ) : (
-                <div className="p-4" style={{ backgroundColor: "#f8f9fa", borderRadius: "15px", border: "1px solid #eee" }}>
-                    {loading ? (
-                        <p className="text-center">Loading user info...</p>
-                    ) : userData ? (
-                        <>
-                            <div className="text-center mb-4">
-                                <div style={{ width: "80px", height: "80px", backgroundColor: "#e33129", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 15px", fontSize: "30px", fontWeight: "bold" }}>
-                                    {userData.full_name.charAt(0)}
-                                </div>
-                                <h4 style={{ fontWeight: "800", margin: 0 }}>{userData.full_name}</h4>
-                                <p className="text-muted">{userData.email}</p>
+        <div style={{ backgroundColor: "#f4f4f4", padding: "60px 20px", minHeight: "90vh" }}>
+            <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "30px", boxShadow: "0 15px 50px rgba(0,0,0,0.1)", maxWidth: "800px", margin: "0 auto" }}>
+                <h3 style={{ marginBottom: "35px", fontWeight: "900", textAlign: "center", color: "#333", fontSize: "32px", letterSpacing: "-1px" }}>Entry Pass Scanner</h3>
+                
+                {!scanResult ? (
+                    <div id="reader" key={scannerKey} style={{ borderRadius: "20px", overflow: "hidden", border: "1px solid #ddd" }}></div>
+                ) : (
+                    <div className="p-5" style={{ 
+                        background: "linear-gradient(135deg, #000 0%, #1a1a1a 100%)", 
+                        color: "#d4af37", 
+                        borderRadius: "25px", 
+                        boxShadow: "0 25px 60px rgba(0,0,0,0.4)", 
+                        position: "relative",
+                        minHeight: "500px",
+                        border: "3px solid #d4af37"
+                    }}>
+                        
+                        {/* Status Circle Plate (Top Right) */}
+                        {userData && !loading && (
+                            <div style={{
+                                position: "absolute",
+                                top: "25px",
+                                right: "25px",
+                                width: "110px",
+                                height: "110px",
+                                borderRadius: "50%",
+                                backgroundColor: userData.is_checked_in ? (msg.type === 'danger' ? "#e74c3c" : "#28a745") : "#f39c12",
+                                color: "#fff",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: "0 8px 25px rgba(0,0,0,0.5)",
+                                zIndex: 10,
+                                border: "4px solid #d4af37",
+                                textAlign: "center"
+                            }}>
+                                <span style={{ fontSize: "18px", fontWeight: "900", lineHeight: "1" }}>{userData.is_checked_in ? (msg.type === 'danger' ? "FAILED" : "ENTRY") : "PENDING"}</span>
+                                <span style={{ fontSize: "16px", marginTop: "5px" }}>{userData.is_checked_in ? (msg.type === 'danger' ? "❌" : "OK ✅") : "⏳"}</span>
                             </div>
+                        )}
 
-                            <table className="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Event:</strong></td>
-                                        <td>{eventData?.title || "Unknown"}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Phone:</strong></td>
-                                        <td>{userData.phone_number}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Location:</strong></td>
-                                        <td>{userData.location || "N/A"}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Status:</strong></td>
-                                        <td>
-                                            {userData.is_checked_in ? (
-                                                <span className="badge bg-success p-2">Already Checked-in ✅</span>
-                                            ) : (
-                                                <span className="badge bg-warning text-dark p-2">Pending ⏳</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        {loading ? (
+                            <div className="text-center py-5">
+                                <p className="fw-bold" style={{ color: "#d4af37", fontSize: "20px" }}>Fetching User Details...</p>
+                            </div>
+                        ) : userData ? (
+                            <div style={{ textAlign: "center" }}>
+                                <div style={{ marginBottom: "35px", borderBottom: "1px solid rgba(212, 175, 55, 0.3)", paddingBottom: "25px" }}>
+                                    <h2 style={{ fontWeight: "900", color: "#fff", fontSize: "40px", marginBottom: "5px" }}>{userData.full_name}</h2>
+                                    <p style={{ color: "#d4af37", opacity: 0.9, fontSize: "20px" }}>{userData.email}</p>
+                                </div>
 
-                            {msg.text && (
-                                <div className={`alert alert-${msg.type} mt-3 text-center`}>{msg.text}</div>
-                            )}
+                                <table style={{ width: "fit-content", margin: "0 auto", fontSize: "19px", borderCollapse: "separate", borderSpacing: "20px 10px", textAlign: "left" }}>
+                                    <tbody>
+                                        <tr>
+                                            <td style={{ color: "#d4af37", fontWeight: "900" }}>EVENT:</td>
+                                            <td style={{ color: "#fff", fontWeight: "bold" }}>{eventData?.title || "Unknown"}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ color: "#d4af37", fontWeight: "900" }}>PHONE:</td>
+                                            <td style={{ color: "#fff", fontWeight: "bold" }}>{userData.phone_number}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ color: "#d4af37", fontWeight: "900" }}>SECTION:</td>
+                                            <td style={{ color: "#fff", fontWeight: "900", textTransform: "uppercase", fontSize: "22px" }}>{userData.selected_section || "General"}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
-                            {!userData.is_checked_in && (
-                                <button 
-                                    onClick={handleAccept} 
-                                    className="btn btn-danger w-100 mt-4 py-3" 
-                                    style={{ fontWeight: "800", borderRadius: "12px" }}
-                                    disabled={isUpdating}
-                                >
-                                    {isUpdating ? "Confirming..." : "ACCEPT ENTRY"}
-                                </button>
-                            )}
+                                {msg.text && (
+                                    <div style={{ 
+                                        backgroundColor: msg.type === "danger" ? "rgba(231, 76, 60, 0.2)" : "rgba(40, 167, 69, 0.2)", 
+                                        color: "#fff", 
+                                        padding: "15px", 
+                                        borderRadius: "12px", 
+                                        border: msg.type === "danger" ? "1px solid #e74c3c" : "1px solid #28a745", 
+                                        marginTop: "25px", 
+                                        maxWidth: "600px", 
+                                        margin: "25px auto 0", 
+                                        textAlign: "center", 
+                                        fontWeight: "bold", 
+                                        fontSize: "18px" 
+                                    }}>
+                                        {msg.text}
+                                    </div>
+                                )}
+                                
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    marginTop: "50px",
+                                    width: "100%",
+                                    gap: "30px"
+                                }}>
+                                    <button 
+                                        onClick={resetScanner} 
+                                        style={{
+                                            backgroundColor: "transparent",
+                                            color: "#d4af37",
+                                            border: "2px solid #d4af37",
+                                            borderRadius: "50px",
+                                            padding: "15px 40px",
+                                            fontWeight: "900",
+                                            cursor: "pointer",
+                                            fontSize: "16px",
+                                            minWidth: "200px"
+                                        }}
+                                    >
+                                        Scan Another
+                                    </button>
 
-                            <button onClick={resetScanner} className="btn btn-outline-secondary w-100 mt-3 py-2" style={{ borderRadius: "10px" }}>Scan Another</button>
-                        </>
-                    ) : (
-                        <div className="text-center">
-                            <p className="text-danger">Failed to retrieve data for ID: {scanResult}</p>
-                            <button onClick={resetScanner} className="btn btn-dark w-100 mt-3">Try Again</button>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            <div className="mt-4 text-center">
-                <p className="text-muted small">Scanner uses your device camera. Please allow permission if prompted.</p>
+                                    {userData && !userData.is_checked_in && (
+                                        <button 
+                                            onClick={handleAccept} 
+                                            style={{
+                                                backgroundColor: "#e33129",
+                                                color: "#fff",
+                                                border: "none",
+                                                borderRadius: "50px",
+                                                padding: "18px 50px",
+                                                fontWeight: "900",
+                                                fontSize: "18px",
+                                                boxShadow: "0 10px 25px rgba(227, 49, 41, 0.4)",
+                                                cursor: "pointer",
+                                                minWidth: "250px"
+                                            }}
+                                            disabled={isUpdating}
+                                        >
+                                            {isUpdating ? "Confirming..." : "ACCEPT ENTRY"}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-5">
+                                <h3 style={{ color: "#e33129", fontWeight: "900", fontSize: "28px" }}>Invalid Pass</h3>
+                                <button onClick={resetScanner} className="btn btn-outline-warning mt-5 px-5 py-3">Try Again</button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
+            <style>{`
+                #reader__dashboard_section_csr button {
+                    background: #e33129 !important;
+                    color: white !important;
+                    border: none !important;
+                    padding: 8px 15px !important;
+                    border-radius: 8px !important;
+                }
+            `}</style>
         </div>
     );
 };
