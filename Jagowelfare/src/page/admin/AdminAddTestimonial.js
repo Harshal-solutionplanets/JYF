@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { supabase } from "../../supabase";
 
 const AdminAddTestimonial = ({ onPublish }) => {
@@ -9,7 +11,15 @@ const AdminAddTestimonial = ({ onPublish }) => {
     const [previewUrl, setPreviewUrl] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const fileInputRef = React.useRef(null);
+    const fileInputRef = useRef(null);
+
+    const quillModules = {
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['clean']
+        ],
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -51,6 +61,12 @@ const AdminAddTestimonial = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#f4f6f9", padding: "40px 20px", borderRadius: "15px" }}>
+            <style>
+                {`
+                    .ql-container { min-height: 100px; font-size: 16px; font-family: inherit; }
+                    .ql-editor { min-height: 100px; }
+                `}
+            </style>
             <div style={{ maxWidth: "800px", margin: "0 auto", backgroundColor: "#fff", padding: "40px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>
                 <h3 style={{ marginBottom: "50px", fontWeight: "800", color: "#222", fontSize: "32px", textAlign: "center" }}>Post Testimonial</h3>
                 
@@ -89,8 +105,8 @@ const AdminAddTestimonial = ({ onPublish }) => {
                     <div style={sectionContainerStyle}>
                         <div style={sectionHeadingStyle}>Their Feedback</div>
                         <div>
-                            <label style={labelStyle}>Testimonial Message</label>
-                            <textarea style={{ ...inputStyle, minHeight: "120px", border: "1px solid #ddd", padding: "15px", borderRadius: "10px", resize: "none" }} placeholder="Type their testimonial message here..." value={comment} onChange={(e) => setComment(e.target.value)} required />
+                            <label style={labelStyle}>Testimonial message</label>
+                            <ReactQuill theme="snow" value={comment} onChange={(val) => { if(val !== comment) setComment(val); }} modules={quillModules} style={{ backgroundColor: "#fff" }} />
                         </div>
                     </div>
 

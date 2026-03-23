@@ -14,6 +14,7 @@ import AdminViewCauses from "./AdminViewCauses";
 import AdminViewNews from "./AdminViewNews";
 import AdminViewRegistrations from "./AdminViewRegistrations";
 import AdminQRScanner from "./AdminQRScanner";
+import AdminDashboardUpdates from "./AdminDashboardUpdates";
 
 const DashboardOverview = () => {
   return (
@@ -169,6 +170,7 @@ const AdminDashboardPage = () => {
       case "view_registrations": return <AdminViewRegistrations />;
       case "manage_master_cat": return <MasterManagementView type="event_category" title="Event Category Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} categoryInput={categoryInput} setCategoryInput={setCategoryInput} />;
       case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} seatTierInput={seatTierInput} setSeatTierInput={setSeatTierInput} />;
+      case "dashboard_updates": return <AdminDashboardUpdates />;
       default:
         return <DashboardOverview />;
     }
@@ -221,6 +223,7 @@ const AdminDashboardPage = () => {
     { title: "Gallery", icon: "fas fa-images", key: "gallery", addView: "add_gallery", viewPath: "/gallery" },
     { title: "Team Members", icon: "fas fa-users", key: "team", addView: "add_team", viewPath: "/team" },
     { title: "Testimonials", icon: "fas fa-comment-dots", key: "testimonials", addView: "add_testimonials", viewPath: "/testimonial" },
+    { title: "Dashboard Updates", icon: "fas fa-edit", key: "dashboard_updates", view: "dashboard_updates" },
     { title: "Master Management", icon: "fas fa-cogs", key: "master_mgmt", isMaster: true },
   ];
 
@@ -263,6 +266,8 @@ const AdminDashboardPage = () => {
                           <span>Seats Type Master</span>
                         </div>
                       </div>
+                    ) : item.view ? (
+                      <div onClick={() => setActiveView(item.view)} style={subItemStyle}>Go to {item.title}</div>
                     ) : item.subs ? (
                       item.subs.map((sub, idx) => (
                         sub.external ? (

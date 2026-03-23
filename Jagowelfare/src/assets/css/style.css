@@ -689,6 +689,24 @@ section {
   text-align: right;
 }
 
+.banner_one_img img {
+  border-radius: 0 !important;
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.banner_para p {
+  padding-top: 10px;
+  font-size: 18px;
+  line-height: 30px;
+  margin-bottom: 0;
+}
+
 .banner_one_text h1 span {
   font-weight: 700;
 }

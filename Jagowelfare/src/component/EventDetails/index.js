@@ -4,6 +4,7 @@ import EventDetailSidebar from "./Sidebar";
 import { apiFetch } from "../../api";
 import { useAuth } from "../../auth/AuthProvider";
 import { supabase } from "../../supabase";
+import { extractDescription } from "../../utils/eventHelper";
 
 function toJsDate(value) {
   if (!value) return null;
@@ -99,7 +100,10 @@ const EventDetailsArea = () => {
                         {event.tag || "#Event"}
                       </Link>
                       <h2>{event.title}</h2>
-                      <p>{event.description}</p>
+                      <div 
+                        style={{ fontSize: "17px", lineHeight: "1.8", color: "#555" }} 
+                        dangerouslySetInnerHTML={{ __html: event.content || extractDescription(event.description) }} 
+                      />
                       <p>
                         <strong>Venue:</strong> {event.venue || "-"}
                         <br />

@@ -5,6 +5,8 @@ import { supabase } from "../../../supabase";
 import Iconclock from "../../../assets/img/icon/clock.png"
 import IconMap from "../../../assets/img/icon/map.png"
 import IconDate from "../../../assets/img/icon/date.png"
+import { extractDescription } from "../../../utils/eventHelper";
+
 
 const EventArea = (props) => {
   const [events, setEvents] = useState([]);
@@ -104,8 +106,11 @@ const EventArea = (props) => {
                           </h6>
                         </div>
                       </div>
-                      <div className="event_para">
-                        <p>{featured.description}</p>
+                      <div className="event_para" style={{ marginBottom: "20px" }}>
+                        <p 
+                          style={{ fontSize: "16px", lineHeight: "1.7", color: "#666" }}
+                          dangerouslySetInnerHTML={{ __html: extractDescription(featured.description) }}
+                        ></p>
                       </div>
                       <div className="event_boxed_bottom_wrapper">
                         <div className="row">
@@ -145,12 +150,44 @@ const EventArea = (props) => {
               <div className="col-lg-6">
                 {rest.map((datas) => (
                   <div className="event_left_side_wrapper mb-3" key={datas.id}>
-                    <div className="event_content_area small_content_padding">
+                    <div className="event_content_area small_content_padding" style={{ position: 'relative' }}>
                       <div className="event_big_img" style={{ marginBottom: '15px' }}>
                         <Link to={`/event/${datas.id}`}>
                           <img src={datas.image_url?.split(',')[0]} alt="img" style={{height: "150px", objectFit: "cover", width: "100%", borderRadius: "10px"}} />
                         </Link>
                       </div>
+
+                      {/* Floating Date Circle (matches user's image) */}
+                      <div className="event_date_circle" style={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        background: 'linear-gradient(135deg, #e33129, #f27234)',
+                        color: '#white',
+                        width: '60px',
+                        height: '60px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 15px rgba(227, 49, 41, 0.4)',
+                        zIndex: 10
+                      }}>
+                        <span style={{ fontSize: '18px', fontWeight: '800', lineHeight: '1', color: '#fff' }}>
+                          {(() => {
+                            const d = new Date(datas.startAt || datas.start_at);
+                            return d.getDate();
+                          })()}
+                        </span>
+                        <span style={{ fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', color: '#fff' }}>
+                          {(() => {
+                            const d = new Date(datas.startAt || datas.start_at);
+                            return d.toLocaleString('en-US', { month: 'short' });
+                          })()}
+                        </span>
+                      </div>
+
                       <div className="event_tag_area">
                         <Link to={`/event/${datas.id}`}>{datas.tag || "#Event"}</Link>
                       </div>
@@ -162,18 +199,18 @@ const EventArea = (props) => {
                             </Link>
                           </h3>
                         </div>
-                        <div className="event_date">
-                          <img src={IconDate} alt="icon" />
-                          <h6>
-                            {(() => {
-                              const { day, mon } = formatDayMonth(datas.startAt || datas.start_at);
-                              return <>{day} <span>{mon}</span></>;
-                            })()}
-                          </h6>
-                        </div>
                       </div>
-                      <div className="event_para">
-                        <p>{datas.description}</p>
+                      <div className="event_para" style={{ 
+                        display: '-webkit-box', 
+                        WebkitBoxOrient: 'vertical', 
+                        WebkitLineClamp: 3, 
+                        overflow: 'hidden',
+                        marginBottom: '20px'
+                      }}>
+                        <p 
+                          style={{ fontSize: "15px", lineHeight: "1.6", color: "#666" }}
+                          dangerouslySetInnerHTML={{ __html: extractDescription(datas.description) }}
+                        ></p>
                       </div>
                       <div className="event_boxed_bottom_wrapper">
                         <div className="row">

@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { supabase } from "../../supabase";
 
 const AdminAddNews = ({ onPublish }) => {
@@ -10,7 +12,16 @@ const AdminAddNews = ({ onPublish }) => {
     const [previewUrls, setPreviewUrls] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const fileInputRef = React.useRef(null);
+    const fileInputRef = useRef(null);
+
+    const quillModules = {
+        toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['link', 'clean']
+        ],
+    };
 
     const handleImageChange = (e) => {
         if (e.target.files) {
@@ -63,6 +74,12 @@ const AdminAddNews = ({ onPublish }) => {
 
     return (
         <div style={{ backgroundColor: "#f4f6f9", padding: "40px 20px", borderRadius: "15px" }}>
+            <style>
+                {`
+                    .ql-container { min-height: 150px; font-size: 16px; font-family: inherit; }
+                    .ql-editor { min-height: 150px; }
+                `}
+            </style>
             <div style={{ maxWidth: "1000px", margin: "0 auto", backgroundColor: "#fff", padding: "40px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>
                 <h3 style={{ marginBottom: "50px", fontWeight: "800", color: "#222", fontSize: "32px", textAlign: "center" }}>Post News Article</h3>
                 
@@ -96,11 +113,11 @@ const AdminAddNews = ({ onPublish }) => {
                         <div style={sectionHeadingStyle}>Content & Details</div>
                         <div className="mb-4">
                             <label style={labelStyle}>Short Summary</label>
-                            <textarea style={{ ...inputStyle, minHeight: "80px", border: "1px solid #ddd", padding: "15px", borderRadius: "10px", resize: "none" }} placeholder="Brief overview of the news..." value={summary} onChange={(e) => setSummary(e.target.value)} required />
+                            <ReactQuill theme="snow" value={summary} onChange={(val) => { if(val !== summary) setSummary(val); }} modules={quillModules} style={{ backgroundColor: "#fff" }} />
                         </div>
                         <div>
                             <label style={labelStyle}>Full Article Content</label>
-                            <textarea style={{ ...inputStyle, minHeight: "200px", border: "1px solid #ddd", padding: "15px", borderRadius: "10px", resize: "none" }} placeholder="Detailed content of the article..." value={content} onChange={(e) => setContent(e.target.value)} required />
+                            <ReactQuill theme="snow" value={content} onChange={(val) => { if(val !== content) setContent(val); }} modules={quillModules} style={{ backgroundColor: "#fff" }} />
                         </div>
                     </div>
 

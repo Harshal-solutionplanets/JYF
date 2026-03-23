@@ -4,6 +4,7 @@ import { supabase } from "../../supabase";
 import Iconclock from "../../assets/img/icon/clock.png";
 import IconMap from "../../assets/img/icon/map.png";
 import IconDate from "../../assets/img/icon/date.png";
+import { extractDescription } from "../../utils/eventHelper";
 
 function toJsDate(value) {
   if (!value) return null;
@@ -86,7 +87,7 @@ const EventAreaPage = (props) => {
                     <div className="event_left_side_wrapper">
                     <div className="event_big_img" >
                       <Link to={`/event/${featured.id}`}>
-                        <img src={featured.image_url || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ width: '100%', borderRadius: '10px' }} />
+                        <img src={featured.image_url?.split(',')[0] || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ width: '100%', borderRadius: '10px' }} />
                       </Link>
                     </div>
                     <div className="event_content_area big_content_padding">
@@ -114,8 +115,11 @@ const EventAreaPage = (props) => {
                           </h6>
                         </div>
                       </div>
-                      <div className="event_para">
-                        <p>{featured.description}</p>
+                      <div className="event_para" style={{ marginBottom: "20px" }}>
+                        <p 
+                          style={{ fontSize: "16px", lineHeight: "1.7", color: "#666" }}
+                          dangerouslySetInnerHTML={{ __html: extractDescription(featured.description) }}
+                        ></p>
                       </div>
                       <div className="event_boxed_bottom_wrapper">
                         <div className="row">
@@ -158,12 +162,44 @@ const EventAreaPage = (props) => {
              <div className="col-lg-6">
              {rest.map((ev)=>(
                <div className="event_left_side_wrapper mb-4" key={ev.id}>
-                     <div className="event_content_area small_content_padding">
+                     <div className="event_content_area small_content_padding" style={{ position: 'relative' }}>
                      <div className="event_big_img" style={{ marginBottom: '15px' }}>
                        <Link to={`/event/${ev.id}`}>
-                         <img src={ev.image_url || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ width: '100%', borderRadius: '10px' }} />
+                         <img src={ev.image_url?.split(',')[0] || ""} alt="img" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ width: '100%', borderRadius: '10px' }} />
                        </Link>
                      </div>
+
+                     {/* Floating Date Circle */}
+                     <div className="event_date_circle" style={{
+                       position: 'absolute',
+                       top: '15px',
+                       right: '15px',
+                       background: 'linear-gradient(135deg, #e33129, #f27234)',
+                       color: '#fff',
+                       width: '60px',
+                       height: '60px',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       flexDirection: 'column',
+                       alignItems: 'center',
+                       justifyContent: 'center',
+                       boxShadow: '0 4px 15px rgba(227, 49, 41, 0.4)',
+                       zIndex: 10
+                     }}>
+                       <span style={{ fontSize: '18px', fontWeight: '800', lineHeight: '1' }}>
+                         {(() => {
+                           const d = toJsDate(ev.startAt);
+                           return d ? d.getDate() : "--";
+                         })()}
+                       </span>
+                       <span style={{ fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>
+                         {(() => {
+                           const d = toJsDate(ev.startAt);
+                           return d ? d.toLocaleString('en-US', { month: 'short' }) : "---";
+                         })()}
+                       </span>
+                     </div>
+
                      <div className="event_tag_area">
                        <Link to={`/event/${ev.id}`}>{ev.tag || "#Event"}</Link>
                      </div>
@@ -175,29 +211,18 @@ const EventAreaPage = (props) => {
                            </Link>
                          </h3>
                        </div>
-                       <div className="event_date">
-                         <img src={IconDate} alt="icon" />
-                         <h6>
-                           {(() => {
-                             const d = toJsDate(ev.startAt);
-                             const { day, mon } = formatDayMonth(d);
-                             return (
-                               <>
-                                 {day} <span>{mon}</span>
-                               </>
-                             );
-                           })()}
-                         </h6>
-                       </div>
                      </div>
                      <div className="event_para" style={{ 
                        display: '-webkit-box', 
                        WebkitBoxOrient: 'vertical', 
                        WebkitLineClamp: 3, 
                        overflow: 'hidden',
-                       marginBottom: '15px'
+                       marginBottom: '20px'
                      }}>
-                       <p>{ev.description}</p>
+                       <p 
+                         style={{ fontSize: "15px", lineHeight: "1.6", color: "#666" }}
+                         dangerouslySetInnerHTML={{ __html: extractDescription(ev.description) }}
+                       ></p>
                      </div>
                      <div className="event_boxed_bottom_wrapper">
                        <div className="row">

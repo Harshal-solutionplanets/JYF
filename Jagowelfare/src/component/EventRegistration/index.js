@@ -338,7 +338,7 @@ const EventRegistrationArea = () => {
                                 <div className="form_step">
                                     <h3 className="text-center mb-4" style={{ fontWeight: "700" }}>Register for Bhakti Sandhya</h3>
                                     
-                                    <div className="participants_scroll_area mb-4" style={{ maxHeight: "65vh", overflowY: "auto", paddingRight: "10px" }}>
+                                    <div className="participants_area mb-4">
                                         {[0, 1].map(offset => {
                                             const pIdx = currentStep + offset;
                                             if (pIdx >= numSeats) return null;
@@ -351,7 +351,7 @@ const EventRegistrationArea = () => {
                                                     {/* Row 1: Name & Email */}
                                                     <div className="row g-3 mb-3">
                                                         <div className="col-md-6 text-start">
-                                                            <label className="mb-2 small fw-bold">Full Name</label>
+                                                            <label className="mb-2 small fw-bold">Full Name <span style={{ color: 'red' }}>*</span></label>
                                                             <input
                                                                 type="text"
                                                                 className="form-control"
@@ -367,7 +367,7 @@ const EventRegistrationArea = () => {
                                                             />
                                                         </div>
                                                         <div className="col-md-6 text-start">
-                                                            <label className="mb-2 small fw-bold">Email Address</label>
+                                                            <label className="mb-2 small fw-bold">Email Address <span style={{ color: 'red' }}>*</span></label>
                                                             <input
                                                                 type="email"
                                                                 className="form-control"
@@ -387,7 +387,7 @@ const EventRegistrationArea = () => {
                                                     {/* Row 2: Phone & Location */}
                                                     <div className="row g-3">
                                                         <div className="col-md-6 text-start">
-                                                            <label className="mb-2 small fw-bold">Phone Number</label>
+                                                            <label className="mb-2 small fw-bold">Phone Number <span style={{ color: 'red' }}>*</span></label>
                                                             <input
                                                                 type="tel"
                                                                 className="form-control"
@@ -403,11 +403,11 @@ const EventRegistrationArea = () => {
                                                             />
                                                         </div>
                                                         <div className="col-md-6 text-start">
-                                                            <label className="mb-2 small fw-bold">Location</label>
+                                                            <label className="mb-2 small fw-bold">Location <span style={{ color: 'red' }}>*</span></label>
                                                             <input
                                                                 type="text"
                                                                 className="form-control"
-                                                                style={{ borderRadius: "10px", padding: "12px" }}
+                                                                style={{ borderRadius: "10px", padding: "12px", border: (error && !p.location.trim()) ? "1px solid red" : "1px solid #ced4da" }}
                                                                 placeholder="e.g. Mulund West"
                                                                 value={p.location}
                                                                 onChange={(e) => {
@@ -415,6 +415,7 @@ const EventRegistrationArea = () => {
                                                                     up[pIdx].location = e.target.value;
                                                                     setParticipants(up);
                                                                 }}
+                                                                required
                                                             />
                                                         </div>
                                                     </div>
@@ -452,6 +453,7 @@ const EventRegistrationArea = () => {
                                                     if (!p.name.trim()) { setError(`Person ${i+1}: Name is required`); return; }
                                                     if (!p.email.trim()) { setError(`Person ${i+1}: Email is required`); return; }
                                                     if (!/^\d{10}$/.test(p.phoneNo)) { setError(`Person ${i+1}: Valid 10-digit number required`); return; }
+                                                    if (!p.location.trim()) { setError(`Person ${i+1}: Location is required`); return; }
                                                     
                                                     // Local check
                                                     const dup = participants.some((dp, idx) => idx !== i && dp.phoneNo === p.phoneNo && p.phoneNo.length > 0);
