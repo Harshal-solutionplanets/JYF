@@ -117,10 +117,16 @@ const AdminDashboardPage = () => {
   };
 
   const [editingEvent, setEditingEvent] = useState(null);
+  const [editingCause, setEditingCause] = useState(null);
 
   const handleEditEvent = (event) => {
     setEditingEvent(event);
     setActiveView("edit_event");
+  };
+
+  const handleEditCause = (cause) => {
+    setEditingCause(cause);
+    setActiveView("edit_cause");
   };
 
   const handleAddMaster = async (type, value, setInput) => {
@@ -160,8 +166,12 @@ const AdminDashboardPage = () => {
         return <AdminAddEvent eventData={editingEvent} onPublish={() => { setEditingEvent(null); setActiveView("view_events"); }} />;
       case "view_events":
         return <AdminViewEvents onEdit={handleEditEvent} />;
-      case "add_causes": return <AdminAddCause onPublish={() => setActiveView("dashboard")} />;
-      case "view_causes": return <AdminViewCauses />;
+      case "add_causes": 
+        return <AdminAddCause onPublish={() => setActiveView("dashboard")} />;
+      case "edit_cause":
+        return <AdminAddCause causeData={editingCause} onPublish={() => { setEditingCause(null); setActiveView("view_causes"); }} />;
+      case "view_causes": 
+        return <AdminViewCauses onEdit={handleEditCause} />;
       case "add_gallery": return <AdminAddGallery onPublish={() => setActiveView("dashboard")} />;
       case "add_news": return <AdminAddNews onPublish={() => setActiveView("dashboard")} />;
       case "view_news": return <AdminViewNews />;

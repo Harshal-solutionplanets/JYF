@@ -1,14 +1,21 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { supabase } from "../../supabase";
 
-const AdminAddCause = ({ onPublish }) => {
+const AdminAddCause = ({ onPublish, causeData }) => {
     const [title, setTitle] = useState("");
-    const [tag, setTag] = useState("");
     const [description, setDescription] = useState("");
     const [content, setContent] = useState("");
-    const [goal, setGoal] = useState("");
+    
+    // Sidebar Key-Value fields (Limit 20 characters)
+    const [infokey1, setInfokey1] = useState("Category");
+    const [infoval1, setInfoval1] = useState("");
+    const [infokey2, setInfokey2] = useState("Location");
+    const [infoval2, setInfoval2] = useState("");
+    const [infokey3, setInfokey3] = useState("Date");
+    const [infoval3, setInfoval3] = useState("");
+
     const [imageFiles, setImageFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -24,13 +31,38 @@ const AdminAddCause = ({ onPublish }) => {
         ],
     };
 
+    useEffect(() => {
+        if (causeData) {
+            setTitle(causeData.title || "");
+            setDescription(causeData.description || "");
+            setContent(causeData.content || "");
+            setInfokey1(causeData.infokey1 || "Category");
+            setInfoval1(causeData.infoval1 || "");
+            setInfokey2(causeData.infokey2 || "Location");
+            setInfoval2(causeData.infoval2 || "");
+            setInfokey3(causeData.infokey3 || "Date");
+            setInfoval3(causeData.infoval3 || "");
+            if (causeData.image_url) {
+                setPreviewUrls(causeData.image_url.split(','));
+            }
+        }
+    }, [causeData]);
+
     const handleImageChange = (e) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            setImageFiles(filesArray);
+            setImageFiles(prev => [...prev, ...filesArray]);
             const urls = filesArray.map(file => URL.createObjectURL(file));
-            setPreviewUrls(urls);
+            setPreviewUrls(prev => [...prev, ...urls]);
         }
+    };
+
+    const removeImage = (index) => {
+        const removedUrl = previewUrls[index];
+        setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+        // If it was a newly selected file, remove it from imageFiles too
+        // We match by URL if it's blob, otherwise it's an existing URL
+        setImageFiles(prev => prev.filter(file => URL.createObjectURL(file) !== removedUrl));
     };
 
     const handleSubmit = async (e) => {
@@ -38,7 +70,10 @@ const AdminAddCause = ({ onPublish }) => {
         setLoading(true);
 
         try {
-            let uploadedUrls = [];
+            // Keep existing URLs (those that don't start with blob:)
+            let finalPreviews = previewUrls.filter(url => !url.startsWith('blob:'));
+            
+            // Upload new files
             if (imageFiles.length > 0) {
                 for (let i = 0; i < imageFiles.length; i++) {
                     const file = imageFiles[i];
@@ -48,25 +83,41 @@ const AdminAddCause = ({ onPublish }) => {
                     const { error: uploadError } = await supabase.storage.from('JYF').upload(filePath, file);
                     if (uploadError) throw uploadError;
                     const { data: { publicUrl } } = supabase.storage.from('JYF').getPublicUrl(filePath);
-                    uploadedUrls.push(publicUrl);
+                    finalPreviews.push(publicUrl);
                 }
             }
             
-            const finalImageUrlStr = uploadedUrls.join(",");
+            const finalImageUrlStr = finalPreviews.join(",");
 
-            const { error: insertError } = await supabase.from('causes').insert([{
+            const payload = {
                 title: title.trim(),
-                tag: tag.trim() || "#Cause",
                 description: description.trim(),
                 content: content.trim(),
-                goal: parseFloat(goal),
-                raised: 0,
                 image_url: finalImageUrlStr,
+                infokey1: infokey1.trim(),
+                infoval1: infoval1.trim(),
+                infokey2: infokey2.trim(),
+                infoval2: infoval2.trim(),
+                infokey3: infokey3.trim(),
+                infoval3: infoval3.trim(),
                 status: "published"
-            }]);
+            };
 
-            if (insertError) throw insertError;
-            alert("New Cause Published successfully!");
+            if (causeData && causeData.id) {
+                const { error: updateError } = await supabase
+                    .from('causes')
+                    .update(payload)
+                    .eq('id', causeData.id);
+                if (updateError) throw updateError;
+                alert("Cause updated successfully!");
+            } else {
+                const { error: insertError } = await supabase
+                    .from('causes')
+                    .insert([payload]);
+                if (insertError) throw insertError;
+                alert("New Cause Published successfully!");
+            }
+            
             if (onPublish) onPublish();
         } catch (error) {
             alert("Submission failed: " + error.message);
@@ -89,32 +140,30 @@ const AdminAddCause = ({ onPublish }) => {
                 `}
             </style>
             <div style={{ maxWidth: "1000px", margin: "0 auto", backgroundColor: "#fff", padding: "40px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>
-                <h3 style={{ marginBottom: "50px", fontWeight: "800", color: "#222", fontSize: "32px", textAlign: "center" }}>Post a New Cause</h3>
+                <h3 style={{ marginBottom: "50px", fontWeight: "800", color: "#222", fontSize: "32px", textAlign: "center" }}>
+                    {causeData ? "Edit Cause Details" : "Post a New Cause"}
+                </h3>
                 
                 <form onSubmit={handleSubmit}>
                     <div style={sectionContainerStyle}>
                         <div style={sectionHeadingStyle}>Basic Information</div>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "30px" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "30px" }}>
                             <div>
                                 <label style={labelStyle}>Cause Title</label>
                                 <input type="text" style={inputStyle} placeholder="e.g. Children Education" value={title} onChange={(e) => setTitle(e.target.value)} required />
                             </div>
-                            <div>
-                                <label style={labelStyle}>Category / Tag</label>
-                                <input type="text" style={inputStyle} placeholder="#Cause" value={tag} onChange={(e) => setTag(e.target.value)} />
-                            </div>
-                            <div>
-                                <label style={labelStyle}>Funding Goal ($)</label>
-                                <input type="number" style={inputStyle} placeholder="e.g. 5000" value={goal} onChange={(e) => setGoal(e.target.value)} required />
-                            </div>
                         </div>
 
-                        <div style={{ marginTop: "30px" }}>
-                            <label style={labelStyle}>Cause Image (Banner)</label>
-                            <input ref={fileInputRef} type="file" style={{ display: "none" }} accept="image/*" onChange={handleImageChange} />
+                        <div style={{ marginTop: "40px" }}>
+                            <label style={labelStyle}>Cause Principal Image (Required)</label>
+                            <p style={{ fontSize: "13px", color: "#666", marginTop: "-5px" }}>Recommended: High-quality landscape image (approx. 930x480px) for the main details page.</p>
+                            <input ref={fileInputRef} type="file" style={{ display: "none" }} accept="image/*" multiple onChange={handleImageChange} />
                             <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "center", marginTop: "15px" }}>
                                 {previewUrls.map((url, i) => (
-                                    <img key={i} src={url} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "15px", border: "1px solid #eee" }} />
+                                    <div key={i} style={{ position: "relative" }}>
+                                        <img src={url} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "15px", border: "1px solid #eee" }} />
+                                        <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: "-10px", right: "-10px", backgroundColor: "#e33129", color: "#fff", border: "none", borderRadius: "50%", width: "24px", height: "24px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "bold" }}>×</button>
+                                    </div>
                                 ))}
                                 <div onClick={() => fileInputRef.current.click()} style={{ width: "100px", height: "100px", border: "2px dashed #ddd", borderRadius: "15px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "32px", color: "#aaa", backgroundColor: "#fafafa" }}>+</div>
                             </div>
@@ -122,20 +171,40 @@ const AdminAddCause = ({ onPublish }) => {
                     </div>
 
                     <div style={sectionContainerStyle}>
+                        <div style={sectionHeadingStyle}>Sidebar Details (At a Glance Stats)</div>
+                        <p style={{ fontSize: "13px", color: "#666", marginBottom: "20px" }}>These 3 fields will be shown in the sidebar box on the details page. (Limit: 40 characters per field)</p>
+                        
+                        <div style={{ marginBottom: "20px" }}>
+                            <label style={{...labelStyle, fontSize: "12px"}}>Point 1</label>
+                            <input type="text" style={inputStyle} value={infoval1} onChange={(e) => setInfoval1(e.target.value.slice(0, 40))} placeholder="e.g. Started treating 50+ patients/day" />
+                        </div>
+
+                        <div style={{ marginBottom: "20px" }}>
+                            <label style={{...labelStyle, fontSize: "12px"}}>Point 2</label>
+                            <input type="text" style={inputStyle} value={infoval2} onChange={(e) => setInfoval2(e.target.value.slice(0, 40))} placeholder="e.g. Operating in Niger, Nigeria" />
+                        </div>
+
+                        <div style={{ marginBottom: "0" }}>
+                            <label style={{...labelStyle, fontSize: "12px"}}>Point 3</label>
+                            <input type="text" style={inputStyle} value={infoval3} onChange={(e) => setInfoval3(e.target.value.slice(0, 40))} placeholder="e.g. Campaign ending on 20 Dec, 2024" />
+                        </div>
+                    </div>
+
+                    <div style={sectionContainerStyle}>
                         <div style={sectionHeadingStyle}>Description & Content</div>
                         <div className="mb-4">
-                            <label style={labelStyle}>Short Summary</label>
+                            <label style={labelStyle}>Short Summary (Introduction)</label>
                             <ReactQuill theme="snow" value={description} onChange={(val) => { if(val !== description) setDescription(val); }} modules={quillModules} style={{ backgroundColor: "#fff" }} />
                         </div>
                         <div>
-                            <label style={labelStyle}>Detailed Story</label>
+                            <label style={labelStyle}>Detailed Story (Full Page Content)</label>
                             <ReactQuill theme="snow" value={content} onChange={(val) => { if(val !== content) setContent(val); }} modules={quillModules} style={{ backgroundColor: "#fff" }} />
                         </div>
                     </div>
 
                     <div className="text-center mt-5">
                         <button type="submit" className="btn btn_theme btn_md" style={{ padding: "18px 100px", borderRadius: "50px", fontWeight: "800", fontSize: "18px", textTransform: "uppercase", letterSpacing: "1.5px", boxShadow: "0 15px 35px rgba(227, 49, 41, 0.25)" }} disabled={loading}>
-                            {loading ? "Publishing..." : "Publish Cause"}
+                            {loading ? "Processing..." : (causeData ? "Update Cause" : "Publish Cause")}
                         </button>
                     </div>
                 </form>

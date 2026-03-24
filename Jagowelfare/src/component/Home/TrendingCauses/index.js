@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-// Import Link
 import { Link } from "react-router-dom";
 import { supabase } from "../../../supabase";
-import { formatDate } from "../../../utils/dateFormatter";
-
-// Fallback icons
-import DateIconFallback from "../../../assets/img/icon/date.png";
-import IconAdminFallback from "../../../assets/img/icon/user.png";
 
 const TrendingCauses = () => {
   const [causes, setCauses] = useState([]);
@@ -20,8 +14,9 @@ const TrendingCauses = () => {
         const { data, error } = await supabase
           .from("causes")
           .select("*")
-          .order("created_at", { ascending: false })
-          .limit(3);
+          .order("created_at", { ascending: false });
+        // Removed .limit(3) based on user's request to see all added causes
+        
         if (error) throw error;
         if (alive) setCauses(data || []);
       } catch (err) {
@@ -46,7 +41,7 @@ const TrendingCauses = () => {
           <div className="row">
             <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
               <div className="section_heading">
-                <h3>Trending causes</h3>
+                <h3>Guided by our philosophy “Unity in CommUNITY"</h3>
                 <h2>
                   We are always where other people
                   <span className="color_big_heading">need</span> help
@@ -61,64 +56,27 @@ const TrendingCauses = () => {
               <div className="col-12 text-center"><p>No trending causes uploaded yet.</p></div>
             ) : (
               causes.map((data) => {
-                const percentage = data.goal > 0 ? Math.min(Math.round(((data.raised || 0) / data.goal) * 100), 100) : 0;
-                
+                const firstImage = (data.image_url || "").split(',')[0];
                 return (
-                <div className="col-lg-4 col-md-12 col-sm-12 col-12" key={data.id}>
-                  <div className="case_boxed_wrapper">
+                <div className="col-lg-4 col-md-6 col-sm-12 col-12 mb-4 d-flex align-items-stretch" key={data.id}>
+                  <div className="case_boxed_wrapper" style={{ height: "100%", width: "100%", background: "#fff", borderRadius: "15px", overflow: "hidden", border: "1px solid #eee", display: "flex", flexDirection: "column" }}>
                     <div className="case_boxed_img">
-                      <Link to="/cause-details">
-                        <img src={data.image_url} alt="img" style={{height: "250px", objectFit: "cover", width: "100%"}} />
+                      <Link to={`/cause-details/${data.id}`}>
+                        <img src={firstImage} alt="img" style={{height: "260px", objectFit: "cover", width: "100%"}} />
                       </Link>
-                      <span className="causes_badge bg-theme">
-                        {data.tag || "#Cause"}
-                      </span>
                     </div>
-                    <div className="causes_boxed_text">
-                      <div className="class-full causes_pro_bar progress_bar">
-                        <div className="class-full-bar-box">
-                          <h3 className="h3-title">
-                            Goal: <span>${data.goal}</span>
-                          </h3>
-                          <div className="class-full-bar-percent">
-                            <h2>
-                              <span className="counting-data" data-count={percentage}>
-                                {percentage}
-                              </span>
-                              <span>%</span>
-                            </h2>
-                          </div>
-                        </div>
-                      </div>
-                      <h3>
-                        <Link to="/cause-details">{data.title}</Link>
+                    <div className="causes_boxed_text" style={{ padding: "20px", flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
+                      <h3 style={{ fontSize: "20px", marginBottom: "12px" }}>
+                        <Link to={`/cause-details/${data.id}`} style={{ color: "#222", fontWeight: "700" }}>{data.title}</Link>
                       </h3>
-                      <p>{data.description}</p>
-                      <div className="causes_boxed_bottom_wrapper">
-                        <div className="row">
-                          <div className="col-lg-6 col-md-6 col-sm-6 col-6">
-                            <div className="casuses_bottom_boxed">
-                              <div className="casuses_bottom_icon">
-                                <img src={DateIconFallback} alt="icon" style={{width: 25}} />
-                              </div>
-                              <div className="casuses_bottom_content">
-                                <h5>Date:</h5>
-                                <p>{formatDate(data.created_at)}</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-6 col-md-6 col-sm-6 col-6">
-                            <div className="casuses_bottom_boxed casuses_left_padding">
-                              <div className="casuses_bottom_icon">
-                                <img src={IconAdminFallback} alt="icon" style={{width: 25}} />
-                              </div>
-                              <div className="casuses_bottom_content">
-                                <h5>By:</h5>
-                                <p>Admin</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      <div 
+                        style={{ color: "#666", fontSize: "14px", marginTop: "0px", lineHeight: "1.6" }}
+                        dangerouslySetInnerHTML={{ __html: data.description }} 
+                      />
+                      <div className="mt-4" style={{ marginTop: "auto" }}>
+                        <Link to={`/cause-details/${data.id}`} className="btn btn_theme btn_sm" style={{ width: "100%", borderRadius: "10px" }}>
+                          Read More
+                        </Link>
                       </div>
                     </div>
                   </div>

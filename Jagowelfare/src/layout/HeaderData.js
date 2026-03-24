@@ -6,35 +6,11 @@ export const HeaderData = [
      },
      {
         menu:"Causes",
-        link:"/#",
-        submenu:true,
-      subMenuitem:[
-         {
-             subItem:"Causes",
-             linkL:"/causes",
-         },
-        
-         {
-             subItem:"Causes Details",
-             linkL:"/cause-details",
-         },
-        ]
+        link:"/causes",
      },
      {
         menu:"Events",
-        link:"/#",
-        submenu:true,
-      subMenuitem:[
-         {
-             subItem:"Events",
-             linkL:"/event",
-         },
-        
-         {
-             subItem:"Events Details",
-             linkL:"/event-details",
-         },
-        ]
+        link:"/event",
      },
      {
         menu:"Gallery",
@@ -42,19 +18,7 @@ export const HeaderData = [
      },
      {
         menu:"News",
-        link:"/#",
-        submenu:true,
-      subMenuitem:[
-         {
-             subItem:"News",
-             linkL:"/news",
-         },
-        
-         {
-             subItem:"News Details",
-             linkL:"/news-details",
-         },
-        ]
+        link:"/news",
      },
      {
         menu:"Pages",
@@ -65,8 +29,6 @@ export const HeaderData = [
              subItem:" About",
              linkL:"/about",
          },
-        
-
          {
              subItem:"Testimonials",
              linkL:"/testimonial",
@@ -86,10 +48,6 @@ export const HeaderData = [
          {
              subItem:"Terms Service",
              linkL:"/terms-service",
-         },
-         {
-             subItem:"404 Error",
-             linkL:"*",
          },
          {
              subItem:"Scanner",

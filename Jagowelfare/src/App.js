@@ -62,7 +62,8 @@ const App = () => {
         <Route path="/make-donation" element={<MakeDonationPage />} />
         <Route path="/blog" element={<BlogMainPage />} />
         <Route path="/causes" element={<Causes />} />
-        <Route path="/cause-details" element={<CausesDetsils />} />
+        <Route path="/cause-details/:id" element={<CausesDetsils />} />
+        <Route path="/cause-details" element={<Navigate to="/causes" replace />} />
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/news" element={<NewsPage />} />
         <Route path="/news-details" element={<NewsDetailsPage />} />
