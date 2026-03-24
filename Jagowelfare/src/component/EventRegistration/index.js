@@ -221,7 +221,7 @@ const EventRegistrationArea = () => {
             // TRIGGER ACTUAL EMAIL SENDING via server.js
             try {
                 for (const reg of enrichedData) {
-                    await fetch('http://localhost:5000/api/send-ticket', {
+                    await fetch('/api/send-ticket', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({

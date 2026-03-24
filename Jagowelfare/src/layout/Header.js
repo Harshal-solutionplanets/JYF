@@ -60,13 +60,13 @@ const Header = () => {
                                                 </Link>
                                                 {data.submenu && (
                                                     <ul className="dropdown-menu">
-                                                                {data.subMenuitem
-                                                                    .filter(sub => sub.subItem !== "Scanner")
-                                                                    .map((data1, index1) => (
-                                                                        <li className="nav-item" key={index1}>
-                                                                            <Link to={data1.linkL} className="nav-link">{data1.subItem}</Link>
-                                                                        </li>
-                                                                    ))}
+                                                        {data.subMenuitem
+                                                            .filter(sub => sub.subItem !== "Scanner")
+                                                            .map((data1, index1) => (
+                                                                <li className="nav-item" key={index1}>
+                                                                    <Link to={data1.linkL} className="nav-link">{data1.subItem}</Link>
+                                                                </li>
+                                                            ))}
                                                     </ul>
                                                 )}
                                             </li>
@@ -75,27 +75,6 @@ const Header = () => {
                                         {isStaff && (
                                             <li className="nav-item">
                                                 {/* Button removed from here, kept in dropdown */}
-                                            </li>
-                                        )}
-
-                                        {user ? (
-                                            <li className="nav-item">
-                                                <button
-                                                    type="button"
-                                                    className="nav-link"
-                                                    style={{ border: "none", background: "none", fontWeight: "600", color: "#ca1e14" }}
-                                                    onClick={() => {
-                                                        supabase.auth.signOut().then(() => {
-                                                            window.location.href = "/";
-                                                        });
-                                                    }}
-                                                >
-                                                    Logout
-                                                </button>
-                                            </li>
-                                        ) : (
-                                            <li className="nav-item">
-                                                <Link to="/login" className="nav-link" style={{ fontWeight: "600" }}>Login</Link>
                                             </li>
                                         )}
                                     </ul>
