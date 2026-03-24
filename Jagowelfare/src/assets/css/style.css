@@ -53,7 +53,7 @@ Default CSS
 
 html,
 body {
-  height: 80%;
+  min-height: 100%;
 }
 
 body {
