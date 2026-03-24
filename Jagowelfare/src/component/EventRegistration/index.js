@@ -213,15 +213,36 @@ const EventRegistrationArea = () => {
 
             if (sbError) throw sbError;
 
-            // Enrich the data for GoldenTicket display
             const enrichedData = data.map(d => ({
                 ...d,
                 section: selectedSection
             }));
 
+            // TRIGGER ACTUAL EMAIL SENDING via server.js
+            try {
+                for (const reg of enrichedData) {
+                    await fetch('http://localhost:5000/api/send-ticket', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            recipientEmail: reg.email,
+                            recipientName: reg.full_name,
+                            eventTitle: event.title,
+                            ticketId: reg.id,
+                            section: reg.selected_section,
+                            venue: event.venue || "TBD",
+                            date: formatDate(event.startAt),
+                            time: formatTime(event.startAt)
+                        })
+                    });
+                }
+            } catch (emailErr) {
+                console.error("Email sending background error:", emailErr);
+            }
+
             setRegisteredParticipants(enrichedData || []);
             setPageStatus('success');
-            setSuccessMsg("Your registration is successful! Your Golden Ticket has been generated.");
+            setSuccessMsg("Your registration is successful! Official Tickets have been sent to your email.");
         } catch (err) {
             setError(err?.message || "Registration failed.");
         } finally {
@@ -358,9 +379,9 @@ const EventRegistrationArea = () => {
                                                                 style={{ borderRadius: "10px", padding: "12px", border: (error && !p.name.trim()) ? "1px solid red" : "1px solid #ced4da" }}
                                                                 placeholder="Enter Name"
                                                                 value={p.name}
-                                                                onChange={(e) => {
+                                                                 onChange={(e) => {
                                                                     const up = [...participants];
-                                                                    up[pIdx].name = e.target.value;
+                                                                    up[pIdx].name = e.target.value.replace(/[^a-zA-Z\s]/g, '');
                                                                     setParticipants(up);
                                                                 }}
                                                                 required
@@ -412,7 +433,7 @@ const EventRegistrationArea = () => {
                                                                 value={p.location}
                                                                 onChange={(e) => {
                                                                     const up = [...participants];
-                                                                    up[pIdx].location = e.target.value;
+                                                                    up[pIdx].location = e.target.value.replace(/[^a-zA-Z\s]/g, '');
                                                                     setParticipants(up);
                                                                 }}
                                                                 required
@@ -495,7 +516,7 @@ const EventRegistrationArea = () => {
                                                     <GoldenTicket registration={reg} event={event} />
                                                 </div>
                                                 <div className="mt-3">
-                                                    <p className="text-muted small">An email with this ticket has been simulated and sent to <strong>{reg.email}</strong></p>
+                                                    <p className="text-muted small">The official ticket has been sent to <strong>{reg.email}</strong></p>
                                                     <button 
                                                         className="btn btn-outline-dark btn-sm" 
                                                         onClick={() => {

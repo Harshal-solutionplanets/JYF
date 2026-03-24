@@ -97,7 +97,7 @@ const AdminAddCause = ({ onPublish }) => {
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "30px" }}>
                             <div>
                                 <label style={labelStyle}>Cause Title</label>
-                                <input type="text" style={inputStyle} placeholder="e.g. Children Education" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                                <input type="text" style={inputStyle} placeholder="e.g. Children Education" value={title} onChange={(e) => setTitle(e.target.value.replace(/[^a-zA-Z\s]/g, ''))} required />
                             </div>
                             <div>
                                 <label style={labelStyle}>Category / Tag</label>
@@ -105,7 +105,7 @@ const AdminAddCause = ({ onPublish }) => {
                             </div>
                             <div>
                                 <label style={labelStyle}>Funding Goal ($)</label>
-                                <input type="number" style={inputStyle} placeholder="e.g. 5000" value={goal} onChange={(e) => setGoal(e.target.value)} required />
+                                <input type="number" style={inputStyle} placeholder="e.g. 5000" value={goal} onChange={(e) => setGoal(e.target.value.replace(/\D/g, ''))} required />
                             </div>
                         </div>
 

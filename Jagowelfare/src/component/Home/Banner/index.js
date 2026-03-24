@@ -11,7 +11,7 @@ import { supabase } from "../../../supabase";
 const HomeBanner = () => {
     const [config, setConfig] = React.useState({
         title: "Unity in commUNITY",
-        description: "Jago Welfare Foundation (JYF) is dedicated to empowering lives through service and welfare. Join us in making a difference.",
+        description: "Jain Youth Foundation is dedicated to empowering lives through service and welfare. Join us in making a difference.",
         image_url: BannerImg,
     });
 
@@ -38,7 +38,7 @@ const HomeBanner = () => {
                 </div>
                 <div className="col-lg-6">
                     <div className="banner_one_img">
-                        <img src={config.image_url || BannerImg} alt="img" />
+                        <img src={config.image_url || BannerImg} alt="img" style={{ width: "619px", height: "684px", objectFit: "cover" }} />
                         <div className="banner_element">
                             <img src={Element1} alt="icon" className="element_1 shape-1" />
                             <img src={Element2} alt="icon" className="element_2 shape-2" />

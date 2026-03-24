@@ -1,18 +1,16 @@
-export const formatDate = (dateStr) => {
-    if (!dateStr) return "N/A";
+export const formatDate = (dateValue) => {
+    if (!dateValue) return "N/A";
     try {
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return "Invalid Date";
+        const date = new Date(dateValue);
+        if (isNaN(date.getTime())) return "N/A";
         
-        // Use Indian/British format: DD/MM/YYYY
-        // padStart ensures leading zeros for day and month
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
+        const year = date.getFullYear(); // Keeping YYYY for clarity, matching previous session
         
         return `${day}/${month}/${year}`;
     } catch (e) {
-        return "Invalid Date";
+        return "N/A";
     }
 };
 

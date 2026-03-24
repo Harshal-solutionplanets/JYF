@@ -5,6 +5,7 @@ import { apiFetch } from "../../api";
 import { useAuth } from "../../auth/AuthProvider";
 import { supabase } from "../../supabase";
 import { extractDescription } from "../../utils/eventHelper";
+import { formatDate } from "../../utils/dateFormatter";
 
 function toJsDate(value) {
   if (!value) return null;
@@ -109,14 +110,12 @@ const EventDetailsArea = () => {
                         <br />
                         <strong>Starts:</strong>{" "}
                         {(() => {
-                          const d = toJsDate(event.startAt || event.start_at);
-                          return d ? d.toLocaleString() : "-";
+                          return formatDate(event.startAt || event.start_at);
                         })()}
                         <br />
                         <strong>Ends:</strong>{" "}
                         {(() => {
-                          const d = toJsDate(event.endAt || event.end_at);
-                          return d ? d.toLocaleString() : "-";
+                          return formatDate(event.endAt || event.end_at);
                         })()}
                       </p>
                       {event.image_url && event.image_url.split(",").length > 1 && (

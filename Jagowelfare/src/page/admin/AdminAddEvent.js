@@ -131,6 +131,16 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
         setPreviewUrls(prev => prev.filter((_, i) => i !== index));
     };
 
+    const replaceImage = (index, file) => {
+        const url = URL.createObjectURL(file);
+        setPreviewUrls(prev => prev.map((u, i) => i === index ? url : u));
+        setImageFiles(prev => {
+            const newFiles = [...prev];
+            newFiles[index] = file;
+            return newFiles;
+        });
+    };
+
     const [showTierDropdown, setShowTierDropdown] = useState(false);
 
     const addSectionWithName = (name) => {
@@ -225,6 +235,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
 
     const inputStyle = { border: "none", borderBottom: "2px solid #ddd", borderRadius: "0", padding: "12px 0", backgroundColor: "transparent", fontSize: "16px", outline: "none", width: "100%", boxSizing: "border-box", transition: "all 0.3s" };
     const labelStyle = { fontWeight: "700", color: "#222", fontSize: "14px", marginBottom: "10px", display: "block", textTransform: "uppercase", letterSpacing: "0.5px" };
+    const actionButtonStyle = { padding: "4px 10px", fontSize: "12px", borderRadius: "4px", cursor: "pointer", border: "none", fontWeight: "600", color: "#444", backgroundColor: "#f0f0f0", transition: "0.2s" };
     const sectionHeadingStyle = { fontSize: "18px", fontWeight: "800", color: "#e33129", marginBottom: "20px", paddingBottom: "8px", borderBottom: "1px solid #eee", width: "100%" };
     const sectionContainerStyle = { backgroundColor: "#fcfcfc", padding: "25px", borderRadius: "15px", border: "1px solid #f0f0f0", marginBottom: "30px", display: "flex", flexWrap: "wrap", boxSizing: "border-box" };
 
@@ -266,7 +277,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                             </div>
                             <div>
                                 <label style={labelStyle}>Seats Available (Quantity)</label>
-                                <input type="number" style={inputStyle} placeholder="e.g. 1700" value={seatsAvailable} onChange={(e) => setSeatsAvailable(e.target.value)} />
+                                <input type="number" style={inputStyle} placeholder="e.g. 1700" value={seatsAvailable} onChange={(e) => setSeatsAvailable(e.target.value.replace(/\D/g, ''))} />
                             </div>
                         </div>
 
@@ -306,9 +317,17 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                             <input ref={fileInputRef} type="file" style={{ display: "none" }} accept="image/*" multiple onChange={handleImageChange} />
                             <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "center", marginTop: "15px" }}>
                                 {previewUrls.map((url, i) => (
-                                    <div key={i} style={{ position: "relative" }}>
-                                        <img src={url} alt="Preview" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "15px", border: "1px solid #eee" }} />
-                                        <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: "-8px", right: "-8px", backgroundColor: "#e33129", color: "#fff", border: "none", borderRadius: "50%", width: "24px", height: "24px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
+                                    <div key={i} style={{ position: "relative", textAlign: "center" }}>
+                                        <img src={url} alt="Preview" style={{ width: "120px", height: "100px", objectFit: "cover", borderRadius: "12px", border: "1px solid #eee", marginBottom: "5px" }} />
+                                        <div style={{ display: "flex", gap: "5px", justifyContent: "center" }}>
+                                            <button type="button" onClick={() => {
+                                                const input = document.createElement('input');
+                                                input.type = 'file';
+                                                input.onchange = (e) => { if(e.target.files[0]) replaceImage(i, e.target.files[0]); };
+                                                input.click();
+                                            }} style={actionButtonStyle}>Edit</button>
+                                            <button type="button" onClick={() => removeImage(i)} style={{ ...actionButtonStyle, color: "#e33129", backgroundColor: "#fff0f0" }}>Del</button>
+                                        </div>
                                     </div>
                                 ))}
                                 <div onClick={() => fileInputRef.current.click()} style={{ width: "100px", height: "100px", border: "2px dashed #ddd", borderRadius: "15px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "32px", color: "#aaa", backgroundColor: "#fafafa" }}>+</div>
@@ -336,14 +355,14 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                         <div style={sectionHeadingStyle}>Contact Information</div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "30px", width: "100%", boxSizing: "border-box" }}>
                             <div><label style={labelStyle}>Contact Email</label><input type="email" style={inputStyle} placeholder="register@example.com" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} /></div>
-                            <div><label style={labelStyle}>Contact Phone</label><input type="tel" style={inputStyle} placeholder="+1 234 567 890" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} /></div>
+                            <div><label style={labelStyle}>Contact Phone</label><input type="tel" style={inputStyle} placeholder="+1 234 567 890" value={contactPhone} onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} /></div>
                         </div>
                     </div>
 
                     <div style={sectionContainerStyle}>
                         <div style={sectionHeadingStyle}>Event Organizer</div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "30px", width: "100%", boxSizing: "border-box" }}>
-                            <div><label style={labelStyle}>Organizer Name</label><input type="text" style={inputStyle} placeholder="Mike Richard" value={organizerName} onChange={(e) => setOrganizerName(e.target.value)} /></div>
+                            <div><label style={labelStyle}>Organizer Name</label><input type="text" style={inputStyle} placeholder="Mike Richard" value={organizerName} onChange={(e) => setOrganizerName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))} /></div>
                             <div><label style={labelStyle}>Role / Designation</label><input type="text" style={inputStyle} placeholder="Director" value={organizerRole} onChange={(e) => setOrganizerRole(e.target.value)} /></div>
                             <div><label style={labelStyle}>Company / Group</label><input type="text" style={inputStyle} placeholder="Care NGO" value={organizerCompany} onChange={(e) => setOrganizerCompany(e.target.value)} /></div>
                         </div>
@@ -352,11 +371,14 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                             <input ref={organizerInputRef} type="file" style={{ display: "none" }} accept="image/*" onChange={handleOrganizerImageChange} />
                             <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "10px" }}>
                                 {organizerPreview ? (
-                                    <div style={{ position: "relative" }}>
-                                        <img src={organizerPreview} alt="Organizer" style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", border: "2px solid #e33129" }} />
-                                        <button type="button" onClick={() => { setOrganizerImageFile(null); setOrganizerPreview(""); }} style={{ position: "absolute", top: "0", right: "0", backgroundColor: "#333", color: "#fff", border: "none", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer" }}>×</button>
+                                    <div style={{ textAlign: "center" }}>
+                                        <img src={organizerPreview} alt="Organizer" style={{ width: "100px", height: "100px", borderRadius: "50%", objectFit: "cover", border: "2px solid #e33129", marginBottom: "10px" }} />
+                                        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                                            <button type="button" onClick={() => organizerInputRef.current.click()} style={actionButtonStyle}>Edit</button>
+                                            <button type="button" onClick={() => { setOrganizerImageFile(null); setOrganizerPreview(""); }} style={{ ...actionButtonStyle, color: "#e33129", backgroundColor: "#fff0f0" }}>Remove</button>
+                                        </div>
                                     </div>
-                                ) : (<div onClick={() => organizerInputRef.current.click()} style={{ width: "80px", height: "80px", borderRadius: "50%", border: "2px dashed #ddd", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#999" }}><i className="fas fa-camera"></i></div>)}
+                                ) : (<div onClick={() => organizerInputRef.current.click()} style={{ width: "100px", height: "100px", borderRadius: "50%", border: "2px dashed #ddd", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#999" }}><i className="fas fa-camera"></i></div>)}
                             </div>
                         </div>
                     </div>

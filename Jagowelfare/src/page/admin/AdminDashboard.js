@@ -148,6 +148,28 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const getViewTitle = () => {
+    const titles = {
+        "dashboard": "Dashboard Overview",
+        "add_events": "Add New Event",
+        "view_events": "Manage Events",
+        "edit_event": "Edit Event",
+        "add_causes": "Post a Cause",
+        "view_causes": "All Causes",
+        "add_gallery": "Add Gallery Image",
+        "add_news": "Publish News Article",
+        "view_news": "Article History",
+        "add_team": "Add Team Member",
+        "add_testimonials": "Add Testimonial",
+        "view_registrations": "Event Registrations",
+        "manage_master_cat": "Event Category Master",
+        "manage_master_seat": "Seats Type Master",
+        "dashboard_updates": "Global Site Updates",
+        "qr_scanner": "QR Entry Scanner"
+    };
+    return titles[activeView] || activeView.replace("_", " ").toUpperCase();
+  };
+
 
 
   const renderContent = () => {
@@ -178,23 +200,26 @@ const AdminDashboardPage = () => {
 
 
   const navItemStyle = {
-    padding: "12px 25px",
+    padding: "12px 20px",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     color: "#222",
     fontWeight: "600",
-    fontSize: "16px",
+    fontSize: "14px",
+    transition: "0.2s"
   };
 
   const subItemStyle = {
-    padding: "8px 25px 8px 60px",
+    padding: "10px 25px 10px 55px",
     cursor: "pointer",
     display: "block",
-    color: "#555",
-    fontSize: "14px",
+    color: "#666",
+    fontSize: "13px",
     fontWeight: "500",
+    borderLeft: "3px solid transparent",
+    transition: "0.2s"
   };
 
   const menuItems = [
@@ -230,7 +255,7 @@ const AdminDashboardPage = () => {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f4f6f9" }}>
-      <aside style={{ width: "260px", backgroundColor: "#ffffff", boxShadow: "2px 0 10px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column" }}>
+      <aside style={{ width: "280px", backgroundColor: "#ffffff", boxShadow: "2px 0 10px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "25px 20px", display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "1px solid #eaeaea" }}>
           <img src={logo} alt="Logo" style={{ maxWidth: "160px" }} />
         </div>
@@ -267,7 +292,7 @@ const AdminDashboardPage = () => {
                         </div>
                       </div>
                     ) : item.view ? (
-                      <div onClick={() => setActiveView(item.view)} style={subItemStyle}>Go to {item.title}</div>
+                      <div onClick={() => setActiveView(item.view)} style={{ ...subItemStyle, color: activeView === item.view ? "#ca1e14" : "#666", borderLeftColor: activeView === item.view ? "#ca1e14" : "transparent" }}>Updates Overview</div>
                     ) : item.subs ? (
                       item.subs.map((sub, idx) => (
                         sub.external ? (
@@ -296,10 +321,10 @@ const AdminDashboardPage = () => {
           </ul>
         </div>
       </aside>
-      <main style={{ flex: 1, padding: "50px" }}>
+      <main style={{ flex: 1, padding: "50px", overflowY: "auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "40px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <h2 style={{ color: "#222", margin: 0, fontWeight: "800" }}>{activeView.replace("_", " ").toUpperCase()}</h2>
+            <h2 style={{ color: "#222", margin: 0, fontWeight: "800", fontSize: "28px" }}>{getViewTitle()}</h2>
             {activeView !== "dashboard" && (
               <button onClick={() => setActiveView("dashboard")} className="btn btn_theme btn_md" style={{ padding: "8px 20px" }}>
                 <i className="fas fa-arrow-left mr-2"></i> Back
