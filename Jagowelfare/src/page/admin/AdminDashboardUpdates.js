@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { supabase } from "../../supabase";
@@ -6,10 +6,14 @@ import { supabase } from "../../supabase";
 const AdminDashboardUpdates = () => {
     const [loading, setLoading] = useState(false);
     
+    // Refs for file inputs
+    const heroInputRef = useRef(null);
+    const introInputRef = useRef(null);
+    const bannerInputRefs = useRef({});
     // Home Hero State
     const [homeHero, setHomeHero] = useState({
         title: "Unity in commUNITY",
-        description: "Jago Welfare Foundation (JYF) is dedicated to empowering lives through service and welfare. Join us in making a difference.",
+        description: "Jain Youth Foundation is dedicated to empowering lives through service and welfare. Join us in making a difference.",
         image_url: "",
     });
 
@@ -93,6 +97,17 @@ const AdminDashboardUpdates = () => {
         marginBottom: "15px",
     };
 
+    const actionButtonStyle = {
+        padding: "6px 12px",
+        fontSize: "13px",
+        borderRadius: "5px",
+        cursor: "pointer",
+        marginRight: "8px",
+        border: "none",
+        fontWeight: "600",
+        transition: "all 0.3s"
+    };
+
     const sectionStyle = {
         backgroundColor: "#fff",
         padding: "30px",
@@ -139,10 +154,19 @@ const AdminDashboardUpdates = () => {
                         </div>
                     </div>
                     <div>
-                        <label>Hero Image</label>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                            <label style={{ margin: 0 }}>Hero Image <span style={{ color: "#888", fontWeight: "normal", fontSize: "12px" }}>(Suggested size: 619 x 684)</span></label>
+                            {homeHero.image_url && (
+                                <div>
+                                    <button onClick={() => heroInputRef.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
+                                    <button onClick={() => setHomeHero({...homeHero, image_url: ""})} style={{ ...actionButtonStyle, backgroundColor: "#ffefef", color: "#ca1e14" }}>Delete</button>
+                                </div>
+                            )}
+                        </div>
                         <input 
+                            ref={heroInputRef}
                             type="file" 
-                            style={inputStyle} 
+                            style={homeHero.image_url ? { display: "none" } : inputStyle} 
                             onChange={async (e) => {
                                 if (e.target.files[0]) {
                                     const url = await handleImageUpload(e.target.files[0], "home_hero");
@@ -150,7 +174,7 @@ const AdminDashboardUpdates = () => {
                                 }
                             }} 
                         />
-                        {homeHero.image_url && <img src={homeHero.image_url} alt="preview" style={{ width: "100%", borderRadius: "10px", marginTop: "10px", border: "1px solid #eee" }} />}
+                        {homeHero.image_url && <img src={homeHero.image_url} alt="preview" style={{ width: "100%", borderRadius: "10px", border: "1px solid #eee" }} />}
                     </div>
                 </div>
                 <button onClick={() => handleSave('home_hero', homeHero)} className="btn btn_theme mt-3" disabled={loading}>
@@ -185,14 +209,26 @@ const AdminDashboardUpdates = () => {
                         </div>
                     </div>
                     <div>
-                        <label>Intro Image</label>
-                        <input type="file" style={inputStyle} onChange={async (e) => {
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                            <label style={{ margin: 0 }}>Intro Image</label>
+                            {homeIntro.image_url && (
+                                <div>
+                                    <button onClick={() => introInputRef.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
+                                    <button onClick={() => setHomeIntro({...homeIntro, image_url: ""})} style={{ ...actionButtonStyle, backgroundColor: "#ffefef", color: "#ca1e14" }}>Delete</button>
+                                </div>
+                            )}
+                        </div>
+                        <input 
+                            ref={introInputRef}
+                            type="file" 
+                            style={homeIntro.image_url ? { display: "none" } : inputStyle} 
+                            onChange={async (e) => {
                             if (e.target.files[0]) {
                                 const url = await handleImageUpload(e.target.files[0], "home_intro");
                                 setHomeIntro({...homeIntro, image_url: url});
                             }
                         }} />
-                        {homeIntro.image_url && <img src={homeIntro.image_url} alt="preview" style={{ width: "100%", borderRadius: "10px", marginTop: "10px", border: "1px solid #eee" }} />}
+                        {homeIntro.image_url && <img src={homeIntro.image_url} alt="preview" style={{ width: "100%", borderRadius: "10px", border: "1px solid #eee" }} />}
                     </div>
                 </div>
                 <button onClick={() => handleSave('home_intro', homeIntro)} className="btn btn_theme mt-3" disabled={loading}>
@@ -218,10 +254,23 @@ const AdminDashboardUpdates = () => {
                                     setPageBanners(newBanners);
                                 }} 
                             />
-                            <label>Banner Image</label>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                                <label style={{ margin: 0 }}>Banner Image</label>
+                                {pageBanners[key].image_url && (
+                                    <div>
+                                        <button onClick={() => bannerInputRefs.current[key].click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
+                                        <button onClick={() => {
+                                            const newBanners = {...pageBanners};
+                                            newBanners[key].image_url = "";
+                                            setPageBanners(newBanners);
+                                        }} style={{ ...actionButtonStyle, backgroundColor: "#ffefef", color: "#ca1e14" }}>Delete</button>
+                                    </div>
+                                )}
+                            </div>
                             <input 
+                                ref={el => bannerInputRefs.current[key] = el}
                                 type="file" 
-                                style={inputStyle} 
+                                style={pageBanners[key].image_url ? { display: "none" } : inputStyle} 
                                 onChange={async (e) => {
                                     if (e.target.files[0]) {
                                         const url = await handleImageUpload(e.target.files[0], key);
@@ -231,7 +280,7 @@ const AdminDashboardUpdates = () => {
                                     }
                                 }} 
                             />
-                            {pageBanners[key].image_url && <img src={pageBanners[key].image_url} alt="preview" style={{ width: "100%", height: "80px", objectFit: "cover", borderRadius: "5px", marginTop: "5px" }} />}
+                            {pageBanners[key].image_url && <img src={pageBanners[key].image_url} alt="preview" style={{ width: "100%", height: "80px", objectFit: "cover", borderRadius: "5px" }} />}
                         </div>
                     ))}
                 </div>

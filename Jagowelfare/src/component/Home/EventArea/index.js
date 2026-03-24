@@ -6,6 +6,7 @@ import Iconclock from "../../../assets/img/icon/clock.png"
 import IconMap from "../../../assets/img/icon/map.png"
 import IconDate from "../../../assets/img/icon/date.png"
 import { extractDescription } from "../../../utils/eventHelper";
+import { formatDate } from "../../../utils/dateFormatter";
 
 
 const EventArea = (props) => {
@@ -100,8 +101,10 @@ const EventArea = (props) => {
                           <img src={IconDate} alt="icon" />
                           <h6>
                             {(() => {
-                              const { day, mon } = formatDayMonth(featured.startAt || featured.start_at);
-                              return <>{day} <span>{mon}</span></>;
+                              const d = new Date(featured.startAt || featured.start_at);
+                              const day = String(d.getDate()).padStart(2, '0');
+                              const mon = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+                              return <>{day} <span style={{fontSize: '10px'}}>{mon}</span></>;
                             })()}
                           </h6>
                         </div>

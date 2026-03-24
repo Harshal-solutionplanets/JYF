@@ -63,7 +63,7 @@ const RegisterArea = () => {
                                   className="form-control"
                                   placeholder="Enter full name"
                                   value={displayName}
-                                  onChange={(e) => setDisplayName(e.target.value)}
+                                  onChange={(e) => setDisplayName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                                   required
                                 />
                             </div>
@@ -83,7 +83,7 @@ const RegisterArea = () => {
                                   className="form-control"
                                   placeholder="Enter mobile number (optional)"
                                   value={phone}
-                                  onChange={(e) => setPhone(e.target.value)}
+                                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                                 />
                             </div>
                             <div className="form-group">

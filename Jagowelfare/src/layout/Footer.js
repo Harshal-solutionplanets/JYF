@@ -14,9 +14,9 @@ const Footer = () => {
                     {/* About Section */}
                     <div className="col-lg-4 col-md-12 col-sm-12 col-12 mb-4">
                         <div className="footer_area_about">
-                            <img src={logo} alt="Jago Welfare Logo" style={{ maxWidth: "150px", marginBottom: "20px" }} />
+                            <img src={logo} alt="Jain Youth Foundation Logo" style={{ maxWidth: "150px", marginBottom: "20px" }} />
                             <p style={{ color: "#555", lineHeight: "1.6" }}>
-                                Jago Welfare Foundation (JYF) - Unity in commUNITY. 
+                                Jain Youth Foundation - Unity in commUNITY. 
                                 Empowering lives through service, compassion, and sustainable community welfare.
                             </p>
                         </div>
