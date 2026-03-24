@@ -41,6 +41,7 @@ import AdminLoginPage from "./page/admin/AdminLogin";
 import EventRegistrationPage from "./page/EventRegistration";
 import QRScannerPage from "./page/QRScannerPage";
 import AdminViewRegistrations from "./page/admin/AdminViewRegistrations";
+import AdminViewGallery from "./page/admin/AdminViewGallery";
 
 const App = () => {
   const location = useLocation();
@@ -109,6 +110,14 @@ const App = () => {
           element={
             <RequireStaff>
               <AdminViewRegistrations />
+            </RequireStaff>
+          }
+        />
+        <Route
+          path="/admin/view-gallery"
+          element={
+            <RequireStaff>
+              <AdminViewGallery />
             </RequireStaff>
           }
         />

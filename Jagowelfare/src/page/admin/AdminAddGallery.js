@@ -12,10 +12,15 @@ const AdminAddGallery = ({ onPublish }) => {
     const handleImageChange = (e) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            setImageFiles(filesArray);
+            setImageFiles(prev => [...prev, ...filesArray]);
             const urls = filesArray.map(file => URL.createObjectURL(file));
-            setPreviewUrls(urls);
+            setPreviewUrls(prev => [...prev, ...urls]);
         }
+    };
+
+    const removeImage = (index) => {
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+        setPreviewUrls(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e) => {
@@ -72,7 +77,16 @@ const AdminAddGallery = ({ onPublish }) => {
                             <input ref={fileInputRef} type="file" style={{ display: "none" }} accept="image/*" multiple onChange={handleImageChange} />
                             <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "center", marginTop: "15px" }}>
                                 {previewUrls.map((url, i) => (
-                                    <img key={i} src={url} alt="Preview" style={{ width: "120px", height: "120px", objectFit: "cover", borderRadius: "15px", border: "1px solid #eee" }} />
+                                    <div key={i} style={{ position: "relative" }}>
+                                        <img src={url} alt="Preview" style={{ width: "120px", height: "120px", objectFit: "cover", borderRadius: "15px", border: "1px solid #eee" }} />
+                                        <button 
+                                            type="button"
+                                            onClick={() => removeImage(i)}
+                                            style={{ position: "absolute", top: "-10px", right: "-10px", background: "#e33129", color: "white", border: "none", borderRadius: "50%", width: "25px", height: "25px", cursor: "pointer", fontSize: "14px", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
                                 ))}
                                 <div onClick={() => fileInputRef.current.click()} style={{ width: "120px", height: "120px", border: "2px dashed #ddd", borderRadius: "15px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "32px", color: "#aaa", backgroundColor: "#fafafa" }}>+</div>
                             </div>

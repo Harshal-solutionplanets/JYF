@@ -8,10 +8,18 @@ CREATE TABLE IF NOT EXISTS public.events (
     description TEXT,
     content TEXT,
     venue TEXT,
-    heroImageUrl TEXT,
+    image_url TEXT,
     startAt TIMESTAMPTZ,
     endAt TIMESTAMPTZ,
     status TEXT DEFAULT 'published',
+    category TEXT,
+    contactEmail TEXT,
+    contactPhone TEXT,
+    seatsAvailable INTEGER,
+    organizerName TEXT,
+    organizerRole TEXT,
+    organizerCompany TEXT,
+    organizerImageUrl TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -19,12 +27,16 @@ CREATE TABLE IF NOT EXISTS public.events (
 CREATE TABLE IF NOT EXISTS public.causes (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title TEXT NOT NULL,
-    tag TEXT,
     description TEXT,
     content TEXT,
-    goal NUMERIC DEFAULT 0,
-    raised NUMERIC DEFAULT 0,
-    imageUrl TEXT,
+    image_url TEXT,
+    infokey1 TEXT,
+    infoval1 TEXT,
+    infokey2 TEXT,
+    infoval2 TEXT,
+    infokey3 TEXT,
+    infoval3 TEXT,
+    status TEXT DEFAULT 'published',
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -32,10 +44,10 @@ CREATE TABLE IF NOT EXISTS public.causes (
 CREATE TABLE IF NOT EXISTS public.news (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title TEXT NOT NULL,
-    tag TEXT,
+    tag TEXT DEFAULT '#News',
     summary TEXT,
     content TEXT,
-    imageUrl TEXT,
+    image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -43,7 +55,7 @@ CREATE TABLE IF NOT EXISTS public.news (
 CREATE TABLE IF NOT EXISTS public.gallery (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title TEXT,
-    imageUrl TEXT NOT NULL,
+    image_url TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -52,7 +64,7 @@ CREATE TABLE IF NOT EXISTS public.team (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
     role TEXT,
-    imageUrl TEXT,
+    image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -62,7 +74,7 @@ CREATE TABLE IF NOT EXISTS public.testimonials (
     name TEXT NOT NULL,
     role TEXT,
     comment TEXT,
-    imageUrl TEXT,
+    image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 

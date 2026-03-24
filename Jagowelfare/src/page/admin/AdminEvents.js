@@ -19,7 +19,7 @@ const AdminEventsPage = () => {
             const { data, error } = await supabase
                 .from('events')
                 .select('*')
-                .order('start_at', { ascending: false });
+                .order('startAt', { ascending: false });
             
             if (error) throw error;
             setEvents(data || []);
@@ -71,7 +71,7 @@ const AdminEventsPage = () => {
                     {
                         title,
                         description,
-                        start_at: new Date(date).toISOString(),
+                        startAt: new Date(date).toISOString(),
                         status: "published",
                         image_url: imageUrl
                     }
@@ -166,7 +166,7 @@ const AdminEventsPage = () => {
                                                 {events.map((event) => (
                                                     <tr key={event.id}>
                                                         <td>{event.title}</td>
-                                                        <td>{formatDate(event.start_at)}</td>
+                                                        <td>{formatDate(event.startAt)}</td>
                                                         <td><span className="badge bg-success">{event.status}</span></td>
                                                     </tr>
                                                 ))}

@@ -15,6 +15,7 @@ import AdminViewNews from "./AdminViewNews";
 import AdminViewRegistrations from "./AdminViewRegistrations";
 import AdminQRScanner from "./AdminQRScanner";
 import AdminDashboardUpdates from "./AdminDashboardUpdates";
+import AdminViewGallery from "./AdminViewGallery";
 
 const DashboardOverview = () => {
   return (
@@ -163,6 +164,7 @@ const AdminDashboardPage = () => {
         "add_causes": "Post a Cause",
         "view_causes": "All Causes",
         "add_gallery": "Add Gallery Image",
+        "view_gallery": "Gallery Management",
         "add_news": "Publish News Article",
         "view_news": "Article History",
         "add_team": "Add Team Member",
@@ -195,6 +197,7 @@ const AdminDashboardPage = () => {
       case "view_causes": 
         return <AdminViewCauses onEdit={handleEditCause} />;
       case "add_gallery": return <AdminAddGallery onPublish={() => setActiveView("dashboard")} />;
+      case "view_gallery": return <AdminViewGallery />;
       case "add_news": return <AdminAddNews onPublish={() => setActiveView("dashboard")} />;
       case "view_news": return <AdminViewNews />;
       case "add_team": return <AdminAddTeam onPublish={() => setActiveView("dashboard")} />;
@@ -255,7 +258,13 @@ const AdminDashboardPage = () => {
         { label: "View News List", view: "view_news" }
       ]
     },
-    { title: "Gallery", icon: "fas fa-images", key: "gallery", addView: "add_gallery", viewPath: "/gallery" },
+    {
+      title: "Gallery", icon: "fas fa-images", key: "gallery",
+      subs: [
+        { label: "Add Gallery", view: "add_gallery" },
+        { label: "View Gallery List", view: "view_gallery" }
+      ]
+    },
     { title: "Team Members", icon: "fas fa-users", key: "team", addView: "add_team", viewPath: "/team" },
     { title: "Testimonials", icon: "fas fa-comment-dots", key: "testimonials", addView: "add_testimonials", viewPath: "/testimonial" },
     { title: "Dashboard Updates", icon: "fas fa-edit", key: "dashboard_updates", view: "dashboard_updates" },
