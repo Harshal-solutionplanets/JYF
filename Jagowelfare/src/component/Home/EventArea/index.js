@@ -6,7 +6,6 @@ import Iconclock from "../../../assets/img/icon/clock.png"
 import IconMap from "../../../assets/img/icon/map.png"
 import IconDate from "../../../assets/img/icon/date.png"
 import { extractDescription } from "../../../utils/eventHelper";
-import { formatDate } from "../../../utils/dateFormatter";
 
 
 const EventArea = (props) => {
@@ -42,13 +41,6 @@ const EventArea = (props) => {
     return [first, others];
   }, [events]);
 
-  const formatDayMonth = (dateStr) => {
-    if (!dateStr) return { day: "--", mon: "---" };
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, "0");
-    const mon = d.toLocaleString(undefined, { month: "short" });
-    return { day, mon };
-  };
 
   const formatTime = (dateStr) => {
     if (!dateStr) return "10 am";
@@ -154,30 +146,26 @@ const EventArea = (props) => {
                 {rest.map((datas) => (
                   <div className="event_left_side_wrapper mb-3" key={datas.id}>
                     <div className="event_content_area small_content_padding" style={{ position: 'relative' }}>
-                      <div className="event_big_img" style={{ marginBottom: '15px' }}>
-                        <Link to={`/event/${datas.id}`}>
-                          <img src={datas.image_url?.split(',')[0]} alt="img" style={{height: "150px", objectFit: "cover", width: "100%", borderRadius: "10px"}} />
-                        </Link>
-                      </div>
+                      {/* Removed big image for rest items to match specific screenshot layout */}
 
                       {/* Floating Date Circle (matches user's image) */}
                       <div className="event_date_circle" style={{
                         position: 'absolute',
-                        top: '15px',
-                        right: '15px',
+                        top: '40px',
+                        right: '0',
                         background: 'linear-gradient(135deg, #e33129, #f27234)',
-                        color: '#white',
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
+                        color: '#fff',
+                        width: '75px',
+                        height: '75px',
+                        borderRadius: '40% 60% 70% 30% / 40% 50% 60% 70%',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 4px 15px rgba(227, 49, 41, 0.4)',
+                        boxShadow: '10px 10px 0px rgba(242, 114, 52, 0.2)',
                         zIndex: 10
                       }}>
-                        <span style={{ fontSize: '18px', fontWeight: '800', lineHeight: '1', color: '#fff' }}>
+                        <span style={{ fontSize: '20px', fontWeight: '800', lineHeight: '1', color: '#fff' }}>
                           {(() => {
                             const d = new Date(datas.startAt || datas.start_at);
                             return d.getDate();
@@ -191,13 +179,13 @@ const EventArea = (props) => {
                         </span>
                       </div>
 
-                      <div className="event_tag_area">
-                        <Link to={`/event/${datas.id}`}>{datas.tag || "#Event"}</Link>
+                      <div className="event_tag_area" style={{ marginBottom: "5px" }}>
+                        <Link to={`/event/${datas.id}`} style={{ color: "#e33129", fontWeight: "700", fontSize: "16px" }}>{datas.tag || "#Event"}</Link>
                       </div>
                       <div className="event_heading_area">
                         <div className="event_heading">
-                          <h3>
-                            <Link to={`/event/${datas.id}`}>
+                          <h3 style={{ fontSize: "24px", fontWeight: "800", marginBottom: "10px" }}>
+                            <Link to={`/event/${datas.id}`} style={{ color: "#222" }}>
                               {datas.title}
                             </Link>
                           </h3>
@@ -206,36 +194,37 @@ const EventArea = (props) => {
                       <div className="event_para" style={{ 
                         display: '-webkit-box', 
                         WebkitBoxOrient: 'vertical', 
-                        WebkitLineClamp: 3, 
+                        WebkitLineClamp: 2, 
                         overflow: 'hidden',
-                        marginBottom: '20px'
+                        marginBottom: '15px',
+                        paddingRight: '80px'
                       }}>
                         <p 
-                          style={{ fontSize: "15px", lineHeight: "1.6", color: "#666" }}
+                          style={{ fontSize: "15px", lineHeight: "1.6", color: "#888" }}
                           dangerouslySetInnerHTML={{ __html: extractDescription(datas.description) }}
                         ></p>
                       </div>
-                      <div className="event_boxed_bottom_wrapper">
+                      <div className="event_boxed_bottom_wrapper" style={{ borderTop: "1px solid #eee", paddingTop: "15px" }}>
                         <div className="row">
-                          <div className="col-lg-6 col-md-6 col-sm-6 col-6">
+                          <div className="col-lg-6 col-md-6 col-sm-6 col-6" style={{ borderRight: "1px solid #eee" }}>
                             <div className="event_bottom_boxed">
                               <div className="event_bottom_icon">
-                                <img src={IconMap} alt="icon" />
+                                <img src={IconMap} alt="icon" style={{ width: "15px" }} />
                               </div>
                               <div className="event_bottom_content">
-                                <h5>Location:</h5>
-                                <p>{datas.venue || "TBD"}</p>
+                                <h5 style={{ fontSize: "13px", color: "#222" }}>Location:</h5>
+                                <p style={{ fontSize: "12px" }}>{datas.venue || "TBD"}</p>
                               </div>
                             </div>
                           </div>
                           <div className="col-lg-6 col-md-6 col-sm-6 col-6">
-                            <div className="event_bottom_boxed">
+                            <div className="event_bottom_boxed" style={{ paddingLeft: "15px" }}>
                               <div className="event_bottom_icon">
-                                <img src={Iconclock} alt="icon" />
+                                <img src={Iconclock} alt="icon" style={{ width: "15px" }} />
                               </div>
                               <div className="event_bottom_content">
-                                <h5>Starts at:</h5>
-                                <p>{formatTime(datas.startAt || datas.start_at)}</p>
+                                <h5 style={{ fontSize: "13px", color: "#222" }}>Starts at:</h5>
+                                <p style={{ fontSize: "12px" }}>{formatTime(datas.startAt || datas.start_at)}</p>
                               </div>
                             </div>
                           </div>

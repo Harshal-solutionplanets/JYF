@@ -181,7 +181,7 @@ const AdminAddCause = ({ onPublish, causeData }) => {
 
                         <div style={{ marginBottom: "20px" }}>
                             <label style={{...labelStyle, fontSize: "12px"}}>Point 2</label>
-                            <input type="text" style={inputStyle} value={infoval2} onChange={(e) => setInfoval2(e.target.value.slice(0, 40))} placeholder="e.g. Operating in Niger, Nigeria" />
+                            <input type="text" style={inputStyle} value={infoval2} onChange={(e) => setInfoval2(e.target.value.slice(0, 40))} placeholder="e.g. Operating in Mulund, Mumbai" />
                         </div>
 
                         <div style={{ marginBottom: "0" }}>

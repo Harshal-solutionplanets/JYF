@@ -7,7 +7,7 @@ import EventAreaPage from '../component/Event'
 const EventMainPage = () => {
   return (
     <>
-       <CommonBanner heading="Events" pagination="Events"/>
+       <CommonBanner heading="All Events" pagination="All Events"/>
       <EventAreaPage padding={true}/>
     </>
   )

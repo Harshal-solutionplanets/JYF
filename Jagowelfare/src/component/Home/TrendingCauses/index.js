@@ -43,8 +43,7 @@ const TrendingCauses = () => {
               <div className="section_heading">
                 <h3>Guided by our philosophy “Unity in CommUNITY"</h3>
                 <h2>
-                  We are always where other people
-                  <span className="color_big_heading">need</span> help
+                  We are always where other people need help
                 </h2>
               </div>
             </div>
@@ -73,7 +72,7 @@ const TrendingCauses = () => {
                         style={{ color: "#666", fontSize: "14px", marginTop: "0px", lineHeight: "1.6" }}
                         dangerouslySetInnerHTML={{ __html: data.description }} 
                       />
-                      <div className="mt-4" style={{ marginTop: "auto" }}>
+                      <div style={{ marginTop: "auto", paddingTop: "20px" }}>
                         <Link to={`/cause-details/${data.id}`} className="btn btn_theme btn_sm" style={{ width: "100%", borderRadius: "10px" }}>
                           Read More
                         </Link>

@@ -7,7 +7,7 @@ import EventDetailsArea from '../component/EventDetails'
 const EventDetailsPage = () => {
   return (
     <>
-      <CommonBanner heading="Event details" pagination="Event details"/>
+      <CommonBanner heading="All Events" pagination="All Events"/>
       <EventDetailsArea/>
     </>
   )

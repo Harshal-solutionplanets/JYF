@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase'
-import { formatDate } from '../../utils/dateFormatter'
 
 const CausesArea = () => {
     const [causes, setCauses] = useState([]);
@@ -65,7 +64,7 @@ const CausesArea = () => {
                                             style={{ color: "#666", fontSize: "14px", margin: "0px", lineHeight: "1.6" }}
                                             dangerouslySetInnerHTML={{ __html: data.description }} 
                                         />
-                                        <div className="mt-4" style={{ marginTop: "auto" }}>
+                                        <div style={{ marginTop: "auto", paddingTop: "20px" }}>
                                             <Link to={`/cause-details/${data.id}`} className="btn btn_theme btn_md" style={{ width: "100%", borderRadius: "10px" }}>
                                                 Read More
                                             </Link>

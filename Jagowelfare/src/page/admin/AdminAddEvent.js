@@ -110,11 +110,10 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
     }, [eventData]);
 
     const handleImageChange = (e) => {
-        if (e.target.files) {
-            const filesArray = Array.from(e.target.files);
-            setImageFiles(prev => [...prev, ...filesArray]);
-            const urls = filesArray.map(file => URL.createObjectURL(file));
-            setPreviewUrls(prev => [...prev, ...urls]);
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImageFiles([file]);
+            setPreviewUrls([URL.createObjectURL(file)]);
         }
     };
 
@@ -314,7 +313,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
 
                         <div style={{ width: "100%", marginTop: "30px", boxSizing: "border-box" }}>
                             <label style={labelStyle}>Event Banner Images</label>
-                            <input ref={fileInputRef} type="file" style={{ display: "none" }} accept="image/*" multiple onChange={handleImageChange} />
+                            <input ref={fileInputRef} type="file" style={{ display: "none" }} accept="image/*" onChange={handleImageChange} />
                             <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "center", marginTop: "15px" }}>
                                 {previewUrls.map((url, i) => (
                                     <div key={i} style={{ position: "relative", textAlign: "center" }}>

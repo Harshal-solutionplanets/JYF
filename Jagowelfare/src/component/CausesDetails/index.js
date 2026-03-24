@@ -51,13 +51,21 @@ const CausesDetailsArea = () => {
                     <div className="row" id="counter">
                         <div className="col-lg-8">
                             <div className="details_wrapper_area">
-                                <div className="details_big_img">
+                                <div className="details_big_img" style={{
+                                    width: "100%",
+                                    height: "480px",
+                                    backgroundColor: "#f4f6f9",
+                                    borderRadius: "20px",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    overflow: "hidden"
+                                }}>
                                     <img 
                                         src={mainImage} 
                                         alt="Main Cause img" 
-                                        style={{ width: "100%", borderRadius: "20px", display: "block" }} 
+                                        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} 
                                     />
-                                    {/* Removed Tag Badge here as requested */}
                                 </div>
                                 <div className="details_text_wrapper">
                                     <h2 style={{ marginTop: "30px", fontSize: "36px", fontWeight: "800" }}>{cause.title}</h2>

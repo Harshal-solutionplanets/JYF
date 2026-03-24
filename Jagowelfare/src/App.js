@@ -40,8 +40,7 @@ import HumanitarianServicesPage from "./page/HumanitarianServices";
 import AdminLoginPage from "./page/admin/AdminLogin";
 import EventRegistrationPage from "./page/EventRegistration";
 import QRScannerPage from "./page/QRScannerPage";
-
-
+import AdminViewRegistrations from "./page/admin/AdminViewRegistrations";
 
 const App = () => {
   const location = useLocation();
@@ -102,6 +101,14 @@ const App = () => {
           element={
             <RequireStaff>
               <AdminScanPage />
+            </RequireStaff>
+          }
+        />
+        <Route
+          path="/admin/registrations"
+          element={
+            <RequireStaff>
+              <AdminViewRegistrations />
             </RequireStaff>
           }
         />

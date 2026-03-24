@@ -6,6 +6,8 @@ const AdminViewRegistrations = () => {
     const [registrations, setRegistrations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [events, setEvents] = useState({});
+    const [eventsList, setEventsList] = useState([]);
+    const [selectedEventId, setSelectedEventId] = useState("all");
 
     useEffect(() => {
         fetchData();
@@ -15,6 +17,7 @@ const AdminViewRegistrations = () => {
         setLoading(true);
         try {
             const { data: eventsData } = await supabase.from('events').select('id, title');
+            setEventsList(eventsData || []);
             const eventMap = {};
             eventsData?.forEach(e => eventMap[e.id] = e.title);
             setEvents(eventMap);
@@ -46,14 +49,28 @@ const AdminViewRegistrations = () => {
     return (
         <div style={{ backgroundColor: "#f4f6f9", padding: "30px", borderRadius: "15px" }}>
             <div style={{ backgroundColor: "#fff", padding: "30px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-                    <h3 style={{ margin: 0, fontWeight: "800", color: "#222" }}>User Registration Data</h3>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px", flexWrap: "wrap", gap: "20px" }}>
+                    <div>
+                        <h3 style={{ margin: 0, fontWeight: "800", color: "#222" }}>User Registration Data</h3>
+                        <div style={{ marginTop: "15px" }}>
+                            <select 
+                                value={selectedEventId} 
+                                onChange={(e) => setSelectedEventId(e.target.value)}
+                                style={{ padding: "10px 15px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "14px", minWidth: "250px", outline: "none", backgroundColor: "#f9f9f9" }}
+                            >
+                                <option value="all">Search / Filter by Event (All)</option>
+                                {eventsList.map(ev => (
+                                    <option key={ev.id} value={ev.id}>{ev.title}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                     <div style={{ display: "flex", gap: "10px" }}>
                         <span className="badge" style={{ backgroundColor: "#28a74515", color: "#28a745", padding: "10px 20px", borderRadius: "30px", fontWeight: "700" }}>
-                            {registrations.filter(r => r.is_checked_in).length} Checked-in
+                            {registrations.filter(r => (selectedEventId === "all" || String(r.event_id) === String(selectedEventId))).filter(r => r.is_checked_in).length} Checked-in
                         </span>
                         <span className="badge" style={{ backgroundColor: "#e3312915", color: "#e33129", padding: "10px 20px", borderRadius: "30px", fontWeight: "700" }}>
-                            {registrations.length} Total
+                            {registrations.filter(r => (selectedEventId === "all" || String(r.event_id) === String(selectedEventId))).length} Total
                         </span>
                     </div>
                 </div>
@@ -71,7 +88,9 @@ const AdminViewRegistrations = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {registrations.map((r) => (
+                            {registrations
+                                .filter(r => selectedEventId === "all" || String(r.event_id) === String(selectedEventId))
+                                .map((r) => (
                                 <tr key={r.id} style={{ backgroundColor: "#fff", boxShadow: "0 4px 10px rgba(0,0,0,0.01)", borderRadius: "12px", verticalAlign: "middle" }}>
                                     <td style={{ border: "none", padding: "15px", borderTopLeftRadius: "15px", borderBottomLeftRadius: "15px" }}>
                                         <div style={{ fontWeight: "800", color: "#222", fontSize: "15px" }}>{r.full_name}</div>
