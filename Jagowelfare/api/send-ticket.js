@@ -38,8 +38,8 @@ export default async function handler(req, res) {
     // --- PDF Content (Rich Design from server.js) ---
     doc.rect(0, 0, doc.page.width, doc.page.height).fill('#050505');
 
-    // Logo (Using process.cwd() for Vercel path mapping)
-    const logoPath = path.join(process.cwd(), 'src/assets/img/jyf_logo.jpg');
+    // Logo (Using __dirname for Vercel path mapping since it's now in the api folder)
+    const logoPath = path.join(__dirname, 'jyf_logo.jpg');
     try {
       doc.image(logoPath, doc.page.width / 2 - 45, 15, { width: 90 });
     } catch (e) { console.error("Logo missing in Vercel environment:", logoPath); }
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     doc.image(qrDataUrl, doc.page.width / 2 - 65, 425, { width: 130 });
 
     // Section Button
-    doc.roundedRect(doc.page.width / 2 - 65, 595, 130, 35, 17.5).fill('#FFCC00');
+    doc.rect(doc.page.width / 2 - 65, 595, 130, 35).fill('#FFCC00'); // Changed from roundedRect to rect as PDFKit older versions/environments can be picky
     doc.fillColor('#000000').fontSize(15).font('Helvetica-Bold').text(section?.toUpperCase() || 'GENERAL', 0, 606, { align: 'center' });
 
     doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 655, { align: 'center' });
@@ -79,10 +79,25 @@ export default async function handler(req, res) {
     });
 
     await transporter.sendMail({
-      from: process.env.GMAIL_USER,
+      from: `"Jain Youth Foundation" <${process.env.GMAIL_USER}>`,
       to: recipientEmail,
-      subject: `Your Ticket for ${eventTitle}`,
-      text: `Hello ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nTicket ID: ${ticketId}`,
+      subject: `Official Ticket: ${eventTitle}`,
+      text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nEvent: ${eventTitle}\nTicket ID: ${ticketId}\n\nThank you,\nJain Youth Foundation`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #D4AF37;">Pranam ${recipientName},</h2>
+          <p>Thank you for choosing <strong>Jain Youth Foundation</strong>. Your ticket for <strong>${eventTitle}</strong> is ready!</p>
+          <div style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+            <p><strong>Event:</strong> ${eventTitle}</p>
+            <p><strong>Date:</strong> ${date || '---'}</p>
+            <p><strong>Venue:</strong> ${venue || '---'}</p>
+            <p><strong>Ticket ID:</strong> ${ticketId}</p>
+          </div>
+          <p>Please find your ticket PDF attached to this email. You will need to scan it at the entrance.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #888;">This is an automated message from Jain Youth Foundation.</p>
+        </div>
+      `,
       attachments: [
         {
           filename: `${recipientName.replace(/\s+/g, '_')}_Ticket.pdf`,
