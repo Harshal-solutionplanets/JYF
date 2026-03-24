@@ -259,12 +259,11 @@ const EventRegistrationArea = () => {
             <div className="container">
                 <div className="row">
                     <div className="col-lg-8 offset-lg-2">
-                        <div className="registration_card" style={{
+                        <div className="registration_card custom_registration_card" style={{
                             background: "#fff",
                             borderRadius: "20px",
                             boxShadow: "0 15px 50px rgba(0,0,0,0.1)",
-                            overflow: "hidden",
-                            padding: "40px"
+                            overflow: "hidden"
                         }}>
 
                             {pageStatus === 'landing' && (
