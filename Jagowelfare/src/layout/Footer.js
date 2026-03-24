@@ -22,23 +22,8 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="col-lg-2 col-md-6 col-sm-12 col-12 mb-4">
-                        <div className="footer_navitem_ara">
-                            <h3 style={{ fontWeight: "700", marginBottom: "25px", fontSize: "1.2rem" }}>Quick Links</h3>
-                            <div className="nav_item_footer">
-                                <ul style={{ listStyle: "none", padding: 0 }}>
-                                    <li><Link to="/about">About Us</Link></li>
-                                    <li><Link to="/causes">Causes</Link></li>
-                                    <li><Link to="/event">Events</Link></li>
-                                    <li><Link to="/news">News</Link></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Support Links */}
-                    <div className="col-lg-2 col-md-6 col-sm-12 col-12 mb-4">
+                    <div className="col-lg-4 col-md-6 col-sm-12 col-12 mb-4">
                         <div className="footer_navitem_ara">
                             <h3 style={{ fontWeight: "700", marginBottom: "25px", fontSize: "1.2rem" }}>Support</h3>
                             <div className="nav_item_footer">

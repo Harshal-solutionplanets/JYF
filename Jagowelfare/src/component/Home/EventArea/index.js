@@ -20,7 +20,7 @@ const EventArea = (props) => {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .order('startAt', { ascending: true })
+          .order('startAt', { ascending: false })
           .limit(4); // Fetch top 4 events
         
         if (error) throw error;
