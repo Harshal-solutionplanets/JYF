@@ -107,17 +107,37 @@ const EventDetailSidebar = ({ event }) => {
                             
                           
                         </div>
-                        <div className="share_causes_wrapper sidebar_boxed" style={{ borderRadius: "15px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", marginTop: "30px" }}>
-                            <div className="sidebar_heading_main">
-                                <h3 style={{ fontWeight: "800", fontSize: "22px" }}>Share event</h3>
+                        {/* Share Section - Unified Design */}
+                        <div className="share_sidebar_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", boxShadow: "none", marginTop: "30px" }}>
+                            <div className="sidebar_heading_main" style={{ marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>
+                                <h3 style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}>Share event</h3>
                             </div>
-                            <div className="social_icon_sidebar">
-                                <ul>
-                                    <li><Link to="#!"><img src={facebook} alt="icon" /></Link></li>
-                                    <li><Link to="#!"><img src={instagram} alt="icon" /></Link></li>
-                                    <li><Link to="#!"><img src={twitter} alt="icon" /></Link></li>
-                                    <li><Link to="#!"><img src={linkedin} alt="icon" /></Link></li>
-                                </ul>
+                            <div style={{ display: "flex", gap: "12px" }}>
+                                {[
+                                    { icon: "fab fa-facebook-f", link: "#" },
+                                    { icon: "fab fa-instagram", link: "#" },
+                                    { icon: "fab fa-twitter", link: "#" },
+                                    { icon: "fab fa-linkedin-in", link: "#" }
+                                ].map((social, i) => (
+                                    <a 
+                                        key={i} 
+                                        href={social.link} 
+                                        style={{ 
+                                            width: "40px", 
+                                            height: "40px", 
+                                            backgroundColor: "#f9f0f0", 
+                                            borderRadius: "50%", 
+                                            display: "flex", 
+                                            alignItems: "center", 
+                                            justifyContent: "center", 
+                                            color: "#2a283e",
+                                            fontSize: "16px",
+                                            transition: "all 0.3s"
+                                        }}
+                                    >
+                                        <i className={social.icon}></i>
+                                    </a>
+                                ))}
                             </div>
                         </div>
                     </div>

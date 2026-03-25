@@ -8,8 +8,10 @@ const AdminDashboardUpdates = () => {
     
     // Refs for file inputs
     const heroInputRef = useRef(null);
-    const introInputRef = useRef(null);
+    const introInputRef1 = useRef(null);
+    const introInputRef2 = useRef(null);
     const bannerInputRefs = useRef({});
+
     // Home Hero State
     const [homeHero, setHomeHero] = useState({
         title: "Unity in commUNITY",
@@ -21,9 +23,11 @@ const AdminDashboardUpdates = () => {
     const [homeIntro, setHomeIntro] = useState({
         heading: "Welcome to JYF",
         title: "Serving Humanity Through Compassion",
-        para1: "At Jain Youth Foundation (JYF), our volunteers are inspired by Jain values of Ahimsa (non-violence), compassion, service, and unity. While the foundation is run by members of the Jain community, our initiatives are dedicated to the welfare of society at large, helping people across communities.",
-        para2: "Through our various initiatives, we focus on healthcare, food support, education, and humanitarian services, impacting thousands of lives every year.",
+        para1: "We are the largest crowdfunding",
+        para2: "At Jain Youth Foundation (JYF), our volunteers are inspired by Jain values of Ahimsa (non-violence), compassion, service, and unity.",
+        para3: "Through our various initiatives, we focus on healthcare, food support, education, and humanitarian services, impacting thousands of lives every year.",
         image_url: "",
+        image_url_2: "",
     });
 
     // Page Banners State
@@ -189,17 +193,12 @@ const AdminDashboardUpdates = () => {
                     <div>
                         <label>Small Heading</label>
                         <input type="text" style={inputStyle} value={homeIntro.heading} onChange={(e) => setHomeIntro({...homeIntro, heading: e.target.value})} />
-                        <label>Main Title</label>
+                        <label>Main Title (Keywords JYF, Humanity, and Compassion are automatically highlighted)</label>
                         <input type="text" style={inputStyle} value={homeIntro.title} onChange={(e) => setHomeIntro({...homeIntro, title: e.target.value})} />
-                        <label>Paragraph 1</label>
-                        <div className="rtf-box">
-                            <ReactQuill theme="snow" value={homeIntro.para1 || ""} onChange={(val) => {
-                                if (val !== homeIntro.para1) {
-                                    setHomeIntro({...homeIntro, para1: val});
-                                }
-                            }} modules={quillModules} />
-                        </div>
-                        <label>Paragraph 2</label>
+                        <label>Sub-Heading (Red Text)</label>
+                        <input type="text" style={inputStyle} value={homeIntro.para1} onChange={(e) => setHomeIntro({...homeIntro, para1: e.target.value})} />
+                        
+                        <label>Main Description Block 1</label>
                         <div className="rtf-box">
                             <ReactQuill theme="snow" value={homeIntro.para2 || ""} onChange={(val) => {
                                 if (val !== homeIntro.para2) {
@@ -207,32 +206,98 @@ const AdminDashboardUpdates = () => {
                                 }
                             }} modules={quillModules} />
                         </div>
+
+                        <label>Main Description Block 2</label>
+                        <div className="rtf-box">
+                            <ReactQuill theme="snow" value={homeIntro.para3 || ""} onChange={(val) => {
+                                if (val !== homeIntro.para3) {
+                                    setHomeIntro({...homeIntro, para3: val});
+                                }
+                            }} modules={quillModules} />
+                        </div>
                     </div>
                     <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                            <label style={{ margin: 0 }}>Intro Image</label>
-                            {homeIntro.image_url && (
-                                <div>
-                                    <button onClick={() => introInputRef.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
-                                    <button onClick={() => setHomeIntro({...homeIntro, image_url: ""})} style={{ ...actionButtonStyle, backgroundColor: "#ffefef", color: "#ca1e14" }}>Delete</button>
-                                </div>
-                            )}
+                        {/* Image 1: Main (Lower) */}
+                        <div style={{ marginBottom: "25px", border: "1px dashed #ddd", padding: "15px", borderRadius: "10px" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                                <label style={{ margin: 0, fontWeight: "700" }}>Main Background Image (Lower)</label>
+                                {homeIntro.image_url ? (
+                                    <div>
+                                        <button onClick={() => introInputRef1.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
+                                        <button onClick={() => setHomeIntro({...homeIntro, image_url: ""})} style={{ ...actionButtonStyle, backgroundColor: "#ffefef", color: "#ca1e14" }}>Delete</button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => introInputRef1.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#ca1e14", color: "#fff" }}>Add Image</button>
+                                )}
+                            </div>
+                            <input 
+                                ref={introInputRef1}
+                                type="file" 
+                                style={{
+                                    opacity: 0,
+                                    position: "absolute",
+                                    width: 0,
+                                    height: 0,
+                                    pointerEvents: "none"
+                                }} 
+                                onChange={async (e) => {
+                                    if (e.target.files[0]) {
+                                        try {
+                                            const url = await handleImageUpload(e.target.files[0], "home_intro_main");
+                                            setHomeIntro({...homeIntro, image_url: url});
+                                            alert("Main image updated successfully!");
+                                        } catch (err) {
+                                            alert("Upload failed: " + err.message);
+                                        }
+                                        e.target.value = null; // Reset for future edits
+                                    }
+                                }} 
+                            />
+                            {homeIntro.image_url && <img src={homeIntro.image_url} alt="preview" style={{ width: "100%", borderRadius: "8px" }} />}
                         </div>
-                        <input 
-                            ref={introInputRef}
-                            type="file" 
-                            style={homeIntro.image_url ? { display: "none" } : inputStyle} 
-                            onChange={async (e) => {
-                            if (e.target.files[0]) {
-                                const url = await handleImageUpload(e.target.files[0], "home_intro");
-                                setHomeIntro({...homeIntro, image_url: url});
-                            }
-                        }} />
-                        {homeIntro.image_url && <img src={homeIntro.image_url} alt="preview" style={{ width: "100%", borderRadius: "10px", border: "1px solid #eee" }} />}
+
+                        {/* Image 2: Floating (Upper) */}
+                        <div style={{ border: "1px dashed #ddd", padding: "15px", borderRadius: "10px" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                                <label style={{ margin: 0, fontWeight: "700" }}>Floating Overlay Image (Upper)</label>
+                                {homeIntro.image_url_2 ? (
+                                    <div>
+                                        <button onClick={() => introInputRef2.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
+                                        <button onClick={() => setHomeIntro({...homeIntro, image_url_2: ""})} style={{ ...actionButtonStyle, backgroundColor: "#ffefef", color: "#ca1e14" }}>Delete</button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => introInputRef2.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#ca1e14", color: "#fff" }}>Add Image</button>
+                                )}
+                            </div>
+                            <input 
+                                ref={introInputRef2}
+                                type="file" 
+                                style={{
+                                    opacity: 0,
+                                    position: "absolute",
+                                    width: 0,
+                                    height: 0,
+                                    pointerEvents: "none"
+                                }}
+                                onChange={async (e) => {
+                                    if (e.target.files[0]) {
+                                        try {
+                                            const url = await handleImageUpload(e.target.files[0], "home_intro_floating");
+                                            setHomeIntro({...homeIntro, image_url_2: url});
+                                            alert("Floating image updated successfully!");
+                                        } catch (err) {
+                                            alert("Upload failed: " + err.message);
+                                        }
+                                        e.target.value = null; // Reset for future edits
+                                    }
+                                }} 
+                            />
+                            {homeIntro.image_url_2 && <img src={homeIntro.image_url_2} alt="preview" style={{ width: "50%", borderRadius: "8px" }} />}
+                        </div>
                     </div>
                 </div>
-                <button onClick={() => handleSave('home_intro', homeIntro)} className="btn btn_theme mt-3" disabled={loading}>
-                    Save Home Intro Changes
+                <button onClick={() => handleSave('home_intro', homeIntro)} className="btn btn_theme mt-3" disabled={loading} style={{ width: "100%", padding: "12px" }}>
+                    Save Home Intro (About) Changes
                 </button>
             </div>
 

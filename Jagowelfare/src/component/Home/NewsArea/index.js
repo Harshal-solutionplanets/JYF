@@ -59,15 +59,28 @@ const NewsAres = () => {
                     <div className="col-lg-4" key={data.id}>
                     <div className="blog_card_wrapper mb-30">
                         <div className="blog_card_img">
-                            <Link to="/news"><img src={data.image_url} alt="img" style={{height: "250px", objectFit: "cover", width: "100%"}} /></Link>
+                            <Link to={`/news-details/${data.id}`}><img src={data.image_url} alt="img" style={{height: "250px", objectFit: "cover", width: "100%"}} /></Link>
                         </div>
                         <div className="blog_card_text">
                             <div className="blog_card_tags">
-                                <Link to="/news-details">{data.tag || "#News"}</Link>
+                                <Link to={`/news-details/${data.id}`}>{data.tag || "#News"}</Link>
                             </div>
                             <div className="blog_card_heading">
-                                <h3><Link to="/news-details">{data.title}</Link></h3>
-                                <p>{data.summary}</p>
+                                <h3><Link to={`/news-details/${data.id}`}>{data.title}</Link></h3>
+                                <div 
+                                    style={{ 
+                                        fontSize: "14px", 
+                                        color: "#666", 
+                                        lineHeight: "1.6", 
+                                        height: "45px", 
+                                        overflow: "hidden", 
+                                        display: "-webkit-box", 
+                                        WebkitLineClamp: "2", 
+                                        WebkitBoxOrient: "vertical",
+                                        marginBottom: "15px"
+                                    }}
+                                    dangerouslySetInnerHTML={{ __html: data.summary }} 
+                                />
                             </div>
                             <div className="blog_boxed_bottom_wrapper">
                                 <div className="row">

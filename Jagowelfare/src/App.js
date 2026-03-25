@@ -42,6 +42,7 @@ import EventRegistrationPage from "./page/EventRegistration";
 import QRScannerPage from "./page/QRScannerPage";
 import AdminViewRegistrations from "./page/admin/AdminViewRegistrations";
 import AdminViewGallery from "./page/admin/AdminViewGallery";
+import ScrollToTop from "./utils/ScrollToTop";
 
 const App = () => {
   const location = useLocation();
@@ -49,6 +50,7 @@ const App = () => {
 
   return (
     <>
+      <ScrollToTop />
       {!isAdminRoute && <Header/>}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -66,7 +68,7 @@ const App = () => {
         <Route path="/cause-details" element={<Navigate to="/causes" replace />} />
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/news" element={<NewsPage />} />
-        <Route path="/news-details" element={<NewsDetailsPage />} />
+        <Route path="/news-details/:id" element={<NewsDetailsPage />} />
         <Route path="/testimonial" element={<TestimonialPage />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/login" element={<LoginPage />} />

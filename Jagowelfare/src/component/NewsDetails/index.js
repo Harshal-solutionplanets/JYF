@@ -1,190 +1,113 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import NewsSidebar from "./Sidebar";
-// Import BigImg
-import BigImg from "../../assets/img/causes/details-big.png";
-import causesImg from "../../assets/img/causes/details-small-1.png";
-import causesImg1 from "../../assets/img/causes/details-small-2.png";
-import PdfIcon from "../../assets/img/icon/pdf.png";
-import PostImg from "../../assets/img/common/post-1.png";
-import PostImg1 from "../../assets/img/common/post-2.png";
-const NewsDetailsArea = () => {
+import { supabase } from "../../supabase";
+
+const NewsDetailsArea = ({ onTitleFetch }) => {
+  const { id } = useParams();
+  const [news, setNews] = useState(null);
+
+  useEffect(() => {
+    if (news && onTitleFetch) {
+      onTitleFetch(news.title);
+    }
+  }, [news, onTitleFetch]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("news")
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (error) throw error;
+        setNews(data);
+      } catch (err) {
+        console.error("Error fetching news:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+  }, [id]);
+
+  if (loading) return <section className="section_padding text-center"><h3>Loading...</h3></section>;
+  if (!news) return <section className="section_padding text-center"><h3>Article not found</h3></section>;
+
+  const firstImg = (news.image_url || "").split(",")[0];
+
   return (
     <>
       <section id="news_details_main" className="section_padding">
         <div className="container">
-          <div className="row" id="counter">
-            <div className="row" id="counter">
-              <div className="col-lg-8">
-                <div className="details_wrapper_area">
-                  <div className="details_big_img">
-                    <img src={BigImg} alt="img" />
-                    <span className="causes_badge bg-yellow">Education</span>
-                  </div>
-                  <div className="details_text_wrapper">
-                    <h2>Give children a good education and a better life</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, cibo mundi ea duo, vim exerci
-                      phaedrum. There are many variations of passages of Lorem
-                      Ipsum available but the majority.
-                    </p>
-                    <p>
-                      If you are going to use a passage of Lorem Ipsum, you need
-                      to be sure there isn't anything embarrang hidden in the
-                      middle of text. All the Lorem Ipsum generators on the
-                      Internet tend to repeat predefined chunks as necessary,
-                      making this the first true.
-                    </p>
-                    <h3>We want to ensure the education for the kids.</h3>
-                    <p>
-                      Lorem ipsum dolor sit amet, cibo mundi ea duo, vim exerci
-                      phaedrum. There are many variations of passages of Lorem
-                      Ipsum available, but the majority have alteration in some
-                      injected or words which don't look even slightly
-                      believable.
-                    </p>
-                    <ul>
-                      <li>
-                        <i className="fas fa-circle"></i> Lorem ipsum dolor sit
-                        amet, cibo mundi ea duo, vim exerci phaedrum.
-                      </li>
-                      <li>
-                        <i className="fas fa-circle"></i> There are many variations
-                        of passages of Lorem Ipsum.
-                      </li>
-                      <li>
-                        <i className="fas fa-circle"></i> Available but the majority
-                        have alteration in some injected or words.
-                      </li>
-                      <li>
-                        <i className="fas fa-circle"></i> There are many variations
-                        of passages of Lorem Ipsum which don't look even
-                        slightly believable.
-                      </li>
-                    </ul>
-                    <div className="row">
-                      <div className="col-lg-6 col-md-6 col-sm-6 col-12">
-                        <div className="details_small_img">
-                          <img src={causesImg} alt="img" />
-                        </div>
-                      </div>
-                      <div className="col-lg-6 col-md-6 col-sm-6 col-12">
-                        <div className="details_small_img">
-                          <img src={causesImg1} alt="img" />
-                        </div>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, cibo mundi ea duo, vim exerci
-                      phaedrum. There are many variations of passages of Lorem
-                      Ipsum available, but the majority have alteration in some
-                      injected or words which don't look even slightly
-                      believable.
-                    </p>
-                  </div>
-                  <div className="download_pdf_area">
-                    <div className="pdf_download_left">
-                      <img src={PdfIcon} alt="icon" />
-                      <h4>Children education manual .pdf</h4>
-                    </div>
-                    <div className="pdf_download_right">
-                      <Link to="#!" className="btn btn_md btn_theme">
-                        Download now
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="comment_area_details">
-                    <h3>2 Comments</h3>
-                    <div className="post_comment_wrapper">
-                      <div className="post_comment_item">
-                        <div className="post_comment_img">
-                          <img src={PostImg} alt="img" />
-                        </div>
-                        <div className="post_comment_text">
-                          <div className="post_names_replay">
-                            <h5>James martin</h5>
-                            <a href="#!">
-                              <i className="fas fa-reply"></i>Reply
-                            </a>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit amet, cibo mundi ea duo, vim
-                            exerci phaedrum. There are many variations of
-                            passages of Lorem Ipsum available but the majority.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="post_comment_item">
-                        <div className="post_comment_img">
-                          <img src={PostImg1} alt="img" />
-                        </div>
-                        <div className="post_comment_text">
-                          <div className="post_names_replay">
-                            <h5>James martin</h5>
-                            <a href="#!">
-                              <i className="fas fa-reply"></i>Reply
-                            </a>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit amet, cibo mundi ea duo, vim
-                            exerci phaedrum. There are many variations of
-                            passages of Lorem Ipsum available but the majority.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="comment_form_area">
-                    <h3>Leave a comment</h3>
-                    <div className="comment_form">
-                      <form action="#!" id="comment_form">
-                        <div className="row">
-                          <div className="col-lg-6">
-                            <div className="form-group">
-                              <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter full name"
-                                required
-                              />
-                            </div>
-                          </div>
-                          <div className="col-lg-6">
-                            <div className="form-group">
-                              <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter email address"
-                                required
-                              />
-                            </div>
-                          </div>
-                          <div className="col-lg-12">
-                            <div className="form-group">
-                              <textarea
-                                rows="5"
-                                placeholder="Write your comments"
-                                className="form-control"
-                                required
-                              ></textarea>
-                            </div>
-                          </div>
-                          <div className="col-lg-12">
-                            <div className="submit_btn">
-                              <button className="btn btn_theme btn_md">
-                                Submit comment
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
+          <div className="row">
+            <div className="col-lg-8">
+              <div className="details_wrapper_area">
+                <div className="details_big_img" style={{ backgroundColor: "#fbfbfb", borderRadius: "15px", overflow: "hidden", border: "1px solid #eee" }}>
+                  <img src={firstImg} alt="img" style={{ width: "100%", height: "auto", maxHeight: "450px", objectFit: "cover" }} />
+                  <span className="causes_badge bg-yellow" style={{ position: "absolute", top: "20px", left: "20px" }}>{news.tag || "#News"}</span>
+                </div>
+                
+                <div className="details_text_wrapper details_main_content">
+                  <style dangerouslySetInnerHTML={{ __html: `
+                        .details_main_content p, 
+                        .details_main_content li { 
+                            margin-bottom: 8px !important; 
+                            margin-top: 0 !important; 
+                            line-height: 1.6 !important;
+                            color: #444;
+                            font-size: 17px;
+                            position: relative;
+                            display: block;
+                            list-style: none;
+                        }
+                        .details_main_content p::before, 
+                        .details_main_content li::before {
+                            content: "";
+                            display: inline-block;
+                            width: 7px;
+                            height: 7px;
+                            background-color: #ca1e14;
+                            border-radius: 50%;
+                            margin-right: 12px;
+                            vertical-align: middle;
+                            margin-bottom: 2px;
+                        }
+                        
+                        /* Hide bullet if paragraph is empty or only contains a line break */
+                        .details_main_content p:empty::before,
+                        .details_main_content p br:only-child::before,
+                        .details_main_content p:has(br:only-child)::before { 
+                            display: none !important; 
+                        }
+                        
+                        .details_main_content h2 { 
+                            font-size: 36px; 
+                            color: #2a283e; 
+                            font-weight: 700; 
+                            margin-bottom: 20px;
+                        }
+                        .details_main_content h4 { 
+                            margin-top: 25px !important; 
+                            margin-bottom: 12px !important; 
+                            font-size: 22px; 
+                            color: #2a283e; 
+                            font-weight: 700; 
+                        }
+                        .details_main_content div { margin-bottom: 0 !important; }
+                  `}} />
+                  
+                  <h2>{news.title}</h2>
+                  <div dangerouslySetInnerHTML={{ __html: news.content }} />
+                  
+                  {/* Removed Gallery, PDF, and Comments per user request */}
                 </div>
               </div>
-              <NewsSidebar />
             </div>
-            <div className="col-lg-4"></div>
+            <NewsSidebar news={news} />
           </div>
         </div>
       </section>

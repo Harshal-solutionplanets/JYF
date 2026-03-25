@@ -3,10 +3,11 @@ import CommonBanner from "../component/Common/CommonBanner";
 import EventRegistrationArea from "../component/EventRegistration";
 
 const EventRegistrationPage = () => {
+  const [title, setTitle] = React.useState("Event Registration");
   return (
     <>
-      <CommonBanner heading="Event Registration" pagination="Event Registration" />
-      <EventRegistrationArea />
+      <CommonBanner heading={title} pagination={title} />
+      <EventRegistrationArea onTitleFetch={setTitle} />
     </>
   );
 };

@@ -6,10 +6,11 @@ import NewsDetailsArea from '../component/NewsDetails'
 
 
 const NewsDetailsPage = () => {
+  const [title, setTitle] = React.useState("News Details");
   return (
     <>
-         <CommonBanner heading="News Details" pagination="News Details"/>
-         <NewsDetailsArea/>
+         <CommonBanner heading={title} pagination={title}/>
+         <NewsDetailsArea onTitleFetch={setTitle}/>
     </>
   )
 }

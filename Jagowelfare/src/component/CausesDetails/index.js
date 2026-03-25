@@ -3,10 +3,16 @@ import { useParams } from 'react-router-dom'
 import { supabase } from '../../supabase'
 import SideBar from './SideBar'
 
-const CausesDetailsArea = () => {
+const CausesDetailsArea = ({ onTitleFetch }) => {
     const { id } = useParams();
     const [cause, setCause] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (cause && onTitleFetch) {
+            onTitleFetch(cause.title);
+        }
+    }, [cause, onTitleFetch]);
 
     useEffect(() => {
         const fetchCause = async () => {
@@ -53,32 +59,74 @@ const CausesDetailsArea = () => {
                             <div className="details_wrapper_area">
                                 <div className="details_big_img" style={{
                                     width: "100%",
-                                    height: "480px",
-                                    backgroundColor: "#f4f6f9",
-                                    borderRadius: "20px",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    overflow: "hidden"
+                                    height: "450px",
+                                    borderRadius: "15px",
+                                    overflow: "hidden",
+                                    marginBottom: "35px",
+                                    boxShadow: "0 10px 30px rgba(0,0,0,0.05)"
                                 }}>
                                     <img 
                                         src={mainImage} 
                                         alt="Main Cause img" 
-                                        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} 
+                                        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
                                     />
                                 </div>
                                 <div className="details_text_wrapper">
-                                    <h2 style={{ marginTop: "30px", fontSize: "36px", fontWeight: "800" }}>{cause.title}</h2>
+                                    <h2 style={{ fontSize: "32px", fontWeight: "700", color: "#2a283e", marginBottom: "8px", lineHeight: "1.2" }}>{cause.title}</h2>
                                     
                                     <div 
-                                        style={{ fontSize: "18px", color: "#555", marginBottom: "40px", lineHeight: "1.8" }}
-                                        dangerouslySetInnerHTML={{ __html: cause.description }} 
-                                    />
+                                        className="cause_subtitle"
+                                        style={{ fontSize: "16px", color: "#818090", marginBottom: "15px", fontWeight: "600", lineHeight: "1.4", borderLeft: "4px solid var(--accent-color)", paddingLeft: "15px" }}
+                                    >
+                                        <style dangerouslySetInnerHTML={{ __html: `
+                                            .cause_subtitle p, .cause_subtitle div { margin-bottom: 0 !important; margin-top: 0 !important; }
+                                        `}} />
+                                        <div dangerouslySetInnerHTML={{ __html: cause.description }} />
+                                    </div>
 
                                     <div 
-                                        style={{ lineHeight: "1.8" }}
-                                        dangerouslySetInnerHTML={{ __html: cause.content }} 
-                                    />
+                                        className="details_main_content"
+                                        style={{ fontSize: "16px", color: "#818090", lineHeight: "1.5", fontWeight: "400" }}
+                                    >
+                                        <style dangerouslySetInnerHTML={{ __html: `
+                                            .details_main_content p, 
+                                            .details_main_content li { 
+                                                margin-bottom: 8px !important; 
+                                                margin-top: 0 !important; 
+                                                line-height: 1.6 !important;
+                                                color: #444;
+                                                font-size: 17px;
+                                                position: relative;
+                                                display: list-item;
+                                                list-style: none;
+                                            }
+                                            .details_main_content p::before, 
+                                            .details_main_content li::before {
+                                                content: "";
+                                                display: inline-block;
+                                                width: 7px;
+                                                height: 7px;
+                                                background-color: #ca1e14;
+                                                border-radius: 50%;
+                                                margin-right: 12px;
+                                                vertical-align: middle;
+                                                margin-bottom: 2px;
+                                            }
+                                            /* Ensure empty paragraphs don't show a dot */
+                                            .details_main_content p:empty::before { content: none !important; }
+                                            
+                                            .details_main_content h4 { 
+                                                margin-top: 15px !important; 
+                                                margin-bottom: 10px !important; 
+                                                font-size: 22px; 
+                                                color: #2a283e; 
+                                                font-weight: 700; 
+                                            }
+                                            .details_main_content div { margin-bottom: 0 !important; }
+                                            .details_main_content ul { margin-bottom: 8px; padding-left: 0; list-style: none; }
+                                        `}} />
+                                        <div dangerouslySetInnerHTML={{ __html: cause.content }} />
+                                    </div>
 
                                     {/* Small images, PDF area, and comments areas removed as requested */}
                                 </div>

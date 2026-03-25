@@ -16,7 +16,7 @@ const TrendingCauses = () => {
           .select("*")
           .order("created_at", { ascending: false });
         // Removed .limit(3) based on user's request to see all added causes
-        
+
         if (error) throw error;
         if (alive) setCauses(data || []);
       } catch (err) {
@@ -43,7 +43,7 @@ const TrendingCauses = () => {
               <div className="section_heading">
                 <h3>Guided by our philosophy “Unity in CommUNITY"</h3>
                 <h2>
-                  We are always where other people need help
+                  We are always where other people <span className="highlight_yellow">need</span> help
                 </h2>
               </div>
             </div>
@@ -57,30 +57,31 @@ const TrendingCauses = () => {
               causes.map((data) => {
                 const firstImage = (data.image_url || "").split(',')[0];
                 return (
-                <div className="col-lg-4 col-md-6 col-sm-12 col-12 mb-4 d-flex align-items-stretch" key={data.id}>
-                  <div className="case_boxed_wrapper" style={{ height: "100%", width: "100%", background: "#fff", borderRadius: "15px", overflow: "hidden", border: "1px solid #eee", display: "flex", flexDirection: "column" }}>
-                    <div className="case_boxed_img">
-                      <Link to={`/cause-details/${data.id}`}>
-                        <img src={firstImage} alt="img" style={{height: "260px", objectFit: "cover", width: "100%"}} />
-                      </Link>
-                    </div>
-                    <div className="causes_boxed_text" style={{ padding: "20px", flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
-                      <h3 style={{ fontSize: "20px", marginBottom: "12px" }}>
-                        <Link to={`/cause-details/${data.id}`} style={{ color: "#222", fontWeight: "700" }}>{data.title}</Link>
-                      </h3>
-                      <div 
-                        style={{ color: "#666", fontSize: "14px", marginTop: "0px", lineHeight: "1.6" }}
-                        dangerouslySetInnerHTML={{ __html: data.description }} 
-                      />
-                      <div style={{ marginTop: "auto", paddingTop: "20px" }}>
-                        <Link to={`/cause-details/${data.id}`} className="btn btn_theme btn_sm" style={{ width: "100%", borderRadius: "10px" }}>
-                          Read More
+                  <div className="col-lg-4 col-md-6 col-sm-12 col-12 mb-4 d-flex align-items-stretch" key={data.id}>
+                    <div className="case_boxed_wrapper" style={{ height: "100%", width: "100%", background: "#fff", borderRadius: "15px", overflow: "hidden", border: "1px solid #eee", display: "flex", flexDirection: "column" }}>
+                      <div className="case_boxed_img">
+                        <Link to={`/cause-details/${data.id}`}>
+                          <img src={firstImage} alt="img" style={{ height: "260px", objectFit: "cover", width: "100%" }} />
                         </Link>
+                      </div>
+                      <div className="causes_boxed_text" style={{ padding: "20px", flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
+                        <h3 style={{ fontSize: "22px", marginBottom: "12px", marginTop: "5px" }}>
+                          <Link to={`/cause-details/${data.id}`} style={{ color: "var(--black-color)", fontWeight: "600", display: "block", lineHeight: "1.3" }}>{data.title}</Link>
+                        </h3>
+                        <div
+                          style={{ color: "var(--paragraph-color)", fontSize: "15px", marginBottom: "20px", lineHeight: "1.7", fontWeight: "400" }}
+                          dangerouslySetInnerHTML={{ __html: data.description }}
+                        />
+                        <div style={{ marginTop: "auto", paddingTop: "20px" }}>
+                          <Link to={`/cause-details/${data.id}`} className="btn btn_theme btn_sm" style={{ width: "100%", borderRadius: "10px" }}>
+                            Read More
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )})
+                )
+              })
             )}
           </div>
         </div>

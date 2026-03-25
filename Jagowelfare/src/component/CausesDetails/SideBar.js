@@ -34,30 +34,30 @@ const SideBar = ({ currentCause }) => {
             <div className="sidebar_first">
                 {/* Stats at a Glance - Conditional Rendering */}
                 {hasStats && (
-                    <div className="project_organizer_wrapper sidebar_boxed" style={{ padding: "25px", borderRadius: "15px", border: "1px solid #f0f0f0", marginBottom: "30px" }}>
+                    <div className="project_organizer_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", marginBottom: "30px", boxShadow: "none" }}>
                         <div className="project_organizer_text" style={{ padding: 0 }}>
-                            <h3 style={{ fontSize: "20px", fontWeight: "800", marginBottom: "20px", color: "#e33129" }}>Stats at a Glance</h3>
+                            <h3 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "20px", color: "var(--black-color)", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>Stats at a Glance</h3>
                             <ul style={{ listStyle: "none", padding: 0 }}>
                                 {currentCause.infoval1 && (
                                     <li style={{ marginBottom: "15px", display: "flex", alignItems: "flex-start", borderBottom: "1px solid #f9f9f9", paddingBottom: "10px" }}>
-                                        <img src={BulletIcon} alt="bullet" style={{ width: "12px", marginRight: "10px", marginTop: "6px" }} />
-                                        <span style={{ color: "#333", fontWeight: "600", wordBreak: "break-word" }}>
+                                        <img src={BulletIcon} alt="bullet" style={{ width: "12px", marginRight: "10px", marginTop: "6px", opacity: "0.8", filter: "brightness(0.6)" }} />
+                                        <span style={{ color: "#444", fontWeight: "600", wordBreak: "break-word" }}>
                                             {currentCause.infoval1}
                                         </span>
                                     </li>
                                 )}
                                 {currentCause.infoval2 && (
                                     <li style={{ marginBottom: "15px", display: "flex", alignItems: "flex-start", borderBottom: "1px solid #f9f9f9", paddingBottom: "10px" }}>
-                                        <img src={BulletIcon} alt="bullet" style={{ width: "12px", marginRight: "10px", marginTop: "6px" }} />
-                                        <span style={{ color: "#333", fontWeight: "600", wordBreak: "break-word" }}>
+                                        <img src={BulletIcon} alt="bullet" style={{ width: "12px", marginRight: "10px", marginTop: "6px", opacity: "0.8", filter: "brightness(0.6)" }} />
+                                        <span style={{ color: "#444", fontWeight: "600", wordBreak: "break-word" }}>
                                             {currentCause.infoval2}
                                         </span>
                                     </li>
                                 )}
                                 {currentCause.infoval3 && (
                                     <li style={{ marginBottom: "0px", display: "flex", alignItems: "flex-start", paddingBottom: "0px" }}>
-                                        <img src={BulletIcon} alt="bullet" style={{ width: "12px", marginRight: "10px", marginTop: "6px" }} />
-                                        <span style={{ color: "#333", fontWeight: "600", wordBreak: "break-word" }}>
+                                        <img src={BulletIcon} alt="bullet" style={{ width: "12px", marginRight: "10px", marginTop: "6px", opacity: "0.8", filter: "brightness(0.6)" }} />
+                                        <span style={{ color: "#444", fontWeight: "600", wordBreak: "break-word" }}>
                                             {currentCause.infoval3}
                                         </span>
                                     </li>
@@ -69,9 +69,9 @@ const SideBar = ({ currentCause }) => {
 
                 {/* Other Causes - Conditional Rendering & Description Update */}
                 {otherCauses.length > 0 && (
-                    <div className="recent_causes_wrapper sidebar_boxed" style={{ padding: "25px", borderRadius: "15px", border: "1px solid #f0f0f0" }}>
-                        <div className="sidebar_heading_main" style={{ marginBottom: "20px" }}>
-                            <h3 style={{ fontSize: "20px", fontWeight: "800" }}>Other Causes</h3>
+                    <div className="recent_causes_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", boxShadow: "none", marginBottom: "30px" }}>
+                        <div className="sidebar_heading_main" style={{ marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>
+                            <h3 style={{ fontSize: "18px", fontWeight: "700" }}>Other Causes</h3>
                         </div>
                         {otherCauses.map((item, index) => {
                             const firstImg = (item.image_url || "").split(',')[0];
@@ -94,15 +94,16 @@ const SideBar = ({ currentCause }) => {
                                         </div>
                                         <div 
                                             style={{ 
-                                                fontSize: "12px", 
-                                                color: "#999", 
+                                                fontSize: "13px", 
+                                                color: "#444", 
                                                 marginTop: "4px", 
                                                 maxHeight: "36px", 
                                                 overflow: "hidden", 
                                                 textOverflow: "ellipsis", 
                                                 display: "-webkit-box", 
                                                 WebkitLineClamp: "2", 
-                                                WebkitBoxOrient: "vertical" 
+                                                WebkitBoxOrient: "vertical",
+                                                fontWeight: "500"
                                             }}
                                             dangerouslySetInnerHTML={{ __html: item.description }}
                                         />
@@ -112,6 +113,39 @@ const SideBar = ({ currentCause }) => {
                         })}
                     </div>
                 )}
+
+                {/* Share Section */}
+                <div className="share_sidebar_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", boxShadow: "none" }}>
+                    <div className="sidebar_heading_main" style={{ marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>
+                        <h3 style={{ fontSize: "18px", fontWeight: "700" }}>Share</h3>
+                    </div>
+                    <div style={{ display: "flex", gap: "10px" }}>
+                        {[
+                            { icon: "fab fa-facebook-f", link: "#" },
+                            { icon: "fab fa-instagram", link: "#" },
+                            { icon: "fab fa-twitter", link: "#" },
+                            { icon: "fab fa-linkedin-in", link: "#" }
+                        ].map((social, i) => (
+                            <a 
+                                key={i} 
+                                href={social.link} 
+                                style={{ 
+                                    width: "40px", 
+                                    height: "40px", 
+                                    backgroundColor: "#f9f0f0", 
+                                    borderRadius: "50%", 
+                                    display: "flex", 
+                                    alignItems: "center", 
+                                    justifyContent: "center", 
+                                    color: "#2a283e",
+                                    fontSize: "16px"
+                                }}
+                            >
+                                <i className={social.icon}></i>
+                            </a>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -22,7 +22,7 @@ const EventArea = (props) => {
           .select('*')
           .order('startAt', { ascending: false })
           .limit(4); // Fetch top 4 events
-        
+
         if (error) throw error;
         if (alive) setEvents(data || []);
       } catch (e) {
@@ -50,7 +50,7 @@ const EventArea = (props) => {
 
   return (
     <>
-      <section id="upcoming_events" className={ props.padding === true ? "section_padding" : "section_padding_bottom"} >
+      <section id="upcoming_events" className={props.padding === true ? "section_padding" : "section_padding_bottom"} >
         <div className="container">
           <div className="row">
             <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
@@ -63,7 +63,7 @@ const EventArea = (props) => {
               </div>
             </div>
           </div>
-          
+
           {loading ? (
             <div className="row"><div className="col-12 text-center"><p>Loading events...</p></div></div>
           ) : events.length === 0 ? (
@@ -76,7 +76,7 @@ const EventArea = (props) => {
                   <div className="event_left_side_wrapper">
                     <div className="event_big_img" >
                       <Link to={`/event/${featured.id}`}>
-                        <img src={featured.image_url?.split(',')[0]} alt="img" style={{height: "350px", objectFit: "cover", width: "100%"}} />
+                        <img src={featured.image_url?.split(',')[0]} alt="img" style={{ height: "350px", objectFit: "cover", width: "100%" }} />
                       </Link>
                     </div>
                     <div className="event_content_area big_content_padding">
@@ -96,13 +96,13 @@ const EventArea = (props) => {
                               const d = new Date(featured.startAt || featured.start_at);
                               const day = String(d.getDate()).padStart(2, '0');
                               const mon = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-                              return <>{day} <span style={{fontSize: '10px'}}>{mon}</span></>;
+                              return <>{day} <span style={{ fontSize: '10px' }}>{mon}</span></>;
                             })()}
                           </h6>
                         </div>
                       </div>
                       <div className="event_para" style={{ marginBottom: "20px" }}>
-                        <p 
+                        <p
                           style={{ fontSize: "16px", lineHeight: "1.7", color: "#666" }}
                           dangerouslySetInnerHTML={{ __html: extractDescription(featured.description) }}
                         ></p>
@@ -191,15 +191,15 @@ const EventArea = (props) => {
                           </h3>
                         </div>
                       </div>
-                      <div className="event_para" style={{ 
-                        display: '-webkit-box', 
-                        WebkitBoxOrient: 'vertical', 
-                        WebkitLineClamp: 2, 
+                      <div className="event_para" style={{
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 2,
                         overflow: 'hidden',
                         marginBottom: '15px',
                         paddingRight: '80px'
                       }}>
-                        <p 
+                        <p
                           style={{ fontSize: "15px", lineHeight: "1.6", color: "#888" }}
                           dangerouslySetInnerHTML={{ __html: extractDescription(datas.description) }}
                         ></p>

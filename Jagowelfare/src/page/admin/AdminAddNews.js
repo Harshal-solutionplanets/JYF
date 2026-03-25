@@ -10,6 +10,9 @@ const AdminAddNews = ({ onPublish }) => {
     const [content, setContent] = useState("");
     const [imageFiles, setImageFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
+    const [authorName, setAuthorName] = useState("");
+    const [authorRole, setAuthorRole] = useState("");
+    const [location, setLocation] = useState("");
     const [loading, setLoading] = useState(false);
 
     const fileInputRef = useRef(null);
@@ -55,6 +58,9 @@ const AdminAddNews = ({ onPublish }) => {
                 tag: tag.trim() || "#News",
                 summary: summary.trim(),
                 content: content.trim(),
+                author_name: authorName.trim(),
+                author_role: authorRole.trim(),
+                location: location.trim(),
                 image_url: finalImageUrlStr
             }]);
             if (insertError) throw insertError;
@@ -95,6 +101,22 @@ const AdminAddNews = ({ onPublish }) => {
                                 <label style={labelStyle}>Category / Tag</label>
                                 <input type="text" style={inputStyle} placeholder="#News" value={tag} onChange={(e) => setTag(e.target.value)} />
                             </div>
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "30px", marginTop: "20px" }}>
+                            <div>
+                                <label style={labelStyle}>Author Name</label>
+                                <input type="text" style={inputStyle} placeholder="e.g. Polin Sarika" value={authorName} onChange={(e) => setAuthorName(e.target.value)} />
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Author Role</label>
+                                <input type="text" style={inputStyle} placeholder="e.g. Manager" value={authorRole} onChange={(e) => setAuthorRole(e.target.value)} />
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: "20px" }}>
+                            <label style={labelStyle}>Location</label>
+                            <input type="text" style={inputStyle} placeholder="e.g. Mumbai, India" value={location} onChange={(e) => setLocation(e.target.value)} />
                         </div>
 
                         <div style={{ marginTop: "30px" }}>

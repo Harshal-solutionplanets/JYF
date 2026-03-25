@@ -1,158 +1,121 @@
-import React from "react";
-// Import link
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// Import Social Icom
-import facebook from "../../assets/img/icon/facebook.png";
-import instagram from "../../assets/img/icon/instagram.png";
-import twitter from "../../assets/img/icon/twitter.png";
-import linkedin from "../../assets/img/icon/linkedin.png";
-import tag from "../../assets/img/icon/tag.png";
-import map from "../../assets/img/icon/map.png";
-import cal from "../../assets/img/icon/cal.png";
-// Import Img
-import Organize from "../../assets/img/sidebar/project_organizer.png"
-import img1 from "../../assets/img/sidebar/rec-cas-1.png";
-import img2 from "../../assets/img/sidebar/rec-cas-2.png";
-import img3 from "../../assets/img/sidebar/rec-cas-3.png";
-import img4 from "../../assets/img/sidebar/rec-cas-4.png";
+import { formatDate } from "../../utils/dateFormatter";
+import { supabase } from "../../supabase";
+import tagIcon from "../../assets/img/icon/tag.png";
+import mapIcon from "../../assets/img/icon/map.png";
+import calIcon from "../../assets/img/icon/cal.png";
 
-const NewsSidebar = () => {
-  const ReceData = [
-    {
-      img: img1,
-      title: `Stop early marriage and educate
-            your girl child`,
-      date: "3rd January, 2022",
-    },
-    {
-      img: img2,
-      title: `Ensure a secure and free life for the wild animal`,
-      date: "10th January, 2022",
-    },
-    {
-      img: img3,
-      title: `Ensure pure and mineral drinking water for rural people`,
-      date: "15th January, 2022",
-    },
-    {
-      img: img4,
-      title: `Collect fund for drinking water & healthy food`,
-      date: "30th Dec, 2021",
-    },
-  ];
+const NewsSidebar = ({ news }) => {
+    const [recentNews, setRecentNews] = useState([]);
+
+    useEffect(() => {
+        const fetchRecent = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("news")
+                    .select("*")
+                    .neq("id", news?.id)
+                    .order("created_at", { ascending: false })
+                    .limit(4);
+                if (error) throw error;
+                setRecentNews(data || []);
+            } catch (err) {
+                console.error("Error fetching recent news:", err);
+            }
+        };
+        if (news?.id) fetchRecent();
+    }, [news?.id]);
+
+    if (!news) return null;
 
   return (
     <>
-      <div class="col-lg-4">
-        <div class="sidebar_first">
-          <div class="project_organizer_wrapper sidebar_boxed">
-            <div class="project_organizer_img">
-              <img src={Organize} alt="img" />
-            </div>
-            <div class="project_organizer_text">
-              <h5>Writte by:</h5>
-              <h3>Polin sarika</h3>
-              <p>Manager at ABC company</p>
-              <ul>
-                <li>
-                  <img src={tag} alt="icon" /> Category:
-                  <span>Education</span>
+      <div className="col-lg-4">
+        <div className="sidebar_first">
+          {/* Author / Organizer Section */}
+          <div className="project_organizer_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", marginBottom: "30px" }}>
+            <div className="project_organizer_text">
+              <h5 style={{ fontSize: "13px", color: "#ca1e14", fontWeight: "700", textTransform: "uppercase", marginBottom: "10px", letterSpacing: "1px" }}>Written by:</h5>
+              <h3 style={{ fontSize: "22px", fontWeight: "800", marginBottom: "5px", textTransform: "lowercase", color: "#222" }}>{news.author_name || "Admin"}</h3>
+              {news.author_role && <p style={{ fontSize: "14px", color: "#777", marginBottom: "15px" }}>{news.author_role}</p>}
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                <li style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px", fontSize: "15px", color: "#444" }}>
+                  <img src={tagIcon} alt="icon" style={{ width: "16px", opacity: "0.7" }} /> 
+                  <strong>Category:</strong> <span style={{ color: "#666" }}>{news.tag || "Education"}</span>
                 </li>
-                <li>
-                  <img src={map} alt="icon" /> Location:
-                  <span>Niger, Nigeria</span>
-                </li>
-                <li>
-                  <img src={cal} alt="icon" /> Date:
-                  <span>20 Dec, 2021</span>
+                {news.location && (
+                    <li style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px", fontSize: "15px", color: "#444" }}>
+                    <img src={mapIcon} alt="icon" style={{ width: "16px", opacity: "0.7" }} /> 
+                    <strong>Location:</strong> <span style={{ color: "#666" }}>{news.location}</span>
+                    </li>
+                )}
+                <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "15px", color: "#444" }}>
+                  <img src={calIcon} alt="icon" style={{ width: "16px", opacity: "0.7" }} /> 
+                  <strong>Date:</strong> <span style={{ color: "#666" }}>{formatDate(news.created_at)}</span>
                 </li>
               </ul>
             </div>
           </div>
-          <div class="recent_causes_wrapper sidebar_boxed">
-            <div class="sidebar_heading_main">
-              <h3>Recent news</h3>
-            </div>
-            {ReceData.map((data, index) => (
-              <div class="recent_donet_item" key={index}>
-                <div class="recent_donet_img">
-                  <Link to="#!">
-                    <img src={data.img} alt="img" />
-                  </Link>
+
+          {/* Recent News Section */}
+          {recentNews.length > 0 && (
+            <div className="recent_news_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", marginBottom: "30px" }}>
+                <div className="sidebar_heading_main" style={{ marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>
+                    <h3 style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}>Recent news</h3>
                 </div>
-                <div class="recent_donet_text">
-                  <div class="sidebar_inner_heading">
-                    <h4>
-                      <Link to="#!">{data.title}</Link>
-                    </h4>
-                  </div>
-                  <h6>{data.date}</h6>
+                {recentNews.map((item) => (
+                    <div key={item.id} style={{ display: "flex", gap: "15px", marginBottom: "20px", alignItems: "center" }}>
+                        <Link to={`/news-details/${item.id}`} style={{ width: "70px", height: "70px", flexShrink: 0 }}>
+                            <img 
+                                src={(item.image_url || "").split(',')[0]} 
+                                alt="recent" 
+                                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} 
+                            />
+                        </Link>
+                        <div style={{ flex: 1 }}>
+                            <h4 style={{ fontSize: "14px", fontWeight: "700", lineHeight: "1.4", margin: "0 0 5px 0" }}>
+                                <Link to={`/news-details/${item.id}`} style={{ color: "#222", textDecoration: "none" }}>{item.title}</Link>
+                            </h4>
+                            <span style={{ fontSize: "12px", color: "#999" }}>{formatDate(item.created_at)}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+          )}
+
+          <div className="share_sidebar_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", boxShadow: "none" }}>
+                <div className="sidebar_heading_main" style={{ marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>
+                    <h3 style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}>Share</h3>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div class="share_causes_wrapper sidebar_boxed">
-            <div class="sidebar_heading_main">
-              <h3>Popular tags</h3>
+                <div style={{ display: "flex", gap: "12px" }}>
+                    {[
+                        { icon: "fab fa-facebook-f", link: "#" },
+                        { icon: "fab fa-instagram", link: "#" },
+                        { icon: "fab fa-twitter", link: "#" },
+                        { icon: "fab fa-linkedin-in", link: "#" }
+                    ].map((social, i) => (
+                        <a 
+                            key={i} 
+                            href={social.link} 
+                            style={{ 
+                                width: "40px", 
+                                height: "40px", 
+                                backgroundColor: "#f9f0f0", 
+                                borderRadius: "50%", 
+                                display: "flex", 
+                                alignItems: "center", 
+                                justifyContent: "center", 
+                                color: "#2a283e",
+                                fontSize: "16px",
+                                transition: "all 0.3s"
+                            }}
+                        >
+                            <i className={social.icon}></i>
+                        </a>
+                    ))}
+                </div>
             </div>
-            <div class="popular_tags">
-              <ul>
-                <li>
-                  <Link to="#!">Poverty</Link>
-                </li>
-                <li>
-                  <Link to="#!">Education</Link>
-                </li>
-                <li>
-                  <Link to="#!">Children education</Link>
-                </li>
-                <li>
-                  <Link to="#!">Food</Link>
-                </li>
-                <li>
-                  <Link to="#!">Health care</Link>
-                </li>
-                <li>
-                  <Link to="#!">Welfare</Link>
-                </li>
-                <li>
-                  <Link to="#!">Donation people</Link>
-                </li>
-                <li>
-                  <Link to="#!">Charity fund</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="share_causes_wrapper sidebar_boxed">
-            <div class="sidebar_heading_main">
-              <h3>Share causes</h3>
-            </div>
-            <div class="social_icon_sidebar">
-              <ul>
-                <li>
-                  <Link to="#">
-                    <img src={facebook} alt="icon" />
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#">
-                    <img src={instagram} alt="icon" />
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#">
-                    <img src={twitter} alt="icon" />
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#">
-                    <img src={linkedin} alt="icon" />
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
     </>

@@ -17,10 +17,16 @@ function toJsDate(value) {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-const EventDetailsArea = () => {
+const EventDetailsArea = ({ onTitleFetch }) => {
   const { eventId } = useParams();
   const { user } = useAuth();
   const [event, setEvent] = useState(null);
+
+  useEffect(() => {
+    if (event && onTitleFetch) {
+      onTitleFetch(event.title);
+    }
+  }, [event, onTitleFetch]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [registering, setRegistering] = useState(false);
@@ -96,31 +102,75 @@ const EventDetailsArea = () => {
                         }}
                       />
                     </div>
-                    <div className="details_text_wrapper">
+                    <div className="details_text_wrapper details_main_content">
+                      <style dangerouslySetInnerHTML={{ __html: `
+                        .details_main_content p, 
+                        .details_main_content li { 
+                            margin-bottom: 8px !important; 
+                            margin-top: 0 !important; 
+                            line-height: 1.6 !important;
+                            color: #444;
+                            font-size: 17px;
+                            position: relative;
+                            display: list-item;
+                            list-style: none;
+                        }
+                        .details_main_content p::before, 
+                        .details_main_content li::before {
+                            content: "";
+                            display: inline-block;
+                            width: 7px;
+                            height: 7px;
+                            background-color: #ca1e14;
+                            border-radius: 50%;
+                            margin-right: 12px;
+                            vertical-align: middle;
+                            margin-bottom: 2px;
+                        }
+                        .details_main_content p:empty::before { content: none !important; }
+                        
+                        .details_main_content h2 { 
+                            font-size: 36px; 
+                            color: #2a283e; 
+                            font-weight: 700; 
+                            margin-bottom: 20px;
+                        }
+                        .details_main_content h4 { 
+                            margin-top: 15px !important; 
+                            margin-bottom: 10px !important; 
+                            font-size: 22px; 
+                            color: #2a283e; 
+                            font-weight: 700; 
+                        }
+                        .details_main_content .tags_noted {
+                            color: #ca1e14;
+                            font-weight: 700;
+                            margin-bottom: 10px;
+                            display: inline-block;
+                        }
+                        .details_main_content div { margin-bottom: 0 !important; }
+                        .details_main_content ul { margin-bottom: 8px; padding-left: 0; list-style: none; }
+                      `}} />
                       <Link to="/event" className="tags_noted">
                         {event.tag || "#Event"}
                       </Link>
                       <h2>{event.title}</h2>
-                      <div 
-                        style={{ fontSize: "17px", lineHeight: "1.8", color: "#555" }} 
-                        dangerouslySetInnerHTML={{ __html: event.content || extractDescription(event.description) }} 
-                      />
+                      
+                      <div dangerouslySetInnerHTML={{ __html: event.content || extractDescription(event.description) }} />
+                      
                       <p>
                         <strong>Venue:</strong> {event.venue || "-"}
-                        <br />
-                        <strong>Starts:</strong>{" "}
-                        {(() => {
-                          return formatDate(event.startAt || event.start_at);
-                        })()}
-                        <br />
-                        <strong>Ends:</strong>{" "}
-                        {(() => {
-                          return formatDate(event.endAt || event.end_at);
-                        })()}
                       </p>
+                      <p>
+                        <strong>Starts:</strong> {formatDate(event.startAt || event.start_at)}
+                      </p>
+                      <p>
+                        <strong>Ends:</strong> {formatDate(event.endAt || event.end_at)}
+                      </p>
+
                       {event.image_url && event.image_url.split(",").length > 1 && (
                         <div style={{ marginTop: "30px" }}>
-                          <h4 style={{ marginBottom: "15px", fontWeight: "700" }}>Event Gallery</h4>
+                          <h4>Event Gallery</h4>
                           <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
                             {event.image_url.split(",").slice(1).map((imgUrl, i) => (
                                 <img

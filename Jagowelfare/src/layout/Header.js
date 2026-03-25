@@ -46,9 +46,9 @@ const Header = () => {
                                     <img src={logo} alt="logo" style={{ maxWidth: "100px", height: "auto" }} />
                                 </Link>
 
-                                <button 
-                                    className="navbar-toggler border-0 shadow-none ps-0" 
-                                    type="button" 
+                                <button
+                                    className="navbar-toggler border-0 shadow-none ps-0"
+                                    type="button"
                                     onClick={toggleMenu}
                                     style={{ color: "#ca1e14" }}
                                 >
@@ -56,26 +56,34 @@ const Header = () => {
                                 </button>
 
                                 <div className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`} id="navbarSupportedContent">
-                                    <ul className="navbar-nav ms-auto mb-2 mb-lg-0 text-start">
+                                    <ul className="navbar-nav mx-auto mb-2 mb-lg-0 text-center">
                                         {HeaderData.map((data, index) => (
-                                            <li className="nav-item dropdown" key={index}>
-                                                <Link 
-                                                    to={data.link} 
+                                            <li className="nav-item dropdown px-lg-2" key={index}>
+                                                <Link
+                                                    to={data.link}
                                                     className={`nav-link ${data.submenu ? 'dropdown-toggle' : ''}`}
                                                     onClick={() => !data.submenu && setIsMenuOpen(false)}
+                                                    style={{ 
+                                                        fontWeight: "600", 
+                                                        fontSize: "15px", 
+                                                        color: "var(--black-color) !important",
+                                                        textTransform: "uppercase",
+                                                        letterSpacing: "0.5px"
+                                                    }}
                                                 >
                                                     {data.menu}
                                                 </Link>
                                                 {data.submenu && (
-                                                    <ul className="dropdown-menu border-0 shadow-sm">
+                                                    <ul className="dropdown-menu border-0 shadow-lg mt-0">
                                                         {data.subMenuitem
                                                             .filter(sub => sub.subItem !== "Scanner")
                                                             .map((data1, index1) => (
                                                                 <li key={index1}>
-                                                                    <Link 
-                                                                        to={data1.linkL} 
-                                                                        className="dropdown-item py-2"
+                                                                    <Link
+                                                                        to={data1.linkL}
+                                                                        className="dropdown-item py-2 px-4"
                                                                         onClick={() => setIsMenuOpen(false)}
+                                                                        style={{ fontWeight: "500", fontSize: "14px" }}
                                                                     >
                                                                         {data1.subItem}
                                                                     </Link>
@@ -85,22 +93,6 @@ const Header = () => {
                                                 )}
                                             </li>
                                         ))}
-
-                                        {user && (
-                                            <li className="nav-item mt-2 mt-lg-0">
-                                                <button
-                                                    type="button"
-                                                    className="btn btn_theme btn_sm w-100"
-                                                    onClick={() => {
-                                                        supabase.auth.signOut().then(() => {
-                                                            window.location.href = "/";
-                                                        });
-                                                    }}
-                                                >
-                                                    Logout
-                                                </button>
-                                            </li>
-                                        )}
                                     </ul>
                                 </div>
                             </div>
@@ -110,24 +102,34 @@ const Header = () => {
             </header>
 
             <style>{`
-                .navbar-collapse.show {
+                .main_header_arae {
                     background: #fff;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                    margin-top: 10px;
+                    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
                 }
-                .nav-link { font-weight: 500; font-size: 16px; color: #333 !important; }
-                .nav-item { padding: 5px 0; }
+                .nav-link { 
+                    padding: 25px 15px !important;
+                    transition: 0.3s;
+                }
+                .nav-link:hover {
+                    color: var(--main-color) !important;
+                }
+                .dropdown-menu {
+                    border-radius: 0 0 10px 10px;
+                    border-top: 3px solid var(--main-color) !important;
+                }
+                .dropdown-item:hover {
+                    background: var(--main-color);
+                    color: #fff;
+                }
                 @media (max-width: 991px) {
                     .navbar-collapse {
-                        position: absolute;
-                        top: 100%;
-                        left: 0;
-                        right: 0;
-                        z-index: 1000;
-                        width: 100%;
+                        background: #fff;
+                        padding: 20px;
+                        border-radius: 10px;
+                        margin-top: 15px;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
                     }
+                    .nav-link { padding: 10px 0 !important; }
                 }
             `}</style>
         </>

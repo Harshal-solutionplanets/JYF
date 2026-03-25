@@ -5,10 +5,11 @@ import CommonBanner from '../component/Common/CommonBanner'
 import CausesDetailsArea from '../component/CausesDetails'
 
 const CausesDetsils = () => {
+  const [title, setTitle] = React.useState("Cause details");
   return (
     <>
-        <CommonBanner heading="Cause details" pagination="Cause details"/>
-        <CausesDetailsArea/>
+        <CommonBanner heading={title} pagination={title}/>
+        <CausesDetailsArea onTitleFetch={setTitle}/>
     </>
   )
 }

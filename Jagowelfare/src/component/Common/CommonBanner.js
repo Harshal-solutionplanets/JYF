@@ -14,9 +14,21 @@ const CommonBanner = (props) => {
             const { data } = await supabase.from('site_config').select('*').eq('key', 'page_banners').single();
             if (data && data.value) {
                 // Try to find by pagination or heading
-                const pageKey = props.pagination?.toLowerCase() || props.heading?.toLowerCase();
-                if (data.value[pageKey] && data.value[pageKey].image_url) {
-                    setBgImage(data.value[pageKey].image_url);
+                const pageKey = (props.pagination?.toLowerCase() || props.heading?.toLowerCase() || "");
+                let banner = data.value[pageKey];
+
+                // Fallback: If 'Cause details' or 'Event details' doesn't have its own banner,
+                // fall back to the generic 'causes' or 'events' banner.
+                if (!banner || !banner.image_url) {
+                    if (pageKey.includes("cause")) banner = data.value["causes"];
+                    else if (pageKey.includes("event")) banner = data.value["events"];
+                    else if (pageKey.includes("news")) banner = data.value["news"];
+                    else if (pageKey.includes("about")) banner = data.value["about"];
+                    else if (pageKey.includes("contact")) banner = data.value["contact"];
+                }
+
+                if (banner && banner.image_url) {
+                    setBgImage(banner.image_url);
                 }
             }
         };

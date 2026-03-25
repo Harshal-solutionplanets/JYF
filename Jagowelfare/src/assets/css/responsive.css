@@ -1,6 +1,6 @@
 @media (max-width: 767px) {
     /* Global Resets */
-    html, body {
+    body {
         overflow-x: hidden !important;
         width: 100%;
         position: relative;
