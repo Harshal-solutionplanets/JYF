@@ -11,15 +11,16 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
+    // Page states: 'landing' (details + seat choice), 'form' (collecting details), 'success' (msg)
+    const [pageStatus, setPageStatus] = useState('landing');
+    const [event, setEvent] = useState(null);
+
     useEffect(() => {
         if (event && onTitleFetch) {
             onTitleFetch(`Registration: ${event.title}`);
         }
     }, [event, onTitleFetch]);
 
-    // Page states: 'landing' (details + seat choice), 'form' (collecting details), 'success' (msg)
-    const [pageStatus, setPageStatus] = useState('landing');
-    const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [bookedCount, setBookedCount] = useState(0);
