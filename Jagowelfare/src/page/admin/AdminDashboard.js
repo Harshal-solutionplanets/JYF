@@ -16,6 +16,7 @@ import AdminViewRegistrations from "./AdminViewRegistrations";
 import AdminQRScanner from "./AdminQRScanner";
 import AdminDashboardUpdates from "./AdminDashboardUpdates";
 import AdminViewGallery from "./AdminViewGallery";
+import { useAuth } from "../../auth/AuthProvider";
 
 const DashboardOverview = () => {
   return (
@@ -87,9 +88,12 @@ const MasterManagementView = ({ type, title, masters, onAdd, onDelete, categoryI
 };
 
 const AdminDashboardPage = () => {
+  const { user } = useAuth();
+  const isScannerOnly = user?.email === 'jainyouthfoundation9@gmail.com';
+
   const navigate = useNavigate();
   const [openMenus, setOpenMenus] = useState({});
-  const [activeView, setActiveView] = useState("dashboard");
+  const [activeView, setActiveView] = useState(isScannerOnly ? "qr_scanner" : "dashboard");
   const [categoryInput, setCategoryInput] = useState("");
   const [seatTierInput, setSeatTierInput] = useState("");
   const [masters, setMasters] = useState([]);
@@ -280,12 +284,14 @@ const AdminDashboardPage = () => {
         </div>
         <div style={{ padding: "25px 0", flex: 1, overflowY: "auto" }}>
           <ul style={{ listStyle: "none", padding: 0 }}>
-            <li onClick={() => setActiveView("dashboard")} style={navItemStyle}>
-              <span style={{ display: "flex", alignItems: "center" }}>
-                <i className="fas fa-home" style={{ width: "35px", color: "#ca1e14" }}></i> Dashboard
-              </span>
-            </li>
-            {menuItems.map((item) => (
+            {!isScannerOnly && (
+              <li onClick={() => setActiveView("dashboard")} style={navItemStyle}>
+                <span style={{ display: "flex", alignItems: "center" }}>
+                  <i className="fas fa-home" style={{ width: "35px", color: "#ca1e14" }}></i> Dashboard
+                </span>
+              </li>
+            )}
+            {!isScannerOnly && menuItems.map((item) => (
               <li key={item.key}>
                 <div onClick={() => toggleMenu(item.key)} style={navItemStyle}>
                   <span style={{ display: "flex", alignItems: "center" }}>
@@ -344,7 +350,7 @@ const AdminDashboardPage = () => {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "40px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <h2 style={{ color: "#222", margin: 0, fontWeight: "800", fontSize: "28px" }}>{getViewTitle()}</h2>
-            {activeView !== "dashboard" && (
+            {activeView !== "dashboard" && !isScannerOnly && (
               <button onClick={() => setActiveView("dashboard")} className="btn btn_theme btn_md" style={{ padding: "8px 20px" }}>
                 <i className="fas fa-arrow-left mr-2"></i> Back
               </button>
