@@ -97,23 +97,9 @@ const CausesDetailsArea = ({ onTitleFetch }) => {
                                                 color: #444;
                                                 font-size: 17px;
                                                 position: relative;
-                                                display: list-item;
+                                                display: block;
                                                 list-style: none;
                                             }
-                                            .details_main_content p::before, 
-                                            .details_main_content li::before {
-                                                content: "";
-                                                display: inline-block;
-                                                width: 7px;
-                                                height: 7px;
-                                                background-color: #ca1e14;
-                                                border-radius: 50%;
-                                                margin-right: 12px;
-                                                vertical-align: middle;
-                                                margin-bottom: 2px;
-                                            }
-                                            /* Ensure empty paragraphs don't show a dot */
-                                            .details_main_content p:empty::before { content: none !important; }
                                             
                                             .details_main_content h4 { 
                                                 margin-top: 15px !important; 

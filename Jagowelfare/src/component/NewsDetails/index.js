@@ -64,25 +64,6 @@ const NewsDetailsArea = ({ onTitleFetch }) => {
                             display: block;
                             list-style: none;
                         }
-                        .details_main_content p::before, 
-                        .details_main_content li::before {
-                            content: "";
-                            display: inline-block;
-                            width: 7px;
-                            height: 7px;
-                            background-color: #ca1e14;
-                            border-radius: 50%;
-                            margin-right: 12px;
-                            vertical-align: middle;
-                            margin-bottom: 2px;
-                        }
-                        
-                        /* Hide bullet if paragraph is empty or only contains a line break */
-                        .details_main_content p:empty::before,
-                        .details_main_content p br:only-child::before,
-                        .details_main_content p:has(br:only-child)::before { 
-                            display: none !important; 
-                        }
                         
                         .details_main_content h2 { 
                             font-size: 36px; 
