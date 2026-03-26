@@ -61,7 +61,7 @@ const TrendingCauses = () => {
                     <div className="case_boxed_wrapper" style={{ height: "100%", width: "100%", background: "#fff", borderRadius: "15px", overflow: "hidden", border: "1px solid #eee", display: "flex", flexDirection: "column" }}>
                       <div className="case_boxed_img">
                         <Link to={`/cause-details/${data.id}`}>
-                          <img src={firstImage} alt="img" style={{ height: "260px", objectFit: "cover", width: "100%" }} />
+                          <img src={firstImage} alt="img" style={{ height: "260px", objectFit: "contain", width: "100%", backgroundColor: "#f8f9fa" }} />
                         </Link>
                       </div>
                       <div className="causes_boxed_text" style={{ padding: "20px", flex: "1 1 auto", display: "flex", flexDirection: "column" }}>

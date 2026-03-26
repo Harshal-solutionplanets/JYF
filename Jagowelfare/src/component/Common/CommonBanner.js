@@ -37,7 +37,7 @@ const CommonBanner = (props) => {
 
   return (
     <>
-        <section id="common_banner_area" style={bgImage ? { backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+        <section id="common_banner_area" style={bgImage ? { backgroundImage: `url(${bgImage})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
         <div className="container">
             <div className="row">
                 <div className="col-lg-12">

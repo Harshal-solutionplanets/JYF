@@ -42,7 +42,7 @@ const AboutAres = () => {
                                     <h3>{config.heading}</h3>
                                 </div>
                                 <div className="about_img_large">
-                                    <img src={config.image_url || Img1} alt="img" />
+                                    <img src={config.image_url || Img1} alt="img" style={{ objectFit: 'contain', width: '100%', height: 'auto', maxHeight: '500px', backgroundColor: '#f8f9fa' }} />
                                 </div>
                                 <div className="about_img_small animate__animated animate__fadeInDown">
                                     <img src={config.image_url_2 || Img1} alt="img" />

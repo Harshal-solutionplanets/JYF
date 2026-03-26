@@ -246,6 +246,9 @@ section {
 
 .case_boxed_img a img {
   width: 100%;
+  height: 250px !important;
+  object-fit: contain !important;
+  background-color: #f8f9fa !important;
   transition: var(--transition);
 }
 

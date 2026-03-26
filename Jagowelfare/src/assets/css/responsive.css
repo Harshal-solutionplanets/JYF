@@ -316,6 +316,7 @@
 
     #common_banner_area {
         padding: 85px 0;
+        background-size: 100% 100% !important;
     }
 
     .banner_one_img {

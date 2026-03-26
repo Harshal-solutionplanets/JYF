@@ -67,7 +67,7 @@ const CausesDetailsArea = ({ onTitleFetch }) => {
                                     <img 
                                         src={mainImage} 
                                         alt="Main Cause img" 
-                                        style={{ width: "100%", height: "auto", minHeight: "250px", maxHeight: "450px", objectFit: "cover" }} 
+                                        style={{ width: "100%", height: "auto", minHeight: "250px", maxHeight: "550px", objectFit: "contain", backgroundColor: "#f8f9fa" }} 
                                     />
                                 </div>
                                 <div className="details_text_wrapper">
