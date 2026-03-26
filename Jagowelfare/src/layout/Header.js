@@ -28,10 +28,8 @@ const Header = () => {
                             </div>
                             <div className="col-lg-6 col-md-6">
                                 <ul className="topbar-list-right">
-                                    <li><Link to="#!"><i className="fab fa-facebook"></i></Link></li>
-                                    <li><Link to="#!"><i className="fab fa-twitter-square"></i></Link></li>
-                                    <li><Link to="#!"><i className="fab fa-instagram"></i></Link></li>
-                                    <li><Link to="#!"><i className="fab fa-linkedin"></i></Link></li>
+                                    <li><Link to="https://www.facebook.com/groups/jyf.mulund/" target="_blank"><i className="fab fa-facebook"></i></Link></li>
+                                    <li><Link to="https://x.com/jyf_india" target="_blank"><i className="fab fa-x-twitter"></i></Link></li>
                                 </ul>
                             </div>
                         </div>

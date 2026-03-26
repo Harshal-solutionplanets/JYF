@@ -25,16 +25,10 @@ const TeamArea = () => {
                              <div className="volunteer_icon">
                                  <ul>
                                      <li>
-                                         <a href="#!"><i className="fab fa-facebook"></i></a>
+                                         <a href="https://www.facebook.com/groups/jyf.mulund/" target="_blank"><i className="fab fa-facebook"></i></a>
                                      </li>
                                      <li>
-                                         <a href="#!"><i className="fab fa-twitter-square"></i></a>
-                                     </li>
-                                     <li>
-                                         <a href="#!"><i className="fab fa-instagram"></i></a>
-                                     </li>
-                                     <li>
-                                         <a href="#!"><i className="fab fa-linkedin"></i></a>
+                                         <a href="https://x.com/jyf_india" target="_blank"><i className="fab fa-x-twitter"></i></a>
                                      </li>
                                  </ul>
                              </div>

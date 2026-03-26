@@ -86,18 +86,18 @@ const NewsSidebar = ({ news }) => {
 
           <div className="share_sidebar_wrapper sidebar_boxed" style={{ padding: "20px", borderRadius: "12px", border: "1px solid #eee", boxShadow: "none" }}>
                 <div className="sidebar_heading_main" style={{ marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>
-                    <h3 style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}>Share</h3>
+                    <h3 style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}>Join our community</h3>
                 </div>
                 <div style={{ display: "flex", gap: "12px" }}>
                     {[
-                        { icon: "fab fa-facebook-f", link: "#" },
-                        { icon: "fab fa-instagram", link: "#" },
-                        { icon: "fab fa-twitter", link: "#" },
-                        { icon: "fab fa-linkedin-in", link: "#" }
+                        { icon: "fab fa-facebook-f", link: "https://www.facebook.com/groups/jyf.mulund/" },
+                        { icon: "fab fa-x-twitter", link: "https://x.com/jyf_india" }
                     ].map((social, i) => (
                         <a 
                             key={i} 
                             href={social.link} 
+                            target="_blank"
+                            rel="noopener noreferrer"
                             style={{ 
                                 width: "40px", 
                                 height: "40px", 

@@ -9,8 +9,23 @@ import PartnerArea from '../Home/Partner'
 import Newsletter from './Newsletter'
 import Testimonials from './Testimonials'
 
+import { supabase } from '../../supabase'
 
 const AboutArea = () => {
+    const [config, setConfig] = React.useState({
+        image_url: Img1
+    });
+
+    React.useEffect(() => {
+        const fetchConfig = async () => {
+            const { data } = await supabase.from('site_config').select('*').eq('key', 'home_intro').single();
+            if (data && data.value) {
+                setConfig(data.value);
+            }
+        };
+        fetchConfig();
+    }, []);
+
   return (
     <>
    <section id="about_area" className="section_padding">
@@ -18,7 +33,7 @@ const AboutArea = () => {
             <div className="row">
                 <div className="col-lg-6 col-md-12 col-sm-12 col-12">
                     <div className="about_area_img">
-                        <img src={Img1} alt="img" />
+                        <img src={config.image_url || Img1} alt="img" />
                     </div>
                 </div>
                 <div className="col-lg-6 col-md-12 col-sm-12 col-12">

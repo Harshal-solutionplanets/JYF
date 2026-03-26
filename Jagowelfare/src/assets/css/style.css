@@ -232,8 +232,9 @@ section {
   z-index: 9;
 }
 
-.case_boxed_wrapper:hover .case_boxed_img a img {
-  transform: scale(1.2) rotate(3deg);
+.case_boxed_wrapper:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .case_boxed_img {
@@ -428,8 +429,9 @@ section {
   transition: var(--transition);
 }
 
-.event_left_side_wrapper:hover .event_big_img a img {
-  transform: scale(1.2) rotate(3deg);
+.event_left_side_wrapper:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .event_content_area {
@@ -606,8 +608,8 @@ section {
   position: relative;
 }
 
-.img_animation:hover img {
-  transform: scale(1.2);
+.img_animation:hover {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 /* --Button Area start-- */
