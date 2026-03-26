@@ -1,7 +1,26 @@
-import React from 'react'
-// import Data
-import { TeamDatas } from './data'
+import React, { useEffect, useState } from 'react'
+import { supabase } from '../../supabase'
+
 const TeamArea = () => {
+  const [team, setTeam] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        const { data, error } = await supabase.from('team').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        setTeam(data || []);
+      } catch (err) {
+        console.error("Error fetching team:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTeam();
+  }, []);
+
+  if (loading) return <div className="text-center p-5"><h3>Loading Volunteers...</h3></div>;
 
   return (
     <>
@@ -17,30 +36,34 @@ const TeamArea = () => {
                 </div>
             </div>
             <div className="row">
-                {TeamDatas.map((data, index)=>(
-                     <div className="col-lg-3 col-md-4 col-sm-6 col-12" key={index}>
-                     <div className="volunteer_wrapper">
-                         <div className="volunteer_img">
-                             <img src={data.img} alt="img" />
-                             <div className="volunteer_icon">
-                                 <ul>
-                                     <li>
-                                         <a href="https://www.facebook.com/groups/jyf.mulund/" target="_blank"><i className="fab fa-facebook"></i></a>
-                                     </li>
-                                     <li>
-                                         <a href="https://x.com/jyf_india" target="_blank"><i className="fab fa-x-twitter"></i></a>
-                                     </li>
-                                 </ul>
-                             </div>
-                         </div>
- 
-                         <div className="volunteer_text">
-                             <h3><a href="#!">{data.name}</a></h3>
-                             <p>{data.title}</p>
-                         </div>
-                     </div>
-                 </div>
-                ))}
+                {team.length === 0 ? (
+                    <div className="col-12 text-center text-muted">No volunteers found.</div>
+                ) : (
+                    team.map((data, index)=>(
+                        <div className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4" key={index}>
+                        <div className="volunteer_wrapper">
+                            <div className="volunteer_img">
+                                <img src={data.image_url || "/default-avatar.png"} alt="img" style={{ height: "300px", objectFit: "cover", width: "100%" }} />
+                                <div className="volunteer_icon">
+                                    <ul>
+                                        <li>
+                                            <a href="https://www.facebook.com/groups/jyf.mulund/" target="_blank"><i className="fab fa-facebook"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="https://x.com/jyf_india" target="_blank"><i className="fab fa-x-twitter"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+    
+                            <div className="volunteer_text">
+                                <h3><a href="#!">{data.name}</a></h3>
+                                <p>{data.role}</p>
+                            </div>
+                        </div>
+                    </div>
+                    ))
+                )}
             </div>
         </div>
     </section>
@@ -48,4 +71,4 @@ const TeamArea = () => {
   )
 }
 
-export default TeamArea
+export default TeamArea
