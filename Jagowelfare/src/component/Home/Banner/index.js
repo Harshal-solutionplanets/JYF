@@ -34,7 +34,12 @@ const HomeBanner = () => {
                             <div className="banner_one_text animate__animated animate__fadeInLeft">
                                 <h1 
                                     style={{ fontSize: "75px", lineHeight: "1.2", fontWeight: "800" }}
-                                    dangerouslySetInnerHTML={{ __html: (config.title || "Unity in commUNITY").replace('JYF', "<span class='heading_highlight'>JYF</span>").replace('Humanity', "<span class='heading_highlight'>Humanity</span>").replace('Compassion', "<span class='heading_highlight'>Compassion</span>") }}
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: (config.title || "Unity in commUNITY")
+                                            .split(' ')
+                                            .map((word, idx) => idx === 1 ? `<span class='heading_highlight'>${word}</span>` : word)
+                                            .join(' ')
+                                    }}
                                 >
                                 </h1>
                                 <div className="banner_para mt-4" 

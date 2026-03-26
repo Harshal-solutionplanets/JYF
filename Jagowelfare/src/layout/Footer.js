@@ -40,15 +40,15 @@ const Footer = () => {
                             <div style={{ color: "#666", fontSize: "15px" }}>
                                 <p style={{ marginBottom: "12px", display: "flex", alignItems: "flex-start", gap: "10px" }}>
                                     <i className="fas fa-map-marker-alt" style={{ marginTop: "4px", color: "#ca1e14" }}></i> 
-                                    <span>[Update with actual address]</span>
+                                    <span>21/B, Shanti Bhuvan Shopping Centre, 2nd Floor, JD Road, Above 396 Bus Stop, Mulund (W), Mumbai-80.</span>
                                 </p>
                                 <p style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
                                     <i className="fas fa-phone" style={{ color: "#ca1e14" }}></i> 
-                                    <Link to="tel:+91XXXXXXXXXX" style={{ color: "inherit" }}>+91 XXXXX XXXXX</Link>
+                                    <Link to="tel:+917045707500" style={{ color: "inherit" }}>+91 70 45 70 75 00</Link>
                                 </p>
                                 <p style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
                                     <i className="fas fa-envelope" style={{ color: "#ca1e14" }}></i> 
-                                    <Link to="mailto:info@jyf.org" style={{ color: "inherit" }}>info@jyf.org</Link>
+                                    <Link to="mailto:info@jainyouth.in" style={{ color: "inherit" }}>info@jainyouth.in</Link>
                                 </p>
                             </div>
                         </div>

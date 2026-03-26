@@ -21,9 +21,9 @@ const Header = () => {
                         <div className="row align-items-center">
                             <div className="col-lg-6 col-md-6">
                                 <ul className="topbar-list">
-                                    <li><Link to="#!"><i className="fa fa-envelope"></i><span>contact@domain.com</span></Link></li>
-                                    <li><Link to="#!"><i className="fa fa-phone"></i><span>+011 234 567 89</span></Link></li>
-                                    <li><Link to="#!"><span>Faqs</span></Link></li>
+                                    <li><Link to="mailto:info@jainyouth.in"><i className="fa fa-envelope"></i><span>info@jainyouth.in</span></Link></li>
+                                    <li><Link to="tel:+917045707500"><i className="fa fa-phone"></i><span>+91 7045707500</span></Link></li>
+                                    <li><Link to="/faqs"><span>Faqs</span></Link></li>
                                 </ul>
                             </div>
                             <div className="col-lg-6 col-md-6">
