@@ -50,11 +50,11 @@ const AboutAres = () => {
                             </div>
                         </div>
                         <div className="col-lg-6 col-md-12 col-sm-12 col-12">
-                            <div className="about_area_main_text" style={{ paddingLeft: "0px", marginLeft: "-55px" }}>
+                            <div className="about_area_main_text">
                                 <div className="about_area_heading_two">
                                     <h2
                                         dangerouslySetInnerHTML={{ __html: (config.title || "Serving Humanity Through <span class='heading_highlight'>Compassion</span>").replace('Compassion', "<span class='heading_highlight'>Compassion</span>").replace('Humanity', "<span class='heading_highlight'>Humanity</span>").replace('poverty', "<span class='heading_highlight'>poverty</span>") }}
-                                        style={{ fontSize: "40px", color: "#1f2230", lineHeight: "1.3", fontWeight: "700", marginBottom: "15px" }}>
+                                        style={{ color: "#1f2230", lineHeight: "1.3", fontWeight: "700", marginBottom: "15px" }}>
                                     </h2>
                                 </div>
 

@@ -14,7 +14,7 @@ const AboutTopArea = () => {
             img: img3,
             heading: "Healthcare",
             roundImg: RoundImg,
-            class: "about_top_boxed bg_three",
+            class: "about_top_boxed bg_three h-100",
             link: "/healthcare"
         },
         {

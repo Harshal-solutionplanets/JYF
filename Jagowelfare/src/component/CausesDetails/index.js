@@ -59,7 +59,6 @@ const CausesDetailsArea = ({ onTitleFetch }) => {
                             <div className="details_wrapper_area">
                                 <div className="details_big_img" style={{
                                     width: "100%",
-                                    height: "450px",
                                     borderRadius: "15px",
                                     overflow: "hidden",
                                     marginBottom: "35px",
@@ -68,7 +67,7 @@ const CausesDetailsArea = ({ onTitleFetch }) => {
                                     <img 
                                         src={mainImage} 
                                         alt="Main Cause img" 
-                                        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                        style={{ width: "100%", height: "auto", minHeight: "250px", maxHeight: "450px", objectFit: "cover" }} 
                                     />
                                 </div>
                                 <div className="details_text_wrapper">

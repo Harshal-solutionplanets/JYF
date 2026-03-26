@@ -33,7 +33,7 @@ const HomeBanner = () => {
                         <div className="col-lg-6">
                             <div className="banner_one_text animate__animated animate__fadeInLeft">
                                 <h1 
-                                    style={{ fontSize: "75px", lineHeight: "1.2", fontWeight: "800" }}
+                                    className="banner_h1_custom"
                                     dangerouslySetInnerHTML={{ 
                                         __html: (config.title || "Unity in commUNITY")
                                             .split(' ')
@@ -43,14 +43,13 @@ const HomeBanner = () => {
                                 >
                                 </h1>
                                 <div className="banner_para mt-4" 
-                                     style={{ fontSize: "20px", color: "#666", lineHeight: "1.6" }}
                                      dangerouslySetInnerHTML={{ __html: config.description }}>
                                 </div>
                             </div>
                         </div>
                         <div className="col-lg-6">
                             <div className="banner_one_img">
-                                <img src={config.image_url || BannerImg} alt="img" style={{ width: "619px", height: "684px", objectFit: "cover" }} />
+                                <img src={config.image_url || BannerImg} alt="img" className="img-fluid banner_img_main" />
                                 <div className="banner_element">
                                     <img src={Element1} alt="icon" className="element_1 shape-1" />
                                     <img src={Element2} alt="icon" className="element_2 shape-2" />

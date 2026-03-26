@@ -65,6 +65,8 @@ body {
   margin: 0;
   font-size: 16px;
   font-family: "Poppins", sans-serif;
+  overflow-x: hidden !important;
+  width: 100%;
 }
 
 img {

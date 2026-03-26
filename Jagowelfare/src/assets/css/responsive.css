@@ -1,6 +1,6 @@
 @media (max-width: 767px) {
     /* Global Resets */
-    body {
+    html, body {
         overflow-x: hidden !important;
         width: 100%;
         position: relative;
@@ -60,9 +60,35 @@
         padding: 15px !important;
     }
 
-    /* Hide decorative elements on mobile */
-    .element_1, .element_2, .element_3 {
-        display: none !important;
+    /* Banner Mobile Fix */
+    .banner_one_img {
+        display: block !important;
+        margin-top: 30px;
+        text-align: center;
+    }
+    
+    .banner_img_main {
+        max-height: 400px;
+        width: 100%;
+        object-fit: contain;
+    }
+
+    .banner_h1_custom {
+        font-size: 32px !important;
+        line-height: 40px !important;
+        font-weight: 800 !important;
+        text-align: center;
+    }
+    
+    .banner_para {
+        text-align: center;
+        font-size: 16px !important;
+    }
+
+    .banner_one_text {
+        padding-top: 50px !important;
+        padding-bottom: 20px !important;
+        text-align: center;
     }
 
     /* Navbar Mobile Fix */
@@ -81,6 +107,49 @@
     /* Footer Mobile */
     .footer_navitem_ara {
         text-align: center;
+    }
+
+    /* About Area Mobile Fixes */
+    .about_area_heading {
+        position: relative !important;
+        right: 0 !important;
+        top: 0 !important;
+        justify-content: center !important;
+        margin-bottom: 25px !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+
+    .about_img_wrapper {
+        padding: 0 !important;
+        text-align: center !important;
+        margin-bottom: 30px !important;
+    }
+
+    .about_img_large, .about_img_large img {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 350px !important;
+        border-radius: 10px !important;
+    }
+
+    .about_img_small {
+        display: none !important;
+    }
+
+    .about_area_main_text {
+        padding-top: 20px !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+
+    .about_area_para div {
+        text-align: center !important;
+    }
+
+    .about_vedio_area {
+        text-align: center !important;
+        margin-top: 30px !important;
     }
 }
 
@@ -254,12 +323,19 @@
     }
 
     .banner_one_text {
-        padding-top: 200px;
-        padding-bottom: 70px;
+        padding-top: 100px;
+        padding-bottom: 50px;
     }
 
     .about_top_boxed {
-        margin-bottom: 80px;
+        margin-bottom: 30px !important;
+        min-height: auto !important;
+        padding: 60px 20px 30px 20px !important;
+    }
+    
+    .about_top_boxed_icon img {
+        width: 100px !important;
+        height: 100px !important;
     }
 
     .case_boxed_wrapper {
