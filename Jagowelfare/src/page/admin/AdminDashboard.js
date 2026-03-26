@@ -98,6 +98,13 @@ const AdminDashboardPage = () => {
   const [seatTierInput, setSeatTierInput] = useState("");
   const [masters, setMasters] = useState([]);
   const [openSubMenus, setOpenSubMenus] = useState({});
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchMasters = async () => {
     try {
@@ -277,8 +284,16 @@ const AdminDashboardPage = () => {
 
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f4f6f9" }}>
-      <aside style={{ width: "280px", backgroundColor: "#ffffff", boxShadow: "2px 0 10px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column" }}>
+    <div style={{ display: "flex", flexWrap: isMobile ? "wrap" : "nowrap", minHeight: "100vh", backgroundColor: "#f4f6f9" }}>
+      {(!isScannerOnly || !isMobile) && (
+        <aside style={{ 
+          width: isMobile ? "100%" : "280px", 
+          backgroundColor: "#ffffff", 
+          boxShadow: "2px 0 10px rgba(0,0,0,0.05)", 
+          display: "flex", 
+          flexDirection: "column",
+          borderBottom: isMobile ? "1px solid #eee" : "none" 
+        }}>
         <div style={{ padding: "25px 20px", display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "1px solid #eaeaea" }}>
           <img src={logo} alt="Logo" style={{ maxWidth: "160px" }} />
         </div>
@@ -337,7 +352,7 @@ const AdminDashboardPage = () => {
                 )}
               </li>
             ))}
-            <li onClick={() => setActiveView("qr_scanner")} style={navItemStyle}>
+            <li onClick={() => setActiveView("qr_scanner")} style={{ ...navItemStyle, backgroundColor: activeView === "qr_scanner" ? "#fff5f5" : "transparent" }}>
               <span style={{ display: "flex", alignItems: "center" }}>
                 <i className="fas fa-qrcode" style={{ width: "35px", color: "#ca1e14" }}></i> Entry QR Scanner
               </span>
@@ -346,8 +361,16 @@ const AdminDashboardPage = () => {
           </ul>
         </div>
       </aside>
-      <main style={{ flex: 1, padding: "50px", overflowY: "auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "40px" }}>
+      )}
+      <main style={{ flex: 1, padding: isMobile ? "20px" : "50px", overflowY: "auto", width: "100%" }}>
+        <div style={{ 
+          display: "flex", 
+          flexDirection: isMobile ? "column" : "row",
+          justifyContent: "space-between", 
+          alignItems: isMobile ? "flex-start" : "center", 
+          marginBottom: "40px",
+          gap: isMobile ? "20px" : "0"
+        }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <h2 style={{ color: "#222", margin: 0, fontWeight: "800", fontSize: "28px" }}>{getViewTitle()}</h2>
             {activeView !== "dashboard" && !isScannerOnly && (
