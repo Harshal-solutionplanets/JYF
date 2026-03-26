@@ -137,6 +137,11 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
 
         if (!p.name.trim()) { setFormError("Name is required"); return; }
         if (!p.email.trim()) { setFormError("Email is required"); return; }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(p.email.trim())) {
+            setFormError("Please enter a valid email address (e.g., user@example.com)");
+            return;
+        }
         if (!/^\d{10}$/.test(p.phoneNo)) { setFormError("Valid 10-digit phone number required"); return; }
         if (!p.location.trim()) { setFormError("Location is required"); return; }
 
