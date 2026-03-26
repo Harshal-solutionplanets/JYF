@@ -40,6 +40,13 @@ const AdminDashboardUpdates = () => {
         contact: { heading: "Contact Us", image_url: "" },
     });
 
+    // Site Contact State
+    const [siteContact, setSiteContact] = useState({
+        phones: ["70 45 70 75 00", "", ""],
+        emails: ["info@jainyouth.in", "", ""],
+        address: "21/B, Shanti Bhuvan Shopping Centre, 2nd Floor, JD Road, Above 396 Bus Stop, Mulund (W), Mumbai-80."
+    });
+
     const quillModules = {
         toolbar: [
             ['bold', 'italic', 'underline', 'strike'],
@@ -64,6 +71,7 @@ const AdminDashboardUpdates = () => {
                 if (item.key === 'home_hero') setHomeHero(item.value);
                 if (item.key === 'home_intro') setHomeIntro(item.value);
                 if (item.key === 'page_banners') setPageBanners(item.value);
+                if (item.key === 'site_contact') setSiteContact(item.value);
             });
         } catch (e) {
             console.error(e);
@@ -159,7 +167,7 @@ const AdminDashboardUpdates = () => {
                     </div>
                     <div>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                            <label style={{ margin: 0 }}>Hero Image <span style={{ color: "#888", fontWeight: "normal", fontSize: "12px" }}>(Suggested size: 619 x 684)</span></label>
+                            <label style={{ margin: 0 }}>Hero Image <span style={{ color: "#ca1e14", fontWeight: "600", fontSize: "12px" }}>(Suggested size: 619 x 684 px)</span></label>
                             {homeHero.image_url && (
                                 <div>
                                     <button onClick={() => heroInputRef.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
@@ -220,7 +228,7 @@ const AdminDashboardUpdates = () => {
                         {/* Image 1: Main (Lower) */}
                         <div style={{ marginBottom: "25px", border: "1px dashed #ddd", padding: "15px", borderRadius: "10px" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                                <label style={{ margin: 0, fontWeight: "700" }}>Main Background Image (Lower)</label>
+                                <label style={{ margin: 0, fontWeight: "700" }}>Main Background Image (Lower) <br/><span style={{ color: "#ca1e14", fontWeight: "600", fontSize: "11px" }}>(Suggested size: 800 x 900 px)</span></label>
                                 {homeIntro.image_url ? (
                                     <div>
                                         <button onClick={() => introInputRef1.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
@@ -259,7 +267,7 @@ const AdminDashboardUpdates = () => {
                         {/* Image 2: Floating (Upper) */}
                         <div style={{ border: "1px dashed #ddd", padding: "15px", borderRadius: "10px" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                                <label style={{ margin: 0, fontWeight: "700" }}>Floating Overlay Image (Upper)</label>
+                                <label style={{ margin: 0, fontWeight: "700" }}>Floating Overlay Image (Upper) <br/><span style={{ color: "#ca1e14", fontWeight: "600", fontSize: "11px" }}>(Suggested size: 400 x 450 px)</span></label>
                                 {homeIntro.image_url_2 ? (
                                     <div>
                                         <button onClick={() => introInputRef2.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
@@ -320,7 +328,7 @@ const AdminDashboardUpdates = () => {
                                 }} 
                             />
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                                <label style={{ margin: 0 }}>Banner Image</label>
+                                <label style={{ margin: 0, fontWeight: "700" }}>Banner Image <span style={{ color: "#ca1e14", fontSize: "11px" }}>(Suggested: 1920 x 450 px)</span></label>
                                 {pageBanners[key].image_url && (
                                     <div>
                                         <button onClick={() => bannerInputRefs.current[key].click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
@@ -356,6 +364,71 @@ const AdminDashboardUpdates = () => {
                   style={{ width: "100%", padding: "15px" }}
                 >
                     Update All Page Banners
+                </button>
+            </div>
+
+            {/* Site Contact Section */}
+            <div style={sectionStyle}>
+                <h4 style={{ marginBottom: "20px", color: "#ca1e14", fontWeight: "700" }}>Global Contact Details (Footer & Header)</h4>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "25px" }}>
+                    <div>
+                        <label style={{ fontWeight: "700", marginBottom: "10px", display: "block" }}>Phone Numbers (Max 3)</label>
+                        {[0, 1, 2].map(idx => (
+                            <div key={idx} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                                <span style={{ color: "#888", width: "20px" }}>{idx + 1}.</span>
+                                <input 
+                                    type="text" 
+                                    style={{ ...inputStyle, marginBottom: 0 }} 
+                                    placeholder={`Phone Number ${idx + 1}`}
+                                    value={siteContact.phones?.[idx] || ""} 
+                                    onChange={(e) => {
+                                        const newPhones = [...(siteContact.phones || ["", "", ""])];
+                                        newPhones[idx] = e.target.value;
+                                        setSiteContact({...siteContact, phones: newPhones});
+                                    }} 
+                                />
+                            </div>
+                        ))}
+
+                        <label style={{ fontWeight: "700", marginTop: "20px", marginBottom: "10px", display: "block" }}>Email Addresses (Max 3)</label>
+                        {[0, 1, 2].map(idx => (
+                            <div key={idx} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                                <span style={{ color: "#888", width: "20px" }}>{idx + 1}.</span>
+                                <input 
+                                    type="text" 
+                                    style={{ ...inputStyle, marginBottom: 0 }} 
+                                    placeholder={`Email Address ${idx + 1}`}
+                                    value={siteContact.emails?.[idx] || ""} 
+                                    onChange={(e) => {
+                                        const newEmails = [...(siteContact.emails || ["", "", ""])];
+                                        newEmails[idx] = e.target.value;
+                                        setSiteContact({...siteContact, emails: newEmails});
+                                    }} 
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div>
+                        <label style={{ fontWeight: "700", marginBottom: "10px", display: "block" }}>Physical Address</label>
+                        <textarea 
+                            style={{ ...inputStyle, height: "130px", resize: "none" }} 
+                            value={siteContact.address} 
+                            placeholder="Enter full organization address..."
+                            onChange={(e) => setSiteContact({...siteContact, address: e.target.value})}
+                        />
+                        <div style={{ marginTop: "20px", padding: "15px", background: "#f9f9f9", borderRadius: "10px", fontSize: "13px", color: "#666" }}>
+                            <i className="fas fa-info-circle" style={{ marginRight: "8px", color: "#ca1e14" }}></i>
+                            These details are used in the Header topbar, Footer contact section, and the main Contact Us page.
+                        </div>
+                    </div>
+                </div>
+                <button 
+                    onClick={() => handleSave('site_contact', siteContact)} 
+                    className="btn btn_theme mt-4" 
+                    disabled={loading}
+                    style={{ width: "100%", padding: "15px", fontWeight: "700" }}
+                >
+                    Save All Contact Details
                 </button>
             </div>
         </div>

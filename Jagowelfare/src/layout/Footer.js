@@ -1,8 +1,28 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import logo from "../assets/img/logo.jpeg"
+import { supabase } from "../supabase"
 
 const Footer = () => {
+    const [contact, setContact] = React.useState({
+        phones: ["70 45 70 75 00", "", ""],
+        emails: ["info@jainyouth.in", "", ""],
+        address: "21/B, Shanti Bhuvan Shopping Centre, 2nd Floor, JD Road, Above 396 Bus Stop, Mulund (W), Mumbai-80."
+    });
+
+    React.useEffect(() => {
+        const fetchContact = async () => {
+            const { data } = await supabase.from('site_config').select('*').eq('key', 'site_contact').single();
+            if (data && data.value) {
+                setContact(data.value);
+            }
+        };
+        fetchContact();
+    }, []);
+
+    const phones = (contact.phones || []).filter(p => p && p.trim() !== "");
+    const emails = (contact.emails || []).filter(e => e && e.trim() !== "");
+
     return (
         <footer id="footer_area" style={{ padding: "40px 0 20px 0", background: "#f8fafd", borderTop: "1px solid #eee" }}>
             <div className="container">
@@ -40,16 +60,22 @@ const Footer = () => {
                             <div style={{ color: "#666", fontSize: "15px" }}>
                                 <p style={{ marginBottom: "12px", display: "flex", alignItems: "flex-start", gap: "10px" }}>
                                     <i className="fas fa-map-marker-alt" style={{ marginTop: "4px", color: "#ca1e14" }}></i> 
-                                    <span>21/B, Shanti Bhuvan Shopping Centre, 2nd Floor, JD Road, Above 396 Bus Stop, Mulund (W), Mumbai-80.</span>
+                                    <span>{contact.address}</span>
                                 </p>
-                                <p style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
-                                    <i className="fas fa-phone" style={{ color: "#ca1e14" }}></i> 
-                                    <Link to="tel:+917045707500" style={{ color: "inherit" }}>+91 70 45 70 75 00</Link>
-                                </p>
-                                <p style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
-                                    <i className="fas fa-envelope" style={{ color: "#ca1e14" }}></i> 
-                                    <Link to="mailto:info@jainyouth.in" style={{ color: "inherit" }}>info@jainyouth.in</Link>
-                                </p>
+                                
+                                {phones.map((p, i) => (
+                                    <p key={`p-${i}`} style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <i className="fas fa-phone" style={{ color: "#ca1e14" }}></i> 
+                                        <Link to={`tel:+91${p.replace(/ /g, '')}`} style={{ color: "inherit" }}>+91 {p}</Link>
+                                    </p>
+                                ))}
+
+                                {emails.map((e, i) => (
+                                    <p key={`e-${i}`} style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <i className="fas fa-envelope" style={{ color: "#ca1e14" }}></i> 
+                                        <Link to={`mailto:${e}`} style={{ color: "inherit" }}>{e}</Link>
+                                    </p>
+                                ))}
                             </div>
                         </div>
                     </div>

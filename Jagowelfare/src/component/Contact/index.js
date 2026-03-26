@@ -1,14 +1,34 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 // import Link
 import { Link } from 'react-router-dom'
+import { supabase } from '../../supabase'
 // import Icon
 import Map from "../../assets/img/icon/sm-location.png"
 import Mail from "../../assets/img/icon/email-color.png"
 import Phone from "../../assets/img/icon/phon-color.png"
 
-
-
 const ContactArea = () => {
+    const [contact, setContact] = useState({
+        phones: ["70 45 70 75 00", "", ""],
+        emails: ["info@jainyouth.in", "", ""],
+        address: "21/B, Shanti Bhuvan Shopping Centre, 2nd Floor, JD Road, Above 396 Bus Stop, Mulund (W), Mumbai-80."
+    });
+
+    useEffect(() => {
+        const fetchContact = async () => {
+            const { data } = await supabase.from('site_config').select('*').eq('key', 'site_contact').single();
+            if (data && data.value) {
+                setContact(data.value);
+            }
+        };
+        fetchContact();
+    }, []);
+
+    const phones = (contact.phones || []).filter(p => p && p.trim() !== "");
+    const emails = (contact.emails || []).filter(e => e && e.trim() !== "");
+
+    const cleanPhone = (p) => p.replace(/[^0-9]/g, '');
+
   return (
     <>
          <section id="contact_arae_main" className="section_padding">
@@ -19,7 +39,7 @@ const ContactArea = () => {
                         <h3>Contact with us</h3>
                         <h2>Get in
                             <span className="color_big_heading">touch</span>with us &
-                            stay updates
+                            stay update
                         </h2>
                     </div>
                 </div>
@@ -33,7 +53,7 @@ const ContactArea = () => {
                             </div>
                             <div className="contact_left_text">
                                 <h3>Address:</h3>
-                                <p>107, Broklyn Golden Road Street. New York, <br /> United States of America</p>
+                                <p>{contact.address}</p>
                             </div>
                         </div>
                         <div className="contact_left_item">
@@ -42,8 +62,9 @@ const ContactArea = () => {
                             </div>
                             <div className="contact_left_text">
                                 <h3>Email:</h3>
-                                <Link to="mailto:support@domain.com">support@domain.com</Link>
-                                <Link to="mailto:support@domain.com">contact@domain.com</Link>
+                                {emails.map((e, idx) => (
+                                    <Link key={idx} to={`mailto:${e}`} style={{ display: "block" }}>{e}</Link>
+                                ))}
                             </div>
                         </div>
                         <div className="contact_left_item">
@@ -52,8 +73,9 @@ const ContactArea = () => {
                             </div>
                             <div className="contact_left_text">
                                 <h3>Phone number:</h3>
-                                <Link to="tel:+01-123-456-789">+01 123 456 789</Link>
-                                <Link to="tel:+01-123-456-789">+02 345 678 901</Link>
+                                {phones.map((p, idx) => (
+                                    <Link key={idx} to={`tel:+91${cleanPhone(p)}`} style={{ display: "block" }}>+91 {p}</Link>
+                                ))}
                             </div>
                         </div>
                     </div>

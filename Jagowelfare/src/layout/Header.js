@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from ".././assets/img/logo.jpeg";
 import { HeaderData } from "./HeaderData";
@@ -8,6 +8,23 @@ import { supabase } from "../supabase";
 const Header = () => {
     const { user, isStaff } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [contact, setContact] = useState({
+        phones: ["70 45 70 75 00", "", ""],
+        emails: ["info@jainyouth.in", "", ""]
+    });
+
+    useEffect(() => {
+        const fetchContact = async () => {
+            const { data } = await supabase.from('site_config').select('*').eq('key', 'site_contact').single();
+            if (data && data.value) {
+                setContact(data.value);
+            }
+        };
+        fetchContact();
+    }, []);
+
+    const primaryPhone = (contact.phones || []).find(p => p && p.trim() !== "") || "70 45 70 75 00";
+    const primaryEmail = (contact.emails || []).find(e => e && e.trim() !== "") || "info@jainyouth.in";
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -21,8 +38,8 @@ const Header = () => {
                         <div className="row align-items-center">
                             <div className="col-lg-6 col-md-6">
                                 <ul className="topbar-list">
-                                    <li><Link to="mailto:info@jainyouth.in"><i className="fa fa-envelope"></i><span>info@jainyouth.in</span></Link></li>
-                                    <li><Link to="tel:+917045707500"><i className="fa fa-phone"></i><span>+91 7045707500</span></Link></li>
+                                    <li><Link to={`mailto:${primaryEmail}`}><i className="fa fa-envelope"></i><span>{primaryEmail}</span></Link></li>
+                                    <li><Link to={`tel:+91${primaryPhone.replace(/ /g, '')}`}><i className="fa fa-phone"></i><span>+91 {primaryPhone}</span></Link></li>
                                     <li><Link to="/faqs"><span>Faqs</span></Link></li>
                                 </ul>
                             </div>
@@ -104,6 +121,9 @@ const Header = () => {
                     background: #fff;
                     box-shadow: 0 5px 25px rgba(0,0,0,0.05);
                 }
+                .nav-item {
+                    position: relative;
+                }
                 .nav-link { 
                     padding: 25px 15px !important;
                     transition: 0.3s;
@@ -112,8 +132,19 @@ const Header = () => {
                     color: var(--main-color) !important;
                 }
                 .dropdown-menu {
+                    display: block;
+                    opacity: 0;
+                    visibility: hidden;
+                    position: absolute;
+                    transition: all 0.3s;
                     border-radius: 0 0 10px 10px;
                     border-top: 3px solid var(--main-color) !important;
+                    margin-top: 10px;
+                }
+                .nav-item:hover > .dropdown-menu {
+                    opacity: 1;
+                    visibility: visible;
+                    margin-top: 0;
                 }
                 .dropdown-item:hover {
                     background: var(--main-color);
@@ -128,6 +159,17 @@ const Header = () => {
                         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
                     }
                     .nav-link { padding: 10px 0 !important; }
+                    .dropdown-menu {
+                        position: static;
+                        display: none;
+                        opacity: 1;
+                        visibility: visible;
+                        border: none !important;
+                        box-shadow: none !important;
+                    }
+                    .nav-item.show .dropdown-menu, .nav-item:hover .dropdown-menu {
+                        display: block;
+                    }
                 }
             `}</style>
         </>
