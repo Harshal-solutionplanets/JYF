@@ -151,6 +151,29 @@
         text-align: center !important;
         margin-top: 30px !important;
     }
+
+    /* Common Banner Mobile Optimization */
+    #common_banner_area {
+        padding: 40px 0 !important;
+        min-height: 150px;
+    }
+
+    .commn_banner_page h2 {
+        font-size: 22px !important;
+        margin-bottom: 10px !important;
+        text-align: center;
+        width: 100%;
+    }
+
+    .color_big_heading {
+        padding: 0 5px !important;
+        background-image: linear-gradient(180deg, transparent 70%, rgba(255, 193, 7, 0.7) 30%) !important;
+    }
+
+    .breadcrumb_wrapper {
+        justify-content: center !important;
+        padding-top: 0 !important;
+    }
 }
 
 @media (max-width: 576px) {
