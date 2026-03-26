@@ -230,7 +230,7 @@ const AdminDashboardUpdates = () => {
                         {/* Image 1: Main (Lower) */}
                         <div style={{ marginBottom: "25px", border: "1px dashed #ddd", padding: "15px", borderRadius: "10px" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                                <label style={{ margin: 0, fontWeight: "700" }}>Main Background Image (Lower) <br/><span style={{ color: "#ca1e14", fontWeight: "600", fontSize: "11px" }}>(Suggested size: 800 x 900 px)</span></label>
+                                <label style={{ margin: 0, fontWeight: "700" }}>Main Background Image (Lower) <br/><span style={{ color: "#ca1e14", fontWeight: "600", fontSize: "11px" }}>(Suggested size: 570 x 630 px)</span></label>
                                 {homeIntro.image_url ? (
                                     <div>
                                         <button onClick={() => introInputRef1.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
@@ -269,7 +269,7 @@ const AdminDashboardUpdates = () => {
                         {/* Image 2: Floating (Upper) */}
                         <div style={{ border: "1px dashed #ddd", padding: "15px", borderRadius: "10px" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                                <label style={{ margin: 0, fontWeight: "700" }}>Floating Overlay Image (Upper) <br/><span style={{ color: "#ca1e14", fontWeight: "600", fontSize: "11px" }}>(Suggested size: 400 x 450 px)</span></label>
+                                <label style={{ margin: 0, fontWeight: "700" }}>Floating Overlay Image (Upper) <br/><span style={{ color: "#ca1e14", fontWeight: "600", fontSize: "11px" }}>(Suggested size: 320 x 300 px)</span></label>
                                 {homeIntro.image_url_2 ? (
                                     <div>
                                         <button onClick={() => introInputRef2.current.click()} style={{ ...actionButtonStyle, backgroundColor: "#eee" }}>Edit</button>
