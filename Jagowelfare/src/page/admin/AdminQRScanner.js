@@ -10,6 +10,13 @@ const AdminQRScanner = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [msg, setMsg] = useState({ text: "", type: "" });
     const [scannerKey, setScannerKey] = useState(0);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -97,9 +104,9 @@ const AdminQRScanner = () => {
     };
 
     return (
-        <div style={{ backgroundColor: "#f4f4f4", padding: "60px 20px", minHeight: "90vh" }}>
-            <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "30px", boxShadow: "0 15px 50px rgba(0,0,0,0.1)", maxWidth: "800px", margin: "0 auto" }}>
-                <h3 style={{ marginBottom: "35px", fontWeight: "900", textAlign: "center", color: "#333", fontSize: "32px", letterSpacing: "-1px" }}>Entry Pass Scanner</h3>
+        <div style={{ backgroundColor: "#f4f4f4", padding: isMobile ? "20px 10px" : "60px 20px", minHeight: "90vh" }}>
+            <div style={{ backgroundColor: "#fff", padding: isMobile ? "20px" : "40px", borderRadius: isMobile ? "15px" : "30px", boxShadow: "0 15px 50px rgba(0,0,0,0.1)", maxWidth: "800px", margin: "0 auto" }}>
+                <h3 style={{ marginBottom: isMobile ? "20px" : "35px", fontWeight: "900", textAlign: "center", color: "#333", fontSize: isMobile ? "24px" : "32px", letterSpacing: "-1px" }}>Entry Pass Scanner</h3>
                 
                 {!scanResult ? (
                     <div id="reader" key={scannerKey} style={{ borderRadius: "20px", overflow: "hidden", border: "1px solid #ddd" }}></div>
@@ -118,10 +125,11 @@ const AdminQRScanner = () => {
                         {userData && !loading && (
                             <div style={{
                                 position: "absolute",
-                                top: "25px",
-                                right: "25px",
-                                width: "110px",
-                                height: "110px",
+                                top: isMobile ? "-15px" : "25px",
+                                right: isMobile ? "50%" : "25px",
+                                transform: isMobile ? "translateX(50%)" : "none",
+                                width: isMobile ? "80px" : "110px",
+                                height: isMobile ? "80px" : "110px",
                                 borderRadius: "50%",
                                 backgroundColor: userData.is_checked_in ? (msg.type === 'danger' ? "#e74c3c" : "#28a745") : "#f39c12",
                                 color: "#fff",
@@ -134,8 +142,8 @@ const AdminQRScanner = () => {
                                 border: "4px solid #d4af37",
                                 textAlign: "center"
                             }}>
-                                <span style={{ fontSize: "18px", fontWeight: "900", lineHeight: "1" }}>{userData.is_checked_in ? (msg.type === 'danger' ? "FAILED" : "ENTRY") : "PENDING"}</span>
-                                <span style={{ fontSize: "16px", marginTop: "5px" }}>{userData.is_checked_in ? (msg.type === 'danger' ? "❌" : "OK ✅") : "⏳"}</span>
+                                <span style={{ fontSize: isMobile ? "14px" : "18px", fontWeight: "900", lineHeight: "1" }}>{userData.is_checked_in ? (msg.type === 'danger' ? "FAILED" : "ENTRY") : "PENDING"}</span>
+                                <span style={{ fontSize: isMobile ? "14px" : "16px", marginTop: "5px" }}>{userData.is_checked_in ? (msg.type === 'danger' ? "❌" : "OK ✅") : "⏳"}</span>
                             </div>
                         )}
 
@@ -145,15 +153,20 @@ const AdminQRScanner = () => {
                             </div>
                         ) : userData ? (
                             <div style={{ textAlign: "center" }}>
-                                <div style={{ marginBottom: "35px", borderBottom: "1px solid rgba(212, 175, 55, 0.3)", paddingBottom: "25px" }}>
-                                    <h2 style={{ fontWeight: "900", color: "#fff", fontSize: "40px", marginBottom: "5px" }}>{userData.full_name}</h2>
-                                    <p style={{ color: "#d4af37", opacity: 0.9, fontSize: "20px" }}>{userData.email}</p>
+                                <div style={{ 
+                                    marginBottom: "35px", 
+                                    borderBottom: "1px solid rgba(212, 175, 55, 0.3)", 
+                                    paddingBottom: "25px",
+                                    marginTop: isMobile ? "50px" : "0"
+                                }}>
+                                    <h2 style={{ fontWeight: "900", color: "#fff", fontSize: isMobile ? "28px" : "40px", marginBottom: "5px" }}>{userData.full_name}</h2>
+                                    <p style={{ color: "#d4af37", opacity: 0.9, fontSize: isMobile ? "14px" : "20px" }}>{userData.email}</p>
                                 </div>
 
-                                <table style={{ width: "fit-content", margin: "0 auto", fontSize: "19px", borderCollapse: "separate", borderSpacing: "20px 10px", textAlign: "left" }}>
+                                <table style={{ width: "100%", margin: "0 auto", fontSize: isMobile ? "16px" : "19px", borderCollapse: "separate", borderSpacing: "0 10px", textAlign: "left" }}>
                                     <tbody>
                                         <tr>
-                                            <td style={{ color: "#d4af37", fontWeight: "900" }}>EVENT:</td>
+                                            <td style={{ color: "#d4af37", fontWeight: "900", width: isMobile ? "90px" : "auto" }}>EVENT:</td>
                                             <td style={{ color: "#fff", fontWeight: "bold" }}>{eventData?.title || "Unknown"}</td>
                                         </tr>
                                         <tr>
@@ -162,7 +175,7 @@ const AdminQRScanner = () => {
                                         </tr>
                                         <tr>
                                             <td style={{ color: "#d4af37", fontWeight: "900" }}>SECTION:</td>
-                                            <td style={{ color: "#fff", fontWeight: "900", textTransform: "uppercase", fontSize: "22px" }}>{userData.selected_section || "General"}</td>
+                                            <td style={{ color: "#fff", fontWeight: "900", textTransform: "uppercase", fontSize: isMobile ? "18px" : "22px" }}>{userData.selected_section || "General"}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -184,14 +197,14 @@ const AdminQRScanner = () => {
                                         {msg.text}
                                     </div>
                                 )}
-                                
                                 <div style={{
                                     display: "flex",
+                                    flexDirection: isMobile ? "column" : "row",
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    marginTop: "50px",
+                                    marginTop: isMobile ? "30px" : "50px",
                                     width: "100%",
-                                    gap: "30px"
+                                    gap: isMobile ? "15px" : "30px"
                                 }}>
                                     <button 
                                         onClick={resetScanner} 
@@ -200,16 +213,15 @@ const AdminQRScanner = () => {
                                             color: "#d4af37",
                                             border: "2px solid #d4af37",
                                             borderRadius: "50px",
-                                            padding: "15px 40px",
+                                            padding: isMobile ? "12px 30px" : "15px 40px",
                                             fontWeight: "900",
                                             cursor: "pointer",
-                                            fontSize: "16px",
-                                            minWidth: "200px"
+                                            fontSize: isMobile ? "14px" : "16px",
+                                            width: isMobile ? "100%" : "200px"
                                         }}
                                     >
                                         Scan Another
                                     </button>
-
                                     {userData && !userData.is_checked_in && (
                                         <button 
                                             onClick={handleAccept} 
@@ -218,12 +230,12 @@ const AdminQRScanner = () => {
                                                 color: "#fff",
                                                 border: "none",
                                                 borderRadius: "50px",
-                                                padding: "18px 50px",
+                                                padding: isMobile ? "15px 40px" : "18px 50px",
                                                 fontWeight: "900",
-                                                fontSize: "18px",
+                                                fontSize: isMobile ? "16px" : "18px",
                                                 boxShadow: "0 10px 25px rgba(227, 49, 41, 0.4)",
                                                 cursor: "pointer",
-                                                minWidth: "250px"
+                                                width: isMobile ? "100%" : "250px"
                                             }}
                                             disabled={isUpdating}
                                         >

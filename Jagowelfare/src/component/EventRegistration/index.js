@@ -116,11 +116,14 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
     }, [eventId]);
 
     useEffect(() => {
+        // Only pre-fill if it's NOT a staff member (to allow easy testing/manual entry by staff)
+        const isStaff = user?.email === 'jainyouthfoundation9@gmail.com'; 
+        
         if (event && selectedSection && participants[0].section === "") {
             setParticipants([{
-                name: user?.user_metadata?.full_name || "",
-                email: user?.email || "",
-                phoneNo: user?.user_metadata?.phone || "",
+                name: (user && !isStaff) ? (user?.user_metadata?.full_name || "") : "",
+                email: (user && !isStaff) ? (user?.email || "") : "",
+                phoneNo: (user && !isStaff) ? (user?.user_metadata?.phone || "") : "",
                 location: "",
                 section: selectedSection
             }]);
