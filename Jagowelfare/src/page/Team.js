@@ -7,7 +7,7 @@ import TeamArea from '../component/Team'
 const TeamPage = () => {
   return (
     <>
-     <CommonBanner heading="Volunter" pagination="Volunter"/>
+     <CommonBanner heading="Team Members" pagination="Team Members"/>
      <TeamArea/>
 
     </>

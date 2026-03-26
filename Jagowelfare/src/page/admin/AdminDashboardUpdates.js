@@ -36,6 +36,8 @@ const AdminDashboardUpdates = () => {
         causes: { heading: "Causes", image_url: "" },
         news: { heading: "News Articles", image_url: "" },
         gallery: { heading: "Gallery", image_url: "" },
+        team: { heading: "Team Members", image_url: "" },
+        testimonials: { heading: "Testimonials", image_url: "" },
         about: { heading: "About Us", image_url: "" },
         contact: { heading: "Contact Us", image_url: "" },
     });

@@ -7,7 +7,7 @@ import Testimonials from '../component/About/Testimonials'
 const TestimonialPage = () => {
   return (
     <>
-     <CommonBanner heading="Testmonials" pagination="Testmonials"/>
+     <CommonBanner heading="Testimonials" pagination="Testimonials"/>
      <Testimonials/>
     </>
   )
