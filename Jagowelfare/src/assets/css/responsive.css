@@ -175,17 +175,9 @@
         padding-top: 0 !important;
     }
 
-    /* Hide banner text and breadcrumbs specifically for Cause-related pages on mobile as requested */
-    section[class*="banner_section_cause"] .commn_banner_page h2,
-    section[class*="banner_section_cause"] .breadcrumb_wrapper,
-    section[class*="banner_section_education"] .commn_banner_page h2,
-    section[class*="banner_section_education"] .breadcrumb_wrapper,
-    section[class*="banner_section_food"] .commn_banner_page h2,
-    section[class*="banner_section_food"] .breadcrumb_wrapper,
-    section[class*="banner_section_health"] .commn_banner_page h2,
-    section[class*="banner_section_health"] .breadcrumb_wrapper,
-    section[class*="banner_section_humanitarian"] .commn_banner_page h2,
-    section[class*="banner_section_humanitarian"] .breadcrumb_wrapper {
+    /* Hide banner text and breadcrumbs specifically for all Cause-related pages on mobile as requested */
+    section.is_cause_banner .commn_banner_page h2,
+    section.is_cause_banner .breadcrumb_wrapper {
         display: none !important;
     }
 }
