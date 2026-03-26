@@ -39,7 +39,7 @@ const CommonBanner = (props) => {
 
     const rawKey = (props.pagination?.toLowerCase() || props.heading?.toLowerCase() || "");
     const sectionKey = rawKey.replace(/[^a-z0-z]/g, '');
-    const isCause = rawKey.includes("cause") || rawKey.includes("health") || rawKey.includes("education") || rawKey.includes("food") || rawKey.includes("humanitarian");
+    const isCause = rawKey.includes("cause") || rawKey.includes("health") || rawKey.includes("education") || rawKey.includes("food") || rawKey.includes("humanitarian") || rawKey.includes("medical") || rawKey.includes("bird") || rawKey.includes("bhojan") || rawKey.includes("kidney") || rawKey.includes("dialysis") || rawKey.includes("camp");
 
   return (
     <>
