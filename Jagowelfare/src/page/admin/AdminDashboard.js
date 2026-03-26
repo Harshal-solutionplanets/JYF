@@ -16,6 +16,8 @@ import AdminViewRegistrations from "./AdminViewRegistrations";
 import AdminQRScanner from "./AdminQRScanner";
 import AdminDashboardUpdates from "./AdminDashboardUpdates";
 import AdminViewGallery from "./AdminViewGallery";
+import AdminViewTeam from "./AdminViewTeam";
+import AdminViewTestimonials from "./AdminViewTestimonials";
 import { useAuth } from "../../auth/AuthProvider";
 
 const DashboardOverview = () => {
@@ -141,6 +143,19 @@ const AdminDashboardPage = () => {
     setActiveView("edit_cause");
   };
 
+  const [editingTeam, setEditingTeam] = useState(null);
+  const [editingTestimonial, setEditingTestimonial] = useState(null);
+
+  const handleEditTeam = (member) => {
+    setEditingTeam(member);
+    setActiveView("edit_team");
+  };
+
+  const handleEditTestimonial = (testimonial) => {
+    setEditingTestimonial(testimonial);
+    setActiveView("edit_testimonial");
+  };
+
   const handleAddMaster = async (type, value, setInput) => {
     if (!value.trim()) return;
     try {
@@ -179,7 +194,11 @@ const AdminDashboardPage = () => {
         "add_news": "Publish News Article",
         "view_news": "Article History",
         "add_team": "Add Team Member",
+        "view_team": "Manage Team Members",
+        "edit_team": "Edit Team Member",
         "add_testimonials": "Add Testimonial",
+        "view_testimonials": "Manage Testimonials",
+        "edit_testimonial": "Edit Testimonial",
         "view_registrations": "Event Registrations",
         "manage_master_cat": "Event Category Master",
         "manage_master_seat": "Seats Type Master",
@@ -212,7 +231,11 @@ const AdminDashboardPage = () => {
       case "add_news": return <AdminAddNews onPublish={() => setActiveView("dashboard")} />;
       case "view_news": return <AdminViewNews />;
       case "add_team": return <AdminAddTeam onPublish={() => setActiveView("dashboard")} />;
+      case "edit_team": return <AdminAddTeam teamData={editingTeam} onPublish={() => { setEditingTeam(null); setActiveView("view_team"); }} />;
+      case "view_team": return <AdminViewTeam onEdit={handleEditTeam} />;
       case "add_testimonials": return <AdminAddTestimonial onPublish={() => setActiveView("dashboard")} />;
+      case "edit_testimonial": return <AdminAddTestimonial testimonialData={editingTestimonial} onPublish={() => { setEditingTestimonial(null); setActiveView("view_testimonials"); }} />;
+      case "view_testimonials": return <AdminViewTestimonials onEdit={handleEditTestimonial} />;
       case "view_registrations": return <AdminViewRegistrations />;
       case "manage_master_cat": return <MasterManagementView type="event_category" title="Event Category Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} categoryInput={categoryInput} setCategoryInput={setCategoryInput} />;
       case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} seatTierInput={seatTierInput} setSeatTierInput={setSeatTierInput} />;
@@ -276,8 +299,20 @@ const AdminDashboardPage = () => {
         { label: "View Gallery List", view: "view_gallery" }
       ]
     },
-    { title: "Team Members", icon: "fas fa-users", key: "team", addView: "add_team", viewPath: "/team" },
-    { title: "Testimonials", icon: "fas fa-comment-dots", key: "testimonials", addView: "add_testimonials", viewPath: "/testimonial" },
+    {
+      title: "Team Members", icon: "fas fa-users", key: "team",
+      subs: [
+        { label: "Add Member", view: "add_team" },
+        { label: "View Team List", view: "view_team" }
+      ]
+    },
+    {
+      title: "Testimonials", icon: "fas fa-comment-dots", key: "testimonials",
+      subs: [
+        { label: "Add Testimonial", view: "add_testimonials" },
+        { label: "View Testimonial List", view: "view_testimonials" }
+      ]
+    },
     { title: "Dashboard Updates", icon: "fas fa-edit", key: "dashboard_updates", view: "dashboard_updates" },
     { title: "Master Management", icon: "fas fa-cogs", key: "master_mgmt", isMaster: true },
   ];

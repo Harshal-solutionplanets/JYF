@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { supabase } from "../../supabase";
 
-const AdminAddTeam = ({ onPublish }) => {
-    const [name, setName] = useState("");
-    const [role, setRole] = useState("");
+const AdminAddTeam = ({ onPublish, teamData }) => {
+    const [name, setName] = useState(teamData?.name || "");
+    const [role, setRole] = useState(teamData?.role || "");
     const [imageFile, setImageFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState("");
+    const [previewUrl, setPreviewUrl] = useState(teamData?.image_url || "");
     const [loading, setLoading] = useState(false);
 
     const fileInputRef = React.useRef(null);
@@ -22,7 +22,7 @@ const AdminAddTeam = ({ onPublish }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            let imageUrl = "";
+            let imageUrl = teamData?.image_url || "";
             if (imageFile) {
                 const fileExt = imageFile.name.split('.').pop();
                 const fileName = `${Date.now()}.${fileExt}`;
@@ -32,9 +32,23 @@ const AdminAddTeam = ({ onPublish }) => {
                 const { data } = supabase.storage.from('JYF').getPublicUrl(filePath);
                 imageUrl = data.publicUrl;
             }
-            const { error } = await supabase.from('team').insert([{ name, role, image_url: imageUrl }]);
-            if (error) throw error;
-            alert("Team member added successfully!");
+            
+            const payload = { 
+                name, 
+                role, 
+                image_url: imageUrl 
+            };
+
+            if (teamData?.id) {
+                const { error } = await supabase.from('team').update(payload).eq('id', teamData.id);
+                if (error) throw error;
+                alert("Team member updated successfully!");
+            } else {
+                const { error } = await supabase.from('team').insert([payload]);
+                if (error) throw error;
+                alert("Team member added successfully!");
+            }
+            
             if (onPublish) onPublish();
         } catch (error) {
             alert("Submission failed: " + error.message);
@@ -87,7 +101,7 @@ const AdminAddTeam = ({ onPublish }) => {
 
                     <div className="text-center mt-5">
                         <button type="submit" className="btn btn_theme btn_md" style={{ padding: "18px 100px", borderRadius: "50px", fontWeight: "800", fontSize: "18px", textTransform: "uppercase", letterSpacing: "1.5px", boxShadow: "0 15px 35px rgba(227, 49, 41, 0.25)" }} disabled={loading}>
-                            {loading ? "Enrolling..." : "Confirm Enrollment"}
+                            {loading ? (teamData ? "Updating..." : "Enrolling...") : (teamData ? "Update Profile" : "Confirm Enrollment")}
                         </button>
                     </div>
                 </form>

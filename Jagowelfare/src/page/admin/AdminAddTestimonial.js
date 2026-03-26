@@ -3,12 +3,12 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { supabase } from "../../supabase";
 
-const AdminAddTestimonial = ({ onPublish }) => {
-    const [name, setName] = useState("");
-    const [role, setRole] = useState("");
-    const [comment, setComment] = useState("");
+const AdminAddTestimonial = ({ onPublish, testimonialData }) => {
+    const [name, setName] = useState(testimonialData?.name || "");
+    const [role, setRole] = useState(testimonialData?.role || "");
+    const [comment, setComment] = useState(testimonialData?.comment || "");
     const [imageFile, setImageFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState("");
+    const [previewUrl, setPreviewUrl] = useState(testimonialData?.image_url || "");
     const [loading, setLoading] = useState(false);
 
     const fileInputRef = useRef(null);
@@ -33,7 +33,7 @@ const AdminAddTestimonial = ({ onPublish }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            let imageUrl = "";
+            let imageUrl = testimonialData?.image_url || "";
             if (imageFile) {
                 const fileExt = imageFile.name.split('.').pop();
                 const fileName = `${Date.now()}.${fileExt}`;
@@ -43,9 +43,23 @@ const AdminAddTestimonial = ({ onPublish }) => {
                 const { data } = supabase.storage.from('JYF').getPublicUrl(filePath);
                 imageUrl = data.publicUrl;
             }
-            const { error } = await supabase.from('testimonials').insert([{ name, role, comment, image_url: imageUrl }]);
-            if (error) throw error;
-            alert("Testimonial added successfully!");
+            const payload = { 
+                name, 
+                role, 
+                comment, 
+                image_url: imageUrl 
+            };
+
+            if (testimonialData?.id) {
+                const { error } = await supabase.from('testimonials').update(payload).eq('id', testimonialData.id);
+                if (error) throw error;
+                alert("Testimonial updated successfully!");
+            } else {
+                const { error } = await supabase.from('testimonials').insert([payload]);
+                if (error) throw error;
+                alert("Testimonial added successfully!");
+            }
+            
             if (onPublish) onPublish();
         } catch (error) {
             alert("Submission failed: " + error.message);
@@ -112,7 +126,7 @@ const AdminAddTestimonial = ({ onPublish }) => {
 
                     <div className="text-center mt-5">
                         <button type="submit" className="btn btn_theme btn_md" style={{ padding: "18px 100px", borderRadius: "50px", fontWeight: "800", fontSize: "18px", textTransform: "uppercase", letterSpacing: "1.5px", boxShadow: "0 15px 35px rgba(227, 49, 41, 0.25)" }} disabled={loading}>
-                            {loading ? "Publishing..." : "Post Testimonial"}
+                            {loading ? (testimonialData ? "Updating..." : "Publishing...") : (testimonialData ? "Update Feedback" : "Post Testimonial")}
                         </button>
                     </div>
                 </form>
