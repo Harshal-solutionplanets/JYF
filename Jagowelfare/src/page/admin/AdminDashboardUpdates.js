@@ -70,10 +70,10 @@ const AdminDashboardUpdates = () => {
             }
             
             data.forEach(item => {
-                if (item.key === 'home_hero') setHomeHero(item.value);
-                if (item.key === 'home_intro') setHomeIntro(item.value);
-                if (item.key === 'page_banners') setPageBanners(item.value);
-                if (item.key === 'site_contact') setSiteContact(item.value);
+                if (item.key === 'home_hero') setHomeHero(prev => ({ ...prev, ...item.value }));
+                if (item.key === 'home_intro') setHomeIntro(prev => ({ ...prev, ...item.value }));
+                if (item.key === 'page_banners') setPageBanners(prev => ({ ...prev, ...item.value }));
+                if (item.key === 'site_contact') setSiteContact(prev => ({ ...prev, ...item.value }));
             });
         } catch (e) {
             console.error(e);
