@@ -37,9 +37,11 @@ const CommonBanner = (props) => {
         fetchConfig();
     }, [props.pagination, props.heading]);
 
+    const sectionKey = (props.pagination?.toLowerCase() || props.heading?.toLowerCase() || "").replace(/[^a-z0-z]/g, '');
+
   return (
     <>
-        <section id="common_banner_area" style={bgImage ? { backgroundImage: `url(${bgImage})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
+        <section id="common_banner_area" className={`banner_section_${sectionKey}`} style={bgImage ? { backgroundImage: `url(${bgImage})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
         <div className="container">
             <div className="row">
                 <div className="col-lg-12">
