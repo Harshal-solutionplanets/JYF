@@ -1,34 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-// Import Partner Logo
-import logo1 from "../../../assets/img/partner/logo-1.png"
-import logo2 from "../../../assets/img/partner/logo-2.png"
-import logo3 from "../../../assets/img/partner/logo-3.png"
-import logo4 from "../../../assets/img/partner/logo-4.png"
-import logo5 from "../../../assets/img/partner/logo-5.png"
-import logo6 from "../../../assets/img/partner/logo-6.png"
-import logo7 from "../../../assets/img/partner/logo-7.png"
-
+import { supabase } from '../../../supabase'
 
 //  OwlCarousel Slider Import
 import OwlCarousel from "react-owl-carousel";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 
-
-
 const PartnerArea = () => {
-    // Logo Data
-    const logoData = [
-        {img:logo1},
-        {img:logo2},
-        {img:logo3},
-        {img:logo4},
-        {img:logo5},
-        {img:logo6},
-        {img:logo7},
+    const [logoData, setLogoData] = useState([]);
 
-    ]
+    useEffect(() => {
+        const fetchSupporters = async () => {
+            const { data, error } = await supabase.from('supporters').select('*').order('created_at', { ascending: false });
+            if (!error && data) setLogoData(data);
+        };
+        fetchSupporters();
+    }, []);
+
     // Slider Handelar
     let responsive = {
         0: {
@@ -44,39 +33,50 @@ const PartnerArea = () => {
           items: 6,
         },
       };
+
   return (
     <>
-     <section id="partner_area">
-        <h2 className="d-none">Heading</h2>
+     <section id="partner_area" className="section_padding_bottom">
         <div className="container">
             <div className="row">
                 <div className="col-lg-12">
+                    <div className="section_heading text-center" style={{ marginBottom: "40px" }}>
+                        <h2 style={{ fontSize: "30px", fontWeight: "800", color: "#222" }}>Our <span className="color_big_heading">Supporters</span></h2>
+                    </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-lg-12">
                     <div className="partner_slider_wrapper">
-                    <OwlCarousel
-                  className="owl-theme"
-                  responsive={responsive}
-                  autoplay={false}
-                  autoplayHoverPause={true}
-                  autoplayTimeout={2500}
-                  loop={true}
-                  margin={10}
-                  nav={false}
-                  dots={false}
-                >
-                    {logoData.map((data, index)=>(
-                          <div className="partner_logo" key={index}>
-                          <Link to="/#"><img src={data.img} alt="img" /></Link>
-                      </div>
-                    ))}
-                </OwlCarousel>
+                    {logoData.length > 0 && (
+                        <OwlCarousel
+                            className="owl-theme"
+                            responsive={responsive}
+                            autoplay={true}
+                            autoplayHoverPause={true}
+                            autoplayTimeout={2500}
+                            loop={logoData.length > 5}
+                            margin={30}
+                            nav={false}
+                            dots={false}
+                        >
+                            {logoData.map((data, index)=>(
+                                <div className="partner_logo" key={index} style={{ textAlign: "center", padding: "10px", border: "1px solid #f0f0f0", borderRadius: "10px", backgroundColor: "#fff" }}>
+                                    <Link to="/#">
+                                        <img src={data.image_url} alt={data.name} style={{ width: "auto", maxWidth: "100%", height: "80px", objectFit: "contain", display: "inline-block" }} />
+                                    </Link>
+                                    {data.name && <p style={{ fontSize: "12px", marginTop: "10px", color: "#666", fontWeight: "600" }}>{data.name}</p>}
+                                </div>
+                            ))}
+                        </OwlCarousel>
+                    )}
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
     </>
   )
 }
 
-export default PartnerArea
+export default PartnerArea

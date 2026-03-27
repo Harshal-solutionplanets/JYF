@@ -55,10 +55,10 @@ const EventArea = (props) => {
           <div className="row">
             <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
               <div className="section_heading">
-                <h3>Upcoming events</h3>
+                <h3 style={{ fontSize: "30px" }}>   Events</h3>
                 <h2>
-                  Join our upcoming
-                  <span className="color_big_heading">events</span> for contribution
+                  Join our
+                  <span className="color_big_heading">events</span>
                 </h2>
               </div>
             </div>
@@ -76,7 +76,7 @@ const EventArea = (props) => {
                   <div className="event_left_side_wrapper">
                     <div className="event_big_img" >
                       <Link to={`/event/${featured.id}`}>
-                        <img src={featured.image_url?.split(',')[0]} alt="img" style={{ height: "350px", objectFit: "cover", width: "100%" }} />
+                        <img src={featured.image_url?.split(',')[0]} alt="img" style={{ height: "350px", objectFit: "contain", width: "100%", backgroundColor: "#f8f9fa" }} />
                       </Link>
                     </div>
                     <div className="event_content_area big_content_padding">

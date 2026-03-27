@@ -112,22 +112,8 @@ const EventDetailsArea = ({ onTitleFetch }) => {
                             color: #444;
                             font-size: 17px;
                             position: relative;
-                            display: list-item;
-                            list-style: none;
                         }
-                        .details_main_content p::before, 
-                        .details_main_content li::before {
-                            content: "";
-                            display: inline-block;
-                            width: 7px;
-                            height: 7px;
-                            background-color: #ca1e14;
-                            border-radius: 50%;
-                            margin-right: 12px;
-                            vertical-align: middle;
-                            margin-bottom: 2px;
-                        }
-                        .details_main_content p:empty::before { content: none !important; }
+                        .details_main_content p:empty { display: none !important; }
                         
                         .details_main_content h2 { 
                             font-size: 36px; 
@@ -157,16 +143,6 @@ const EventDetailsArea = ({ onTitleFetch }) => {
                       <h2>{event.title}</h2>
                       
                       <div dangerouslySetInnerHTML={{ __html: event.content || extractDescription(event.description) }} />
-                      
-                      <p>
-                        <strong>Venue:</strong> {event.venue || "-"}
-                      </p>
-                      <p>
-                        <strong>Starts:</strong> {formatDate(event.startAt || event.start_at)}
-                      </p>
-                      <p>
-                        <strong>Ends:</strong> {formatDate(event.endAt || event.end_at)}
-                      </p>
 
                       {event.image_url && event.image_url.split(",").length > 1 && (
                         <div style={{ marginTop: "30px" }}>

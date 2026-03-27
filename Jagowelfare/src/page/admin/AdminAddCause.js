@@ -137,6 +137,12 @@ const AdminAddCause = ({ onPublish, causeData }) => {
                 {`
                     .ql-container { min-height: 150px; font-size: 16px; font-family: inherit; }
                     .ql-editor { min-height: 150px; }
+                    .ql-editor ul { list-style: none !important; padding-left: 0 !important; }
+                    .ql-editor ul li { position: relative; padding-left: 15px !important; margin-bottom: 2px !important; }
+                    .ql-editor ul li::before { 
+                        content: "•"; color: #ca1e14; font-weight: bold; display: inline-block; 
+                        width: 15px; margin-left: -15px; font-size: 18px; vertical-align: middle; 
+                    }
                 `}
             </style>
             <div style={{ maxWidth: "1000px", margin: "0 auto", backgroundColor: "#fff", padding: "40px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>

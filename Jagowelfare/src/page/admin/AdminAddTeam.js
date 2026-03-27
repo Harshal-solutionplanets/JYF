@@ -6,6 +6,8 @@ const AdminAddTeam = ({ onPublish, teamData }) => {
     const [role, setRole] = useState(teamData?.role || "");
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(teamData?.image_url || "");
+    const [companyName, setCompanyName] = useState(teamData?.company_name || "");
+    const [companyUrl, setCompanyUrl] = useState(teamData?.company_url || "");
     const [loading, setLoading] = useState(false);
 
     const fileInputRef = React.useRef(null);
@@ -36,7 +38,9 @@ const AdminAddTeam = ({ onPublish, teamData }) => {
             const payload = { 
                 name, 
                 role, 
-                image_url: imageUrl 
+                image_url: imageUrl,
+                company_name: companyName,
+                company_url: companyUrl
             };
 
             if (teamData?.id) {
@@ -78,6 +82,14 @@ const AdminAddTeam = ({ onPublish, teamData }) => {
                             <div>
                                 <label style={labelStyle}>Role / Designation</label>
                                 <input type="text" style={inputStyle} placeholder="e.g. Chief Coordinator" value={role} onChange={(e) => setRole(e.target.value)} required />
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Current Company</label>
+                                <input type="text" style={inputStyle} placeholder="e.g. Jain Youth Foundation" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Company Website URL</label>
+                                <input type="url" style={inputStyle} placeholder="https://example.com" value={companyUrl} onChange={(e) => setCompanyUrl(e.target.value)} />
                             </div>
                         </div>
 

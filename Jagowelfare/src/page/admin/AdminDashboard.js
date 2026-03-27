@@ -7,6 +7,7 @@ import AdminAddEvent from "./AdminAddEvent";
 import AdminAddCause from "./AdminAddCause";
 import AdminAddGallery from "./AdminAddGallery";
 import AdminAddNews from "./AdminAddNews";
+import AdminAddSupporter from "./AdminAddSupporter";
 import AdminAddTeam from "./AdminAddTeam";
 import AdminAddTestimonial from "./AdminAddTestimonial";
 import AdminViewEvents from "./AdminViewEvents";
@@ -16,6 +17,7 @@ import AdminViewRegistrations from "./AdminViewRegistrations";
 import AdminQRScanner from "./AdminQRScanner";
 import AdminDashboardUpdates from "./AdminDashboardUpdates";
 import AdminViewGallery from "./AdminViewGallery";
+import AdminViewSupporter from "./AdminViewSupporter";
 import AdminViewTeam from "./AdminViewTeam";
 import AdminViewTestimonials from "./AdminViewTestimonials";
 import { useAuth } from "../../auth/AuthProvider";
@@ -146,6 +148,13 @@ const AdminDashboardPage = () => {
   const [editingTeam, setEditingTeam] = useState(null);
   const [editingTestimonial, setEditingTestimonial] = useState(null);
 
+  const [editingSupporter, setEditingSupporter] = useState(null);
+
+  const handleEditSupporter = (supporter) => {
+    setEditingSupporter(supporter);
+    setActiveView("edit_supporter");
+  };
+
   const handleEditTeam = (member) => {
     setEditingTeam(member);
     setActiveView("edit_team");
@@ -199,6 +208,9 @@ const AdminDashboardPage = () => {
         "add_testimonials": "Add Testimonial",
         "view_testimonials": "Manage Testimonials",
         "edit_testimonial": "Edit Testimonial",
+        "add_supporter": "Add Supporter",
+        "view_supporter": "Manage Supporters",
+        "edit_supporter": "Edit Supporter",
         "view_registrations": "Event Registrations",
         "manage_master_cat": "Event Category Master",
         "manage_master_seat": "Seats Type Master",
@@ -236,6 +248,9 @@ const AdminDashboardPage = () => {
       case "add_testimonials": return <AdminAddTestimonial onPublish={() => setActiveView("dashboard")} />;
       case "edit_testimonial": return <AdminAddTestimonial testimonialData={editingTestimonial} onPublish={() => { setEditingTestimonial(null); setActiveView("view_testimonials"); }} />;
       case "view_testimonials": return <AdminViewTestimonials onEdit={handleEditTestimonial} />;
+      case "add_supporter": return <AdminAddSupporter onPublish={() => setActiveView("dashboard")} />;
+      case "edit_supporter": return <AdminAddSupporter supporterData={editingSupporter} onPublish={() => { setEditingSupporter(null); setActiveView("view_supporter"); }} />;
+      case "view_supporter": return <AdminViewSupporter onEdit={handleEditSupporter} />;
       case "view_registrations": return <AdminViewRegistrations />;
       case "manage_master_cat": return <MasterManagementView type="event_category" title="Event Category Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} categoryInput={categoryInput} setCategoryInput={setCategoryInput} />;
       case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} seatTierInput={seatTierInput} setSeatTierInput={setSeatTierInput} />;
@@ -304,6 +319,13 @@ const AdminDashboardPage = () => {
       subs: [
         { label: "Add Member", view: "add_team" },
         { label: "View Team List", view: "view_team" }
+      ]
+    },
+    {
+      title: "Our Supporters", icon: "fas fa-handshake", key: "supporters",
+      subs: [
+        { label: "Add Supporter", view: "add_supporter" },
+        { label: "View Supporters List", view: "view_supporter" }
       ]
     },
     {

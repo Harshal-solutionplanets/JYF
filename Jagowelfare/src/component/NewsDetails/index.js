@@ -47,7 +47,7 @@ const NewsDetailsArea = ({ onTitleFetch }) => {
             <div className="col-lg-8">
               <div className="details_wrapper_area">
                 <div className="details_big_img" style={{ backgroundColor: "#fbfbfb", borderRadius: "15px", overflow: "hidden", border: "1px solid #eee" }}>
-                  <img src={firstImg} alt="img" style={{ width: "100%", height: "auto", maxHeight: "450px", objectFit: "cover" }} />
+                  <img src={firstImg} alt="img" style={{ width: "100%", height: "auto", maxHeight: "450px", objectFit: "contain" }} />
                   <span className="causes_badge bg-yellow" style={{ position: "absolute", top: "20px", left: "20px" }}>{news.tag || "#News"}</span>
                 </div>
                 

@@ -13,7 +13,7 @@ const SideBar = ({ currentCause }) => {
                     .from('causes')
                     .select('*')
                     .neq('id', currentCause?.id || '')
-                    .limit(4);
+                    .limit(5);
                 
                 if (error) throw error;
                 setOtherCauses(data || []);

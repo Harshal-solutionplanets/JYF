@@ -11,14 +11,24 @@ const TrendingCauses = () => {
     const fetchCauses = async () => {
       setLoading(true);
       try {
+        // Try sorting by priority first
         const { data, error } = await supabase
           .from("causes")
           .select("*")
+          .order("priority", { ascending: false })
           .order("created_at", { ascending: false });
-        // Removed .limit(3) based on user's request to see all added causes
 
-        if (error) throw error;
-        if (alive) setCauses(data || []);
+        if (error) {
+            // Fallback for missing priority column
+            const { data: fallbackData, error: fallbackError } = await supabase
+                .from("causes")
+                .select("*")
+                .order("created_at", { ascending: false });
+            if (fallbackError) throw fallbackError;
+            if (alive) setCauses(fallbackData || []);
+        } else {
+            if (alive) setCauses(data || []);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -41,7 +51,7 @@ const TrendingCauses = () => {
           <div className="row">
             <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
               <div className="section_heading">
-                <h3>Guided by our philosophy “Unity in CommUNITY"</h3>
+                <h3>   Guided by our philosophy “Unity in CommUNITY"</h3>
                 <h2>
                   We are always where other people <span className="highlight_yellow">need</span> help
                 </h2>
@@ -69,7 +79,8 @@ const TrendingCauses = () => {
                           <Link to={`/cause-details/${data.id}`} style={{ color: "var(--black-color)", fontWeight: "600", display: "block", lineHeight: "1.3" }}>{data.title}</Link>
                         </h3>
                         <div
-                          style={{ color: "var(--paragraph-color)", fontSize: "15px", marginBottom: "20px", lineHeight: "1.7", fontWeight: "400" }}
+                          className="description_tight"
+                          style={{ color: "var(--paragraph-color)", fontSize: "15px", marginBottom: "20px", fontWeight: "400" }}
                           dangerouslySetInnerHTML={{ __html: data.description }}
                         />
                         <div style={{ marginTop: "auto", paddingTop: "20px" }}>

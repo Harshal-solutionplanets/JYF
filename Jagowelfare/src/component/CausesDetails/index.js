@@ -78,7 +78,13 @@ const CausesDetailsArea = ({ onTitleFetch }) => {
                                         style={{ fontSize: "16px", color: "#818090", marginBottom: "15px", fontWeight: "600", lineHeight: "1.4", borderLeft: "4px solid var(--accent-color)", paddingLeft: "15px" }}
                                     >
                                         <style dangerouslySetInnerHTML={{ __html: `
-                                            .cause_subtitle p, .cause_subtitle div { margin-bottom: 0 !important; margin-top: 0 !important; }
+                                            .cause_subtitle p, .cause_subtitle div { margin-bottom: 2px !important; margin-top: 0 !important; line-height: 1.3 !important; }
+                                            .cause_subtitle ul { list-style: none !important; padding-left: 0 !important; margin-bottom: 5px !important; }
+                                            .cause_subtitle ul li { position: relative; padding-left: 15px !important; margin-bottom: 2px !important; line-height: 1.4 !important; }
+                                            .cause_subtitle ul li::before { 
+                                                content: "•"; color: #ca1e14; font-weight: bold; display: inline-block; 
+                                                width: 15px; margin-left: -15px; font-size: 18px; vertical-align: middle; 
+                                            }
                                         `}} />
                                         <div dangerouslySetInnerHTML={{ __html: cause.description }} />
                                     </div>
@@ -90,9 +96,9 @@ const CausesDetailsArea = ({ onTitleFetch }) => {
                                         <style dangerouslySetInnerHTML={{ __html: `
                                             .details_main_content p, 
                                             .details_main_content li { 
-                                                margin-bottom: 8px !important; 
+                                                margin-bottom: 2px !important; 
                                                 margin-top: 0 !important; 
-                                                line-height: 1.6 !important;
+                                                line-height: 1.35 !important;
                                                 color: #444;
                                                 font-size: 17px;
                                                 position: relative;
@@ -109,6 +115,10 @@ const CausesDetailsArea = ({ onTitleFetch }) => {
                                             }
                                             .details_main_content div { margin-bottom: 0 !important; }
                                             .details_main_content ul { margin-bottom: 8px; padding-left: 0; list-style: none; }
+                                            .details_main_content ul li::before { 
+                                                content: "•"; color: #ca1e14; font-weight: bold; display: inline-block; 
+                                                width: 15px; margin-left: -15px; font-size: 18px; vertical-align: middle; 
+                                            }
                                         `}} />
                                         <div dangerouslySetInnerHTML={{ __html: cause.content }} />
                                     </div>

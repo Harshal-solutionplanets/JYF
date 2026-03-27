@@ -3,36 +3,36 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 // import Img
 import RoundImg from "../../../assets/img/icon/round.png"
-import img1 from "../../../assets/img/icon/sm-book.png"
-import img2 from "../../../assets/img/icon/hand-love.png"
-import img3 from "../../../assets/img/icon/sm-heart.png"
-import img4 from "../../../assets/img/icon/sm-restaurant.png"
+import bookImg from "../../../assets/img/icon/book.png"
+import handLoveImg from "../../../assets/img/icon/hand-love.png"
+import heartImg from "../../../assets/img/icon/heart.png"
+import restaurantImg from "../../../assets/img/icon/restaurant.png"
 
 const AboutTopArea = () => {
     const AboutData = [
         {
-            img: img3,
+            img: heartImg,
             heading: "Healthcare",
             roundImg: RoundImg,
             class: "about_top_boxed bg_three h-100",
             link: "/healthcare"
         },
         {
-            img: img4,
+            img: restaurantImg,
             heading: "Food support",
             roundImg: RoundImg,
             class: "about_top_boxed bg_four h-100",
             link: "/food-support"
         },
         {
-            img: img1,
+            img: bookImg,
             heading: "Education",
             roundImg: RoundImg,
             class: "about_top_boxed bg_one h-100",
             link: "/education"
         },
         {
-            img: img2,
+            img: handLoveImg,
             heading: "Humanitarian services",
             roundImg: RoundImg,
             class: "about_top_boxed bg_two h-100",
@@ -50,11 +50,11 @@ const AboutTopArea = () => {
                                 <Link to={data.link} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <div className={data.class}>
                                         <div className="about_top_boxed_icon">
-                                            <img src={data.img} alt="img" />
+                                            <img src={data.img} alt="img" style={{ width: "auto", height: "auto", maxWidth: "90px", padding: "5px", objectFit: "contain" }} />
                                         </div>
-                                        <div className="about_top_boxed_text">
+                                        <div className="about_top_boxed_text" style={{ textAlign: "center" }}>
                                             <p>{data.para}</p>
-                                            <h3>{data.heading}</h3>
+                                            <h3 style={{ fontSize: "28px", fontWeight: "700" }}>{data.heading}</h3>
                                         </div>
                                         <div className="about_top_boxed_vector">
                                             <img src={data.roundImg} alt="img" />

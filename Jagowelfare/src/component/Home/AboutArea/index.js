@@ -51,10 +51,10 @@ const AboutAres = () => {
                         </div>
                         <div className="col-lg-6 col-md-12 col-sm-12 col-12">
                             <div className="about_area_main_text">
-                                <div className="about_area_heading_two">
+                                <div className="about_area_heading_two" style={{ marginTop: "-20px" }}>
                                     <h2
                                         dangerouslySetInnerHTML={{ __html: (config.title || "Serving Humanity Through <span class='heading_highlight'>Compassion</span>").replace('Compassion', "<span class='heading_highlight'>Compassion</span>").replace('Humanity', "<span class='heading_highlight'>Humanity</span>").replace('poverty', "<span class='heading_highlight'>poverty</span>") }}
-                                        style={{ color: "#1f2230", lineHeight: "1.3", fontWeight: "700", marginBottom: "15px" }}>
+                                        style={{ color: "#1f2230", lineHeight: "1.2", fontWeight: "700", marginBottom: "20px", fontSize: "46px" }}>
                                     </h2>
                                 </div>
 
@@ -63,20 +63,22 @@ const AboutAres = () => {
                                     dangerouslySetInnerHTML={{ __html: config.para1 }}
                                 ></h4>
 
-                                <div className="about_area_para pt-2">
+                                <div className="about_area_para pt-0">
                                     <div
-                                        className="mb-4"
+                                        className="mb-2"
+                                        style={{ fontSize: "16px", lineHeight: "1.6", color: "#666" }}
                                         dangerouslySetInnerHTML={{ __html: config.para2 }}
                                     ></div>
                                     {config.para3 && (
                                         <div
+                                            style={{ fontSize: "16px", lineHeight: "1.6", color: "#666" }}
                                             dangerouslySetInnerHTML={{ __html: config.para3 }}
                                         ></div>
                                     )}
                                 </div>
 
-                                <div className="about_vedio_area mt-5">
-                                    <Link to="/about" className="btn btn_theme btn_md me-4" style={{ borderRadius: "5px", padding: "15px 35px" }}>Learn more</Link>
+                                <div className="about_vedio_area mt-3">
+                                    <Link to="/about" className="btn btn_theme btn_md me-4" style={{ borderRadius: "5px", padding: "12px 30px" }}>Learn more</Link>
                                 </div>
                             </div>
                         </div>

@@ -65,6 +65,9 @@ const AdminViewTeam = ({ onEdit }) => {
                                     <td style={{ border: "none", padding: "15px" }}>
                                         <div style={{ fontWeight: "700", color: "#222", fontSize: "15px" }}>{t.name}</div>
                                         <div style={{ fontSize: "12px", color: "#e33129", fontWeight: "600" }}>{t.role}</div>
+                                        <div style={{ display: "flex", gap: "10px", marginTop: "5px" }}>
+                                            {t.company_url && <a href={t.company_url} target="_blank" rel="noreferrer" style={{ fontSize: "11px", color: "#e33129", textDecoration: "underline", fontWeight: "700" }}>{t.company_name || "Visit Website"}</a>}
+                                        </div>
                                         <div style={{ fontSize: "10px", color: "#bbb", marginTop: "3px" }}>Member since: {formatDate(t.created_at)}</div>
                                     </td>
                                     <td style={{ border: "none", padding: "15px", borderTopRightRadius: "15px", borderBottomRightRadius: "15px", textAlign: "right" }}>

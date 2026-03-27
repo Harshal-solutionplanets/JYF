@@ -35,7 +35,7 @@ const EventAreaPage = (props) => {
           .from('events')
           .select('*')
           .order('startAt', { ascending: true });
-        
+
         if (error) throw error;
         if (alive) setEvents(data || []);
       } catch (e) {
@@ -51,15 +51,15 @@ const EventAreaPage = (props) => {
 
   return (
     <>
-         <section id="upcoming_events" className={ props.padding === true ? "section_padding" : "section_padding_bottom"} >
+      <section id="upcoming_events" className={props.padding === true ? "section_padding" : "section_padding_bottom"} >
         <div className="container">
           <div className="row">
             <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
               <div className="section_heading">
-                <h3>Upcoming events</h3>
+                <h3 style={{ fontSize: "24px" }}>   Events</h3>
                 <h2>
-                  Join our upcoming
-                  <span className="color_big_heading">events</span> for contribution
+                  Join our
+                  <span className="color_big_heading">events</span>
                 </h2>
               </div>
             </div>
@@ -76,7 +76,7 @@ const EventAreaPage = (props) => {
                 <div className="col-lg-6 col-md-12 col-sm-12 col-12" key={ev.id}>
                   <div className="event_left_side_wrapper mb-4">
                     <div className="event_content_area small_content_padding" style={{ position: 'relative', backgroundColor: "#fff", borderRadius: "15px", padding: "30px", boxShadow: "0 5px 20px rgba(0,0,0,0.03)" }}>
-                      
+
                       {/* Floating Date Circle */}
                       <div className="event_date_circle" style={{
                         position: 'absolute',
@@ -122,15 +122,15 @@ const EventAreaPage = (props) => {
                         </div>
                       </div>
 
-                      <div className="event_para" style={{ 
-                        display: '-webkit-box', 
-                        WebkitBoxOrient: 'vertical', 
-                        WebkitLineClamp: 2, 
+                      <div className="event_para" style={{
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 2,
                         overflow: 'hidden',
                         marginBottom: '15px',
                         paddingRight: '80px'
                       }}>
-                        <p 
+                        <p
                           style={{ fontSize: "15px", lineHeight: "1.6", color: "#888" }}
                           dangerouslySetInnerHTML={{ __html: extractDescription(ev.description) }}
                         ></p>

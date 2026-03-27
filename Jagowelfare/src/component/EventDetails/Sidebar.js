@@ -19,7 +19,7 @@ import rece1 from "../../assets/img/sidebar/rec-donet-1.png"
 import rece2 from "../../assets/img/sidebar/rec-donet-2.png"
 import rece3 from "../../assets/img/sidebar/rec-donet-3.png"
 
-import { formatDate } from "../../utils/dateFormatter";
+import { formatDate, formatTime } from "../../utils/dateFormatter";
 
 const EventDetailSidebar = ({ event }) => {
     if (!event) return null;
@@ -60,18 +60,16 @@ const EventDetailSidebar = ({ event }) => {
                                     </li>
                                     <li>
                                         <img src={Map} alt="icon" /> 
-                                        <strong>Location:</strong> <span>{event.venue || "Global"}</span>
+                                        <strong>Venue:</strong> <span>{event.venue || "Global"}</span>
                                     </li>
                                     <li>
                                         <img src={Cal} alt="icon" /> 
-                                        <strong>Date:</strong> <span>{formattedDate}</span>
+                                        <strong>Starts:</strong> <span>{formatDate(event.startAt || event.start_at)} {formatTime(event.startAt || event.start_at)}</span>
                                     </li>
-                                    {event.contactEmail && (
-                                        <li>
-                                            <img src={Mail} alt="icon" /> 
-                                            <strong>Mail:</strong> <span>{event.contactEmail}</span>
-                                        </li>
-                                    )}
+                                    <li>
+                                        <img src={Cal} alt="icon" /> 
+                                        <strong>Ends:</strong> <span>{formatDate(event.endAt || event.end_at)} {formatTime(event.endAt || event.end_at)}</span>
+                                    </li>
                                     {event.contactPhone && (
                                         <li>
                                             <img src={Phone} alt="icon" /> 
@@ -101,6 +99,12 @@ const EventDetailSidebar = ({ event }) => {
                                     </div>
                                     <p style={{ margin: "2px 0", color: "#666", fontSize: "14px" }}>{data.desnation}</p>
                                     <h6 style={{ color: "#e33129", margin: "0", fontSize: "13px", fontWeight: "600" }}>{data.group}</h6>
+                                    {event.contactEmail && (
+                                        <div style={{ marginTop: "5px", display: "flex", alignItems: "center", gap: "5px" }}>
+                                            <img src={Mail} alt="icon" style={{ width: "14px" }} />
+                                            <span style={{ fontSize: "12px", color: "#555" }}>{event.contactEmail}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             ))}

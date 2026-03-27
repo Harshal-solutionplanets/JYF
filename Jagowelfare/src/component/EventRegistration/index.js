@@ -243,6 +243,29 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                         <h2 style={{ fontWeight: "800", color: "#333" }}>{event.title}</h2>
                                     </div>
 
+                                    {/* Important Note Added */}
+                                    <div className="important_note_section mb-4 p-4" style={{ 
+                                        backgroundColor: "#f9fcf9", 
+                                        border: "1px solid #d4edda", 
+                                        borderRadius: "15px",
+                                        textAlign: "left" 
+                                    }}>
+                                        <h6 style={{ color: "#155724", fontWeight: "700", marginBottom: "15px" }}>⚠️ Important Note:</h6>
+                                        <ul style={{ 
+                                            margin: 0, 
+                                            paddingLeft: "1.5rem", 
+                                            color: "#333", 
+                                            fontSize: "15px", 
+                                            lineHeight: "1.6",
+                                            fontWeight: "500"
+                                        }}>
+                                            <li>Kindly register only if you are certain to attend, as seats are limited.</li>
+                                            <li>One registration per mobile number will be considered.</li>
+                                            <li>Entry will be on a first-come, first-served basis — registration does not guarantee a reserved seat.</li>
+                                            <li>Guests are requested to arrive on time to avoid inconvenience.</li>
+                                        </ul>
+                                    </div>
+
                                     <div className="event_basic_details mb-5 p-4" style={{ background: "#f8f9fa", borderRadius: "15px" }}>
                                         <div className="row text-center">
                                             <div className="col-md-6 mb-3">

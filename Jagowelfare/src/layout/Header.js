@@ -40,7 +40,6 @@ const Header = () => {
                                 <ul className="topbar-list">
                                     <li><Link to={`mailto:${primaryEmail}`}><i className="fa fa-envelope"></i><span>{primaryEmail}</span></Link></li>
                                     <li><Link to={`tel:+91${primaryPhone.replace(/ /g, '')}`}><i className="fa fa-phone"></i><span>+91 {primaryPhone}</span></Link></li>
-                                    <li><Link to="/faqs"><span>Faqs</span></Link></li>
                                 </ul>
                             </div>
                             <div className="col-lg-6 col-md-6">
@@ -80,10 +79,10 @@ const Header = () => {
                                                     onClick={() => !data.submenu && setIsMenuOpen(false)}
                                                     style={{ 
                                                         fontWeight: "600", 
-                                                        fontSize: "15px", 
+                                                        fontSize: "17px", 
                                                         color: "var(--black-color) !important",
                                                         textTransform: "uppercase",
-                                                        letterSpacing: "0.5px"
+                                                        letterSpacing: "0.8px"
                                                     }}
                                                 >
                                                     {data.menu}
@@ -125,7 +124,7 @@ const Header = () => {
                     position: relative;
                 }
                 .nav-link { 
-                    padding: 25px 15px !important;
+                    padding: 25px 22px !important;
                     transition: 0.3s;
                 }
                 .nav-link:hover {
