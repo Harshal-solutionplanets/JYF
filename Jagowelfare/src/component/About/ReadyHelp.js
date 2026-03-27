@@ -41,8 +41,8 @@ const ReadyHelp = () => {
                         <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
                             <div className="section_heading">
                                 <h3>Ready to help</h3>
-                                <h2> We have thousands of happy
-                                    volunteer to <span className="color_big_heading">help</span> you</h2>
+                                <h2> Core Team
+                                    <span className="color_big_heading"> Members</span></h2>
                             </div>
                         </div>
                     </div>
