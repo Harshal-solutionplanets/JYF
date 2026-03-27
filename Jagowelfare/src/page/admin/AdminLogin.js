@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabase";
 import CommonBanner from "../../component/Common/CommonBanner";
 import { useAuth } from "../../auth/AuthProvider";
-import logo from "../../assets/img/logo.jpeg";
+import logo from "../../assets/img/logo.png";
 
 const AdminLoginPage = () => {
     const navigate = useNavigate();

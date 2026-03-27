@@ -1,6 +1,6 @@
 import React from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import logo from "../../assets/img/jyf_logo.jpg"; // Now using the new logo
+import logo from "../../assets/img/jyf_logo.png"; // Now using the new logo
 
 const GoldenTicket = ({ registration, event }) => {
     if (!registration || !event) return null;

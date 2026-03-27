@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/img/logo.jpeg";
+import logo from "../../assets/img/logo.png";
 import { supabase } from "../../supabase";
 import { formatDate } from "../../utils/dateFormatter";
 import AdminAddEvent from "./AdminAddEvent";

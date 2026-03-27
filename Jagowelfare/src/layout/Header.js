@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import logo from ".././assets/img/logo.jpeg";
+import logo from ".././assets/img/logo.png";
 import { HeaderData } from "./HeaderData";
 import { useAuth } from "../auth/AuthProvider";
 import { supabase } from "../supabase";
