@@ -5,7 +5,7 @@ import Iconclock from "../../assets/img/icon/clock.png";
 import IconMap from "../../assets/img/icon/map.png";
 import IconDate from "../../assets/img/icon/date.png";
 import { extractDescription } from "../../utils/eventHelper";
-import { formatDate } from "../../utils/dateFormatter";
+import { formatDate, formatTime } from "../../utils/dateFormatter";
 
 function toJsDate(value) {
   if (!value) return null;
@@ -156,10 +156,7 @@ const EventAreaPage = (props) => {
                               </div>
                               <div className="event_bottom_content">
                                 <h5 style={{ fontSize: "13px", color: "#222" }}>Starts at:</h5>
-                                <p style={{ fontSize: "12px" }}>{(() => {
-                                  const d = toJsDate(ev.startAt);
-                                  return d ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "-";
-                                })()}</p>
+                                <p style={{ fontSize: "12px" }}>{formatTime(ev.startAt || ev.start_at)}</p>
                               </div>
                             </div>
                           </div>

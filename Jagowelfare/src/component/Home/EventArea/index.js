@@ -6,6 +6,7 @@ import Iconclock from "../../../assets/img/icon/clock.png"
 import IconMap from "../../../assets/img/icon/map.png"
 import IconDate from "../../../assets/img/icon/date.png"
 import { extractDescription } from "../../../utils/eventHelper";
+import { formatTime } from "../../../utils/dateFormatter";
 
 
 const EventArea = (props) => {
@@ -42,11 +43,7 @@ const EventArea = (props) => {
   }, [events]);
 
 
-  const formatTime = (dateStr) => {
-    if (!dateStr) return "10 am";
-    const d = new Date(dateStr);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+
 
   return (
     <>
