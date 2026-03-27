@@ -3,6 +3,7 @@ import { supabase } from "../../supabase";
 
 const AdminAddSupporter = ({ onPublish, supporterData }) => {
     const [name, setName] = useState(supporterData?.name || "");
+    const [websiteUrl, setWebsiteUrl] = useState(supporterData?.website_url || "");
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(supporterData?.image_url || "");
     const [loading, setLoading] = useState(false);
@@ -34,6 +35,7 @@ const AdminAddSupporter = ({ onPublish, supporterData }) => {
             
             const payload = { 
                 name, 
+                website_url: websiteUrl,
                 image_url: imageUrl 
             };
 
@@ -65,6 +67,11 @@ const AdminAddSupporter = ({ onPublish, supporterData }) => {
                 <div style={{ marginBottom: "25px" }}>
                     <label style={labelStyle}>Supporter Name / Company</label>
                     <input type="text" style={inputStyle} placeholder="e.g. Reliance Foundation" value={name} onChange={(e) => setName(e.target.value)} required />
+                </div>
+
+                <div style={{ marginBottom: "25px" }}>
+                    <label style={labelStyle}>Supporter Website / Company Link</label>
+                    <input type="url" style={inputStyle} placeholder="e.g. https://www.google.com" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} />
                 </div>
 
                 <div style={{ marginBottom: "30px" }}>

@@ -62,9 +62,13 @@ const PartnerArea = () => {
                         >
                             {logoData.map((data, index)=>(
                                 <div className="partner_logo" key={index} style={{ textAlign: "center", padding: "10px", border: "1px solid #f0f0f0", borderRadius: "10px", backgroundColor: "#fff" }}>
-                                    <Link to="/#">
+                                    {data.website_url ? (
+                                        <a href={data.website_url} target="_blank" rel="noopener noreferrer">
+                                            <img src={data.image_url} alt={data.name} style={{ width: "auto", maxWidth: "100%", height: "80px", objectFit: "contain", display: "inline-block" }} />
+                                        </a>
+                                    ) : (
                                         <img src={data.image_url} alt={data.name} style={{ width: "auto", maxWidth: "100%", height: "80px", objectFit: "contain", display: "inline-block" }} />
-                                    </Link>
+                                    )}
                                     {data.name && <p style={{ fontSize: "12px", marginTop: "10px", color: "#666", fontWeight: "600" }}>{data.name}</p>}
                                 </div>
                             ))}
