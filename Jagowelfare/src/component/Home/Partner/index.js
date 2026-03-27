@@ -41,7 +41,9 @@ const PartnerArea = () => {
             <div className="row">
                 <div className="col-lg-12">
                     <div className="section_heading text-center" style={{ marginBottom: "40px" }}>
-                        <h2 style={{ fontSize: "30px", fontWeight: "800", color: "#222" }}>Our <span className="color_big_heading">Supporters</span></h2>
+                        <h2 style={{ fontSize: "30px", fontWeight: "800", color: "#222", position: "relative" }}>
+                            Our <span className="color_big_heading">Supporters</span>
+                        </h2>
                     </div>
                 </div>
             </div>
