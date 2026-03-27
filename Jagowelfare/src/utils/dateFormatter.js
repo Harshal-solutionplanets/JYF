@@ -19,7 +19,11 @@ export const formatTime = (dateStr) => {
     try {
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) return "";
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            hour12: true 
+        }).toUpperCase();
     } catch (e) {
         return "";
     }
