@@ -1801,7 +1801,7 @@ section {
   text-align: left !important;
 }
 
-.description_tight p, 
+.description_tight p,
 .description_tight div,
 .description_tight h1,
 .description_tight h2,
@@ -1829,7 +1829,8 @@ section {
 
 .description_tight ul li::before {
   content: "•";
-  color: #ca1e14; /* JYF Red */
+  color: #ca1e14;
+  /* JYF Red */
   font-weight: bold;
   display: inline-block;
   width: 15px;
