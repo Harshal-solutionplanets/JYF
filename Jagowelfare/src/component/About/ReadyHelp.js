@@ -62,11 +62,11 @@ const ReadyHelp = () => {
                         {displayData.map((data, index) => (
                             <div className="col-lg-3 col-md-4 col-sm-6 col-12" key={index}>
                                 <div className="volunteer_wrapper" style={{ marginBottom: "30px" }}>
-                                    <div className="volunteer_img" style={{ height: "345px", overflow: "hidden" }}>
+                                    <div className="volunteer_img" style={{ height: "400px", overflow: "hidden" }}>
                                         <img 
                                             src={data.image_url || DefaultImg} 
                                             alt="img" 
-                                            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} 
                                         />
                                         <div className="volunteer_icon">
                                             <ul>
