@@ -40,6 +40,7 @@ const AdminDashboardUpdates = () => {
         contact: { heading: "Contact Us", image_url: "" },
         team: { heading: "Volunteering Team", image_url: "" },
         testimonials: { heading: "Supporter Feedback", image_url: "" },
+        admin_login: { heading: "Admin Login", image_url: "" },
     });
 
     // Site Contact State

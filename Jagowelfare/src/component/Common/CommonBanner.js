@@ -27,6 +27,7 @@ const CommonBanner = (props) => {
                     else if (pageKey.includes("contact")) banner = data.value["contact"];
                     else if (pageKey.includes("team") || pageKey.includes("member") || pageKey.includes("volunter")) banner = data.value["team"];
                     else if (pageKey.includes("testimonial")) banner = data.value["testimonials"];
+                    else if (pageKey.includes("admin") && pageKey.includes("login")) banner = data.value["admin_login"];
                 }
 
                 if (banner && banner.image_url) {
