@@ -45,7 +45,7 @@ const CounterArea = () => {
                                     {CounterData.map((data, index) => (
                                         <div className="col-lg-3 col-md-6 col-sm-6 col-12" key={index}>
                                             <div className="counter_item">
-                                                <img src={data.img} alt="icon" />
+                                                <img src={data.img} alt="icon" style={index === 1 ? { transform: 'scale(0.5)' } : {}} />
                                                 <h2 className="counter">
                                                     <CountUp isCounting end={data.count} duration={3.2} />
                                                     {data.suffix}
