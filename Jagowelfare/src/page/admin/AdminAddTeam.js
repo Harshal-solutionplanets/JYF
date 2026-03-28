@@ -77,11 +77,11 @@ const AdminAddTeam = ({ onPublish, teamData }) => {
                         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "25px" }}>
                             <div>
                                 <label style={labelStyle}>Full Name</label>
-                                <input type="text" style={inputStyle} placeholder="e.g. John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+                                <input type="text" style={inputStyle} placeholder="e.g. John Doe" value={name} onChange={(e) => setName(e.target.value)} />
                             </div>
                             <div>
                                 <label style={labelStyle}>Role / Designation</label>
-                                <input type="text" style={inputStyle} placeholder="e.g. Chief Coordinator" value={role} onChange={(e) => setRole(e.target.value)} required />
+                                <input type="text" style={inputStyle} placeholder="e.g. Chief Coordinator" value={role} onChange={(e) => setRole(e.target.value)} />
                             </div>
                             <div>
                                 <label style={labelStyle}>Current Company</label>
