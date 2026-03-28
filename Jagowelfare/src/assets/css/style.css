@@ -1104,6 +1104,15 @@ section {
   border-right: none;
 }
 
+.counter_item img {
+  height: 80px;
+  margin-bottom: 20px;
+  object-fit: contain;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .counter_item h2 {
   line-height: 50px;
   padding-top: -5px;
@@ -1112,6 +1121,11 @@ section {
 .counter_item p {
   font-size: 18px;
   padding-top: -5px;
+  min-height: 54px;
+  line-height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* --Blog area-- */

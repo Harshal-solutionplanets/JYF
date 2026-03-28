@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 // import Img
 import RoundImg from "../../../assets/img/icon/round.png"
 import bookImg from "../../../assets/img/icon/book.png"
-import handLoveImg from "../../../assets/img/icon/hand-love.png"
 import heartImg from "../../../assets/img/icon/heart.png"
 import restaurantImg from "../../../assets/img/icon/restaurant.png"
+import humanitarianImg from "../../../assets/img/icon/humanitarian_final.jpg"
 
 const AboutTopArea = () => {
     const AboutData = [
@@ -32,7 +32,7 @@ const AboutTopArea = () => {
             link: "/education"
         },
         {
-            img: handLoveImg,
+            img: humanitarianImg,
             heading: "Humanitarian services",
             roundImg: RoundImg,
             class: "about_top_boxed bg_two h-100",
@@ -50,7 +50,7 @@ const AboutTopArea = () => {
                                 <Link to={data.link} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <div className={data.class}>
                                         <div className="about_top_boxed_icon">
-                                            <img src={data.img} alt="img" style={{ width: "auto", height: "auto", maxWidth: "90px", padding: "5px", objectFit: "contain" }} />
+                                            <img src={data.img} alt="img" />
                                         </div>
                                         <div className="about_top_boxed_text" style={{ textAlign: "center" }}>
                                             <p>{data.para}</p>
