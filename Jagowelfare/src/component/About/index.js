@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 // Import Img
 import Img1 from "../../assets/img/common/about.png"
+import Img2 from "../../assets/img/icon/about.png"
 // import Commonent
 import ReadyHelp from './ReadyHelp'
 import PartnerArea from '../Home/Partner'
@@ -37,6 +38,10 @@ const AboutArea = () => {
                         </div>
                         <div className="col-lg-6 col-md-12 col-sm-12 col-12">
                             <div className="about_area_main_text">
+                                <div className="about_area_heading">
+                                    <img src={Img2} alt="img" />
+                                    <h3>Welcome to JYF</h3>
+                                </div>
                                 <div className="about_area_heading_two">
                                     <h2>Serving Humanity Through <span className="color_big_heading">Compassion</span></h2>
                                 </div>
@@ -53,6 +58,9 @@ const AboutArea = () => {
                     <div className="row mt-5">
                         <div className="col-lg-12">
                             <div className="about_area_main_text">
+                                <div className="about_area_heading">
+                                    <h3>Our Philosophy</h3>
+                                </div>
                                 <div className="about_area_heading_two">
                                     <h2>Unity in <span className="color_big_heading">CommUNITY</span></h2>
                                 </div>

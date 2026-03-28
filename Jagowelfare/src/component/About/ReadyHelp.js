@@ -10,13 +10,26 @@ const ReadyHelp = () => {
     useEffect(() => {
         const fetchTeam = async () => {
             try {
+                // Try sorting by priority first
                 const { data, error } = await supabase
                     .from('team')
                     .select('*')
+                    .order('priority', { ascending: false })
+                    .order('created_at', { ascending: false })
                     .limit(10);
                 
-                if (error) throw error;
-                setTeamData(data || []);
+                if (error) {
+                    console.warn("Priority column might be missing. Falling back to date sorting.", error);
+                    const { data: fallbackData, error: fallbackError } = await supabase
+                        .from('team')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(10);
+                    if (fallbackError) throw fallbackError;
+                    setTeamData(fallbackData || []);
+                } else {
+                    setTeamData(data || []);
+                }
             } catch (err) {
                 console.error("Error fetching team data:", err);
             } finally {

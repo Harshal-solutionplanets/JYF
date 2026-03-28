@@ -7,7 +7,7 @@ import EventArea from '../component/Home/EventArea'
 // import DonationArea from '../component/Home/Donation'
 import PartnerArea from '../component/Home/Partner'
 import CounterArea from '../component/Home/Counter'
-import NewsAres from '../component/Home/NewsArea'
+// import NewsAres from '../component/Home/NewsArea'
 const Home = () => {
   return (
     <>
@@ -19,7 +19,7 @@ const Home = () => {
        {/* <DonationArea/> */}
        <PartnerArea/>
        <CounterArea/>
-       <NewsAres/>
+       {/* <NewsAres/> */}
     </>
   )
 }

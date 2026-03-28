@@ -19,15 +19,15 @@ const TrendingCauses = () => {
           .order("created_at", { ascending: false });
 
         if (error) {
-            // Fallback for missing priority column
-            const { data: fallbackData, error: fallbackError } = await supabase
-                .from("causes")
-                .select("*")
-                .order("created_at", { ascending: false });
-            if (fallbackError) throw fallbackError;
-            if (alive) setCauses(fallbackData || []);
+          // Fallback for missing priority column
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from("causes")
+            .select("*")
+            .order("created_at", { ascending: false });
+          if (fallbackError) throw fallbackError;
+          if (alive) setCauses(fallbackData || []);
         } else {
-            if (alive) setCauses(data || []);
+          if (alive) setCauses(data || []);
         }
       } catch (err) {
         console.error(err);
@@ -51,7 +51,7 @@ const TrendingCauses = () => {
           <div className="row">
             <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
               <div className="section_heading">
-                <h3>   Guided by our philosophy “Unity in CommUNITY"</h3>
+                <h3>          Guided by our philosophy “Unity in CommUNITY"</h3>
                 <h2>
                   We are always where other people <span className="highlight_yellow">need</span> help
                 </h2>

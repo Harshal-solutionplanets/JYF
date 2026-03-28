@@ -12,8 +12,20 @@ const PartnerArea = () => {
 
     useEffect(() => {
         const fetchSupporters = async () => {
-            const { data, error } = await supabase.from('supporters').select('*').order('created_at', { ascending: false });
-            if (!error && data) setLogoData(data);
+            try {
+                // Try sorting by priority first
+                const { data, error } = await supabase.from('supporters').select('*').order('priority', { ascending: false }).order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.warn("Priority column might be missing. Falling back to date sorting.", error);
+                    const { data: fallbackData, error: fallbackError } = await supabase.from('supporters').select('*').order('created_at', { ascending: false });
+                    if (!fallbackError && fallbackData) setLogoData(fallbackData);
+                } else if (data) {
+                    setLogoData(data);
+                }
+            } catch (err) {
+                console.error("Error fetching supporters:", err);
+            }
         };
         fetchSupporters();
     }, []);

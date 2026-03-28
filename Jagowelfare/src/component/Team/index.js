@@ -8,9 +8,17 @@ const TeamArea = () => {
   useEffect(() => {
     const fetchTeam = async () => {
       try {
-        const { data, error } = await supabase.from('team').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-        setTeam(data || []);
+        // Try sorting by priority first
+        const { data, error } = await supabase.from('team').select('*').order('priority', { ascending: false }).order('created_at', { ascending: false });
+        
+        if (error) {
+          console.warn("Priority column might be missing. Falling back to date sorting.", error);
+          const { data: fallbackData, error: fallbackError } = await supabase.from('team').select('*').order('created_at', { ascending: false });
+          if (fallbackError) throw fallbackError;
+          setTeam(fallbackData || []);
+        } else {
+          setTeam(data || []);
+        }
       } catch (err) {
         console.error("Error fetching team:", err);
       } finally {

@@ -11,13 +11,24 @@ const CausesArea = () => {
         const fetchCauses = async () => {
             setLoading(true);
             try {
+                // Try sorting by priority first
                 const { data, error } = await supabase
                     .from('causes')
                     .select('*')
+                    .order('priority', { ascending: false })
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
-                if (alive) setCauses(data || []);
+                if (error) {
+                    console.warn("Priority column might be missing. Falling back to date sorting.", error);
+                    const { data: fallbackData, error: fallbackError } = await supabase
+                        .from('causes')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (fallbackError) throw fallbackError;
+                    if (alive) setCauses(fallbackData || []);
+                } else {
+                    if (alive) setCauses(data || []);
+                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -35,7 +46,7 @@ const CausesArea = () => {
                     <div className="row">
                         <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
                             <div className="section_heading">
-                                <h3>   Guided by our philosophy “Unity in CommUNITY"</h3>
+                                <h3>          Guided by our philosophy “Unity in CommUNITY"</h3>
                                 <h2>   We are always where other people <span className="color_big_heading">need</span> help</h2>
                             </div>
                         </div>
