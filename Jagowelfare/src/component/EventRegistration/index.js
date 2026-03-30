@@ -286,7 +286,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                                         {isSoldOut ? (
                                                             <span>🚫 SOLD OUT - All {event.seatsAvailable} seats are booked!</span>
                                                         ) : (
-                                                            <span>✨ Only {(event.seatsAvailable - bookedCount)} Seats Remaining (Total: {event.seatsAvailable})</span>
+                                                            <span>✨ Only {(event.seatsAvailable - bookedCount)} Seats Remaining</span>
                                                         )}
                                                     </div>
                                                 </div>
