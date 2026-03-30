@@ -17,6 +17,7 @@ import AdminViewRegistrations from "./AdminViewRegistrations";
 import AdminQRScanner from "./AdminQRScanner";
 import AdminDashboardUpdates from "./AdminDashboardUpdates";
 import AdminViewGallery from "./AdminViewGallery";
+import AdminViewAlbums from "./AdminViewAlbums";
 import AdminViewSupporter from "./AdminViewSupporter";
 import AdminViewTeam from "./AdminViewTeam";
 import AdminViewTestimonials from "./AdminViewTestimonials";
@@ -200,6 +201,7 @@ const AdminDashboardPage = () => {
         "view_causes": "All Causes",
         "add_gallery": "Add Gallery Image",
         "view_gallery": "Gallery Management",
+        "view_albums": "Manage Albums",
         "add_news": "Publish News Article",
         "view_news": "Article History",
         "add_team": "Add Team Member",
@@ -240,6 +242,7 @@ const AdminDashboardPage = () => {
         return <AdminViewCauses onEdit={handleEditCause} />;
       case "add_gallery": return <AdminAddGallery onPublish={() => setActiveView("dashboard")} />;
       case "view_gallery": return <AdminViewGallery />;
+      case "view_albums": return <AdminViewAlbums />;
       case "add_news": return <AdminAddNews onPublish={() => setActiveView("dashboard")} />;
       case "view_news": return <AdminViewNews />;
       case "add_team": return <AdminAddTeam onPublish={() => setActiveView("dashboard")} />;
@@ -311,7 +314,8 @@ const AdminDashboardPage = () => {
       title: "Gallery", icon: "fas fa-images", key: "gallery",
       subs: [
         { label: "Add Gallery", view: "add_gallery" },
-        { label: "View Gallery List", view: "view_gallery" }
+        { label: "View All Images", view: "view_gallery" },
+        { label: "View Albums", view: "view_albums" }
       ]
     },
     {

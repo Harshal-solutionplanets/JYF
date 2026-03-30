@@ -6,29 +6,49 @@ import Icon from "../../assets/img/icon/arrow-round.png"
 
 const GalleryArea = () => {
   const [galleryItems, setGalleryItems] = React.useState([]);
+  const [categories, setCategories] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState("");
 
   React.useEffect(() => {
-    const fetchGallery = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-        setGalleryItems(data || []);
+        // 1. Fetch gallery items
+        const { data: galleryData, error: galleryError } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
+        if (galleryError) throw galleryError;
+        setGalleryItems(galleryData || []);
+
+        // 2. Fetch ordered categories
+        const { data: catData, error: catError } = await supabase
+          .from('gallery_categories')
+          .select('*')
+          .order('priority', { ascending: false });
+        
+        if (!catError) {
+          setCategories(catData.map(c => c.name));
+        }
       } catch (e) {
-        console.error("Failed to load gallery:", e);
+        console.error("Failed to load gallery data:", e);
       } finally {
         setLoading(false);
       }
     };
-    fetchGallery();
+    fetchData();
   }, []);
 
   const uniqueTitles = React.useMemo(() => {
+    // If categories exist from the categories table, use that order
+    if (categories.length > 0) {
+      const titlesInGallery = new Set(galleryItems.map(item => item.title).filter(Boolean));
+      // Only keep categories that actually have images
+      return categories.filter(cat => titlesInGallery.has(cat));
+    }
+    
+    // Fallback: simple sorting
     const titles = galleryItems.map(item => item.title).filter(Boolean);
     return Array.from(new Set(titles)).sort();
-  }, [galleryItems]);
+  }, [galleryItems, categories]);
 
   const filteredItems = galleryItems.filter(item => 
     !searchTerm || (item.title && item.title.toLowerCase() === searchTerm.toLowerCase())
