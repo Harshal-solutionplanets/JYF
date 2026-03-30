@@ -62,7 +62,27 @@ const AdminViewGallery = () => {
         }
     };
 
-    const filteredImages = images.filter(img => 
+    const sortedImages = React.useMemo(() => {
+        if (categories.length === 0) return images;
+
+        const categoryOrder = {};
+        categories.forEach((cat, index) => {
+            categoryOrder[cat.toLowerCase()] = index;
+        });
+
+        return [...images].sort((a, b) => {
+            const orderA = categoryOrder[(a.title || "").toLowerCase()];
+            const orderB = categoryOrder[(b.title || "").toLowerCase()];
+
+            const pA = orderA !== undefined ? orderA : 999;
+            const pB = orderB !== undefined ? orderB : 999;
+
+            if (pA !== pB) return pA - pB;
+            return 0;
+        });
+    }, [images, categories]);
+
+    const filteredImages = sortedImages.filter(img => 
         (img.title || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
