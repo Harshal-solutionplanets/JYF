@@ -92,6 +92,31 @@ const AdminViewAlbums = () => {
         setDraggedIndex(null);
     };
 
+    const handleMove = async (index, direction) => {
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex >= albums.length) return;
+
+        const newAlbums = [...albums];
+        const temp = newAlbums[index];
+        newAlbums[index] = newAlbums[newIndex];
+        newAlbums[newIndex] = temp;
+        setAlbums(newAlbums);
+
+        // Update priority in DB
+        const updates = newAlbums.map((a, i) => ({
+            id: a.id,
+            priority: newAlbums.length - i
+        }));
+
+        try {
+            for (const update of updates) {
+                await supabase.from('gallery_categories').update({ priority: update.priority }).eq('id', update.id);
+            }
+        } catch (err) {
+            console.error("Order update failed", err);
+        }
+    };
+
     if (loading) return <div className="text-center p-5"><h4>Loading Albums...</h4></div>;
 
     return (
@@ -101,7 +126,7 @@ const AdminViewAlbums = () => {
                     <div>
                         <h3 style={{ margin: 0, fontWeight: "800", color: "#222" }}>Manage Album Order</h3>
                         <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#e33129", fontWeight: "600" }}>
-                            <i className="fas fa-info-circle mr-2"></i> Drag albums to reorder how they appear on the website dropdown.
+                            <i className="fas fa-info-circle mr-2"></i> Use the grip icon to drag or the buttons to reorder albums.
                         </p>
                     </div>
                     <span className="badge" style={{ backgroundColor: "#e3312915", color: "#e33129", padding: "10px 20px", borderRadius: "30px", fontWeight: "700" }}>
@@ -115,6 +140,7 @@ const AdminViewAlbums = () => {
                             <tr style={{ backgroundColor: "#fdfdfd" }}>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "12px", width: "80px", textAlign: "center" }}>Grip</th>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "12px" }}>Album Name (Category)</th>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "12px", textAlign: "center" }}>Move</th>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "12px", textAlign: "center" }}>Priority</th>
                             </tr>
                         </thead>
@@ -141,6 +167,24 @@ const AdminViewAlbums = () => {
                                     </td>
                                     <td style={{ border: "none", padding: "20px" }}>
                                         <div style={{ fontWeight: "700", color: "#333", fontSize: "16px" }}>{album.name}</div>
+                                    </td>
+                                    <td style={{ border: "none", padding: "20px", textAlign: "center" }}>
+                                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                                            <button 
+                                                disabled={index === 0}
+                                                onClick={(e) => { e.stopPropagation(); handleMove(index, 'up'); }}
+                                                style={{ padding: "5px 12px", borderRadius: "8px", border: "1px solid #ddd", backgroundColor: index === 0 ? "#f9f9f9" : "#fff", cursor: index === 0 ? "not-allowed" : "pointer" }}
+                                            >
+                                                <i className="fas fa-chevron-up" style={{ color: index === 0 ? "#ccc" : "#e33129" }}></i>
+                                            </button>
+                                            <button 
+                                                disabled={index === albums.length - 1}
+                                                onClick={(e) => { e.stopPropagation(); handleMove(index, 'down'); }}
+                                                style={{ padding: "5px 12px", borderRadius: "8px", border: "1px solid #ddd", backgroundColor: index === albums.length - 1 ? "#f9f9f9" : "#fff", cursor: index === albums.length - 1 ? "not-allowed" : "pointer" }}
+                                            >
+                                                <i className="fas fa-chevron-down" style={{ color: index === albums.length - 1 ? "#ccc" : "#e33129" }}></i>
+                                            </button>
+                                        </div>
                                     </td>
                                     <td style={{ border: "none", padding: "20px", borderTopRightRadius: "15px", borderBottomRightRadius: "15px", textAlign: "center" }}>
                                         <span style={{ backgroundColor: "#eee", padding: "5px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "700", color: "#666" }}>
