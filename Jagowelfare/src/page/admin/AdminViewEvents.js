@@ -13,7 +13,7 @@ const AdminViewEvents = ({ onEdit }) => {
     const fetchEvents = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase.from('events').select('*').order('created_at', { ascending: false });
+            const { data, error } = await supabase.from('events').select('*').order('startAt', { ascending: false });
             if (error) throw error;
             setEvents(data || []);
         } catch (err) {

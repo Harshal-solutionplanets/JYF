@@ -77,8 +77,10 @@ const EventDetailSidebar = ({ event }) => {
                                         </li>
                                     )}
                                 </ul>
-                                <div className="register_now_details" style={{ marginTop: "20px" }}>
-                                    <Link to={`/event-registration/${event.id}`} className="btn btn_theme btn_md w-100" style={{ borderRadius: "10px", fontWeight: "700" }}>Register now</Link>
+                                <div className="register_now_details" style={{ marginTop: event.description?.includes("REG_TYPE: not_required") ? "0" : "20px" }}>
+                                    {(!event.description?.includes("REG_TYPE: not_required")) && (
+                                        <Link to={`/event-registration/${event.id}`} className="btn btn_theme btn_md w-100" style={{ borderRadius: "10px", fontWeight: "700" }}>Register now</Link>
+                                    )}
                                 </div>
 
                             </div>

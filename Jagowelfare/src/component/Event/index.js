@@ -34,7 +34,7 @@ const EventAreaPage = (props) => {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .order('startAt', { ascending: true });
+          .order('startAt', { ascending: false });
 
         if (error) throw error;
         if (alive) setEvents(data || []);

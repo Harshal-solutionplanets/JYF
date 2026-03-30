@@ -55,6 +55,14 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                     .single();
 
                 if (sbError) throw sbError;
+                
+                // Safety check: if registration not required, redirect or error
+                if (data.description?.includes("REG_TYPE: not_required")) {
+                    setError("Online registration is not required for this event. You can attend directly.");
+                    setLoading(false);
+                    return;
+                }
+
                 setEvent(data);
 
                 // Extract sections from description

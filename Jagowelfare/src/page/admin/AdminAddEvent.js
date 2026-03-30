@@ -20,6 +20,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
     const [contactPhone, setContactPhone] = useState("");
     const [seatsAvailable, setSeatsAvailable] = useState("");
 
+    const [registrationType, setRegistrationType] = useState("required");
     const [sections, setSections] = useState([]);
 
     const [organizerName, setOrganizerName] = useState("");
@@ -79,7 +80,13 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
             if (desc.startsWith("SECTIONS:")) {
                 try {
                     const parts = desc.split(" | CONTENT: ");
-                    const sectionsJson = parts[0].replace("SECTIONS: ", "");
+                    const firstPart = parts[0];
+                    const regTypeMatch = firstPart.match(/\| REG_TYPE: (\w+)/);
+                    if (regTypeMatch) {
+                        setRegistrationType(regTypeMatch[1]);
+                    }
+
+                    const sectionsJson = firstPart.replace("SECTIONS: ", "").split(" | ")[0];
                     const parsedSections = JSON.parse(sectionsJson);
                     if (!Array.isArray(parsedSections)) {
                         const arr = Object.keys(parsedSections)
@@ -206,7 +213,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                 const { data: { publicUrl } } = supabase.storage.from('JYF').getPublicUrl(filePath);
                 organizerImageUrl = publicUrl;
             }
-            const finalDescription = `SECTIONS: ${JSON.stringify(sections)} | CONTENT: ${description.trim()}`;
+            const finalDescription = `SECTIONS: ${JSON.stringify(sections)} | REG_TYPE: ${registrationType} | CONTENT: ${description.trim()}`;
             const eventPayload = {
                 title: title.trim(),
                 tag: tag.trim() || "#Event",
@@ -277,6 +284,17 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
                             <div>
                                 <label style={labelStyle}>Seats Available (Quantity)</label>
                                 <input type="number" style={inputStyle} placeholder="e.g. 1700" value={seatsAvailable} onChange={(e) => setSeatsAvailable(e.target.value.replace(/\D/g, ''))} />
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Event Registration Type</label>
+                                <select 
+                                    style={{ ...inputStyle, appearance: "none", cursor: "pointer", padding: "12px 0", color: registrationType === "not_required" ? "#e33129" : "#28a745", fontWeight: "700" }} 
+                                    value={registrationType} 
+                                    onChange={(e) => setRegistrationType(e.target.value)}
+                                >
+                                    <option value="required" style={{ color: "#28a745" }}>Registration Required (Button Visible)</option>
+                                    <option value="not_required" style={{ color: "#e33129" }}>Registration Not Required (Button Hidden)</option>
+                                </select>
                             </div>
                         </div>
 
