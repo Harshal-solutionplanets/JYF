@@ -68,6 +68,22 @@ const AdminViewGallery = () => {
 
     const [selectedImage, setSelectedImage] = useState(null);
 
+    const handleNext = (e) => {
+        e.stopPropagation();
+        const currentIndex = filteredImages.findIndex(item => item.id === selectedImage.id);
+        if (currentIndex < filteredImages.length - 1) {
+            setSelectedImage(filteredImages[currentIndex + 1]);
+        }
+    };
+
+    const handlePrev = (e) => {
+        e.stopPropagation();
+        const currentIndex = filteredImages.findIndex(item => item.id === selectedImage.id);
+        if (currentIndex > 0) {
+            setSelectedImage(filteredImages[currentIndex - 1]);
+        }
+    };
+
     if (loading) return <div className="text-center p-5"><h4>Loading Gallery...</h4></div>;
 
     return (
@@ -193,34 +209,75 @@ const AdminViewGallery = () => {
                         animation: 'fadeIn 0.3s ease-out', cursor: 'zoom-out'
                     }}
                 >
-                    <div style={{ position: 'relative', maxWidth: '80%', maxHeight: '90%' }} onClick={(e) => e.stopPropagation()}>
+                    {/* Navigation Buttons */}
+                    <button 
+                        onClick={handlePrev}
+                        disabled={filteredImages.findIndex(i => i.id === selectedImage.id) === 0}
+                        style={{ 
+                            position: 'absolute', left: '30px', background: 'rgba(255,255,255,0.15)', 
+                            border: 'none', color: 'white', width: '55px', height: '55px', 
+                            borderRadius: '50%', cursor: 'pointer', fontSize: '20px', zIndex: 10001,
+                            transition: '0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                    >
+                        <i className="fas fa-chevron-left"></i>
+                    </button>
+
+                    <button 
+                        onClick={handleNext}
+                        disabled={filteredImages.findIndex(i => i.id === selectedImage.id) === filteredImages.length - 1}
+                        style={{ 
+                            position: 'absolute', right: '30px', background: 'rgba(255,255,255,0.15)', 
+                            border: 'none', color: 'white', width: '55px', height: '55px', 
+                            borderRadius: '50%', cursor: 'pointer', fontSize: '20px', zIndex: 10001,
+                            transition: '0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                    >
+                        <i className="fas fa-chevron-right"></i>
+                    </button>
+
+                    <div 
+                        style={{ 
+                            position: 'relative', maxWidth: '85%', maxHeight: '85%', 
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '25px'
+                        }} 
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close Button - Adjusted position */}
                         <button 
                             onClick={() => setSelectedImage(null)}
                             style={{ 
-                                position: 'absolute', top: '-60px', right: '-10px', 
+                                position: 'absolute', top: '-15px', right: '-15px', 
                                 background: 'white', border: 'none', width: '45px', height: '45px', 
                                 borderRadius: '50%', cursor: 'pointer', fontWeight: '800', fontSize: '24px',
-                                boxShadow: '0 5px 25px rgba(227, 49, 41, 0.4)', color: '#e33129'
+                                boxShadow: '0 5px 15px rgba(227, 49, 41, 0.4)', color: '#e33129', zIndex: 10005
                             }}
                         >
                             &times;
                         </button>
+
                         <img 
+                            key={selectedImage.id}
                             src={selectedImage.image_url} 
                             alt={selectedImage.title} 
                             style={{ 
-                                maxWidth: '100%', maxHeight: '80vh', 
+                                maxWidth: '100%', maxHeight: '70vh', 
                                 borderRadius: '15px', boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-                                animation: 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                                animation: 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                                objectFit: 'contain'
                             }} 
                         />
+
+                        {/* Centered Admin Caption Bubble */}
                         <div style={{ 
-                            backgroundColor: 'white', padding: '15px 30px', borderRadius: '30px', 
-                            marginTop: '25px', textAlign: 'center', display: 'inline-block', 
-                            marginLeft: '50%', transform: 'translateX(-50%)',
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.2)', animation: 'slideUp 0.4s'
+                            backgroundColor: 'white', padding: '12px 30px', borderRadius: '30px', 
+                            textAlign: 'center', animation: 'slideUp 0.4s',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.3)', width: 'fit-content'
                         }}>
-                            <h5 style={{ margin: 0, fontWeight: 800, color: '#222', fontSize: '14px' }}>{selectedImage.title}</h5>
+                            <h5 style={{ margin: 0, fontWeight: 800, color: '#222', fontSize: '13px' }}>{selectedImage.title}</h5>
+                            <p style={{ margin: '5px 0 0 0', fontSize: '10px', color: '#999', fontWeight: '600' }}>
+                                Image {filteredImages.findIndex(i => i.id === selectedImage.id) + 1} of {filteredImages.length}
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -56,6 +56,22 @@ const GalleryArea = () => {
 
   const [selectedImage, setSelectedImage] = React.useState(null);
 
+  const handleNext = (e) => {
+    e.stopPropagation();
+    const currentIndex = filteredItems.findIndex(item => item.id === selectedImage.id);
+    if (currentIndex < filteredItems.length - 1) {
+      setSelectedImage(filteredItems[currentIndex + 1]);
+    }
+  };
+
+  const handlePrev = (e) => {
+    e.stopPropagation();
+    const currentIndex = filteredItems.findIndex(item => item.id === selectedImage.id);
+    if (currentIndex > 0) {
+      setSelectedImage(filteredItems[currentIndex - 1]);
+    }
+  };
+
   return (
     <>
       <section id="gallery_grid_area" className="section_padding">
@@ -151,32 +167,75 @@ const GalleryArea = () => {
                         animation: 'fadeIn 0.3s ease-out', cursor: 'zoom-out'
                     }}
                 >
-                    <div style={{ position: 'relative', maxWidth: '90%', maxHeight: '90%' }} onClick={(e) => e.stopPropagation()}>
+                    {/* Navigation Buttons */}
+                    <button 
+                        onClick={handlePrev}
+                        disabled={filteredItems.findIndex(i => i.id === selectedImage.id) === 0}
+                        style={{ 
+                            position: 'absolute', left: '30px', background: 'rgba(255,255,255,0.2)', 
+                            border: 'none', color: 'white', width: '60px', height: '60px', 
+                            borderRadius: '50%', cursor: 'pointer', fontSize: '24px', zIndex: 10001,
+                            transition: '0.3s', pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                    >
+                        <i className="fas fa-chevron-left"></i>
+                    </button>
+
+                    <button 
+                        onClick={handleNext}
+                        disabled={filteredItems.findIndex(i => i.id === selectedImage.id) === filteredItems.length - 1}
+                        style={{ 
+                            position: 'absolute', right: '30px', background: 'rgba(255,255,255,0.2)', 
+                            border: 'none', color: 'white', width: '60px', height: '60px', 
+                            borderRadius: '50%', cursor: 'pointer', fontSize: '24px', zIndex: 10001,
+                            transition: '0.3s', pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                    >
+                        <i className="fas fa-chevron-right"></i>
+                    </button>
+
+                    <div 
+                        style={{ 
+                            position: 'relative', maxWidth: '85%', maxHeight: '85%', 
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px'
+                        }} 
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close Button - Moved down slightly */}
                         <button 
                             onClick={() => setSelectedImage(null)}
                             style={{ 
-                                position: 'absolute', top: '-50px', right: '-10px', 
+                                position: 'absolute', top: '-15px', right: '-15px', 
                                 background: 'white', border: 'none', width: '40px', height: '40px', 
                                 borderRadius: '50%', cursor: 'pointer', fontWeight: '800', fontSize: '20px',
-                                boxShadow: '0 5px 15px rgba(227, 49, 41, 0.4)', color: '#e33129'
+                                boxShadow: '0 5px 15px rgba(227, 49, 41, 0.4)', color: '#e33129', zIndex: 10005
                             }}
                         >
                             &times;
                         </button>
+
                         <img 
+                            key={selectedImage.id}
                             src={selectedImage.image_url} 
                             alt={selectedImage.title} 
                             style={{ 
-                                maxWidth: '100%', maxHeight: '80vh', 
+                                maxWidth: '100%', maxHeight: '70vh', 
                                 borderRadius: '15px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                                animation: 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                                animation: 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                                objectFit: 'contain'
                             }} 
                         />
+
+                        {/* Centered Caption Bubble */}
                         <div style={{ 
-                            backgroundColor: 'white', padding: '20px', borderRadius: '12px', 
-                            marginTop: '20px', textAlign: 'center', animation: 'slideUp 0.4s'
+                            backgroundColor: 'white', padding: '12px 30px', borderRadius: '30px', 
+                            textAlign: 'center', animation: 'slideUp 0.4s',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.2)', width: 'fit-content'
                         }}>
-                            <h4 style={{ margin: 0, fontWeight: 800, color: '#222' }}>{selectedImage.title}</h4>
+                            <h4 style={{ margin: 0, fontWeight: 800, color: '#222', fontSize: '15px' }}>{selectedImage.title}</h4>
+                            <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: '#999', fontWeight: '600' }}>
+                                Image {filteredItems.findIndex(i => i.id === selectedImage.id) + 1} of {filteredItems.length}
+                            </p>
                         </div>
                     </div>
                 </div>
