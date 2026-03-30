@@ -66,6 +66,8 @@ const AdminViewGallery = () => {
         (img.title || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const [selectedImage, setSelectedImage] = useState(null);
+
     if (loading) return <div className="text-center p-5"><h4>Loading Gallery...</h4></div>;
 
     return (
@@ -143,11 +145,12 @@ const AdminViewGallery = () => {
                     {filteredImages.map((img) => (
                         <div key={img.id} style={{ flex: "0 0 33.333%", maxWidth: "33.333%", padding: "0 15px", marginBottom: "30px" }}>
                             <div style={{ backgroundColor: "#fcfcfc", borderRadius: "15px", overflow: "hidden", border: "1px solid #eee", transition: "transform 0.2s", position: "relative" }}>
-                                <div style={{ height: "150px", overflow: "hidden", position: "relative", cursor: "pointer" }} onClick={() => window.open(img.image_url, '_blank')}>
+                                <div style={{ height: "150px", overflow: "hidden", position: "relative", cursor: "pointer" }} onClick={() => setSelectedImage(img)}>
                                     <img 
                                         src={img.image_url} 
                                         alt={img.title} 
-                                        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                        style={{ width: "100%", height: "100%", objectFit: "cover", transition: "0.3s" }} 
+                                        className="gallery_img"
                                     />
                                     <div style={{ position: "absolute", top: "10px", right: "10px", display: "flex", gap: "5px" }} onClick={(e) => e.stopPropagation()}>
                                         <button 
@@ -178,6 +181,57 @@ const AdminViewGallery = () => {
                     )}
                 </div>
             </div>
+
+            {/* Custom Admin Image Modal */}
+            {selectedImage && (
+                <div 
+                    onClick={() => setSelectedImage(null)}
+                    style={{ 
+                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+                        backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', 
+                        zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        animation: 'fadeIn 0.3s ease-out', cursor: 'zoom-out'
+                    }}
+                >
+                    <div style={{ position: 'relative', maxWidth: '80%', maxHeight: '90%' }} onClick={(e) => e.stopPropagation()}>
+                        <button 
+                            onClick={() => setSelectedImage(null)}
+                            style={{ 
+                                position: 'absolute', top: '-60px', right: '-10px', 
+                                background: 'white', border: 'none', width: '45px', height: '45px', 
+                                borderRadius: '50%', cursor: 'pointer', fontWeight: '800', fontSize: '24px',
+                                boxShadow: '0 5px 25px rgba(227, 49, 41, 0.4)', color: '#e33129'
+                            }}
+                        >
+                            &times;
+                        </button>
+                        <img 
+                            src={selectedImage.image_url} 
+                            alt={selectedImage.title} 
+                            style={{ 
+                                maxWidth: '100%', maxHeight: '80vh', 
+                                borderRadius: '15px', boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                                animation: 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                            }} 
+                        />
+                        <div style={{ 
+                            backgroundColor: 'white', padding: '15px 30px', borderRadius: '30px', 
+                            marginTop: '25px', textAlign: 'center', display: 'inline-block', 
+                            marginLeft: '50%', transform: 'translateX(-50%)',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.2)', animation: 'slideUp 0.4s'
+                        }}>
+                            <h5 style={{ margin: 0, fontWeight: 800, color: '#222', fontSize: '14px' }}>{selectedImage.title}</h5>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <style>{`
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+                @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                .gallery_img:hover { transform: scale(1.05); filter: brightness(1.1); }
+            `}</style>
         </div>
     );
 };
