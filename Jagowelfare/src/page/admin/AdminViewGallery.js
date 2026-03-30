@@ -4,6 +4,7 @@ import { formatDate } from "../../utils/dateFormatter";
 
 const AdminViewGallery = () => {
     const [images, setImages] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -13,6 +14,12 @@ const AdminViewGallery = () => {
             const { data, error } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
             if (error) throw error;
             setImages(data || []);
+
+            // Also fetch categories to maintain order in dropdown
+            const { data: catData } = await supabase.from('gallery_categories').select('name').order('priority', { ascending: false });
+            if (catData) {
+                setCategories(catData.map(c => c.name));
+            }
         } catch (err) {
             console.error(err);
         } finally {
@@ -25,9 +32,12 @@ const AdminViewGallery = () => {
     }, []);
 
     const uniqueTitles = React.useMemo(() => {
-        const titles = images.map(img => img.title).filter(Boolean);
-        return Array.from(new Set(titles)).sort();
-    }, [images]);
+        const titlesInGallery = new Set(images.map(img => img.title).filter(Boolean));
+        if (categories.length > 0) {
+            return categories.filter(cat => titlesInGallery.has(cat));
+        }
+        return Array.from(titlesInGallery).sort();
+    }, [images, categories]);
 
     const handleDelete = async (image) => {
         if (window.confirm("Are you sure you want to delete this image?")) {

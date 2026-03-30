@@ -54,6 +54,8 @@ const GalleryArea = () => {
     !searchTerm || (item.title && item.title.toLowerCase() === searchTerm.toLowerCase())
   );
 
+  const [selectedImage, setSelectedImage] = React.useState(null);
+
   return (
     <>
       <section id="gallery_grid_area" className="section_padding">
@@ -121,13 +123,13 @@ const GalleryArea = () => {
                     </div>
                 ) : filteredItems.map((data, index)=>(
                     <div className="col-lg-4 co-md-6 col-sm-12 col-12" key={index}>
-                        <div className="gallery_item mb-4" onClick={() => window.open(data.image_url, '_blank')} style={{ cursor: 'pointer', position: 'relative' }}>
+                        <div className="gallery_item mb-4" onClick={() => setSelectedImage(data)} style={{ cursor: 'pointer', position: 'relative' }}>
                             <div className="gallery_img_wrapper" style={{ overflow: 'hidden', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}>
                                 <img src={data.image_url} alt={data.title} style={{ height: '300px', width: '100%', objectFit: 'cover', transition: 'transform 0.5s' }} className="gallery_main_img" />
                             </div>
                             <div className="gallery_overlay_custom" style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', backgroundColor: 'rgba(255,255,255,0.95)', padding: '15px', borderRadius: '12px', transform: 'translateY(10px)', opacity: 0, transition: '0.3s' }}>
                                 <h5 style={{ margin: 0, fontSize: '15px', fontWeight: '800', color: '#222' }}>{data.title || "Gallery Item"}</h5>
-                                <span style={{ fontSize: '12px', color: '#e33129', fontWeight: '700' }}>View Full Image <i className="fas fa-external-link-alt ml-1"></i></span>
+                                <span style={{ fontSize: '12px', color: '#e33129', fontWeight: '700' }}>Click to Expand <i className="fas fa-search-plus ml-1"></i></span>
                             </div>
                             <style>{`
                                 .gallery_item:hover .gallery_main_img { transform: scale(1.1); }
@@ -137,6 +139,54 @@ const GalleryArea = () => {
                     </div>
                 ))}
             </div>
+
+            {/* Custom Premium Image Modal */}
+            {selectedImage && (
+                <div 
+                    onClick={() => setSelectedImage(null)}
+                    style={{ 
+                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+                        backgroundColor: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', 
+                        zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        animation: 'fadeIn 0.3s ease-out', cursor: 'zoom-out'
+                    }}
+                >
+                    <div style={{ position: 'relative', maxWidth: '90%', maxHeight: '90%' }} onClick={(e) => e.stopPropagation()}>
+                        <button 
+                            onClick={() => setSelectedImage(null)}
+                            style={{ 
+                                position: 'absolute', top: '-50px', right: '-10px', 
+                                background: 'white', border: 'none', width: '40px', height: '40px', 
+                                borderRadius: '50%', cursor: 'pointer', fontWeight: '800', fontSize: '20px',
+                                boxShadow: '0 5px 15px rgba(227, 49, 41, 0.4)', color: '#e33129'
+                            }}
+                        >
+                            &times;
+                        </button>
+                        <img 
+                            src={selectedImage.image_url} 
+                            alt={selectedImage.title} 
+                            style={{ 
+                                maxWidth: '100%', maxHeight: '80vh', 
+                                borderRadius: '15px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                                animation: 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                            }} 
+                        />
+                        <div style={{ 
+                            backgroundColor: 'white', padding: '20px', borderRadius: '12px', 
+                            marginTop: '20px', textAlign: 'center', animation: 'slideUp 0.4s'
+                        }}>
+                            <h4 style={{ margin: 0, fontWeight: 800, color: '#222' }}>{selectedImage.title}</h4>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <style>{`
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+                @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            `}</style>
         </div>
     </section>
     </>

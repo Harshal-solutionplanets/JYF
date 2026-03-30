@@ -144,7 +144,7 @@ const AdminViewAlbums = () => {
                                     </td>
                                     <td style={{ border: "none", padding: "20px", borderTopRightRadius: "15px", borderBottomRightRadius: "15px", textAlign: "center" }}>
                                         <span style={{ backgroundColor: "#eee", padding: "5px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "700", color: "#666" }}>
-                                            Order: {albums.length - index}
+                                            Order: {index + 1}
                                         </span>
                                     </td>
                                 </tr>
