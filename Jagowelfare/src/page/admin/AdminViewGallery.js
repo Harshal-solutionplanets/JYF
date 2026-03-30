@@ -67,16 +67,62 @@ const AdminViewGallery = () => {
                         <p style={{ color: "#888", fontSize: "14px", marginTop: "5px" }}>View and manage uploaded images</p>
                     </div>
                     <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-                        <select 
-                            value={searchTerm} 
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{ padding: "10px 15px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "14px", minWidth: "250px", backgroundColor: "#f9f9f9" }}
-                        >
-                            <option value="">Filter by Caption (All)</option>
-                            {uniqueTitles.map(t => (
-                                <option key={t} value={t}>{t}</option>
-                            ))}
-                        </select>
+                        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                            <select 
+                                value={searchTerm} 
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{ padding: "10px 15px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "14px", minWidth: "250px", backgroundColor: "#f9f9f9" }}
+                            >
+                                <option value="">Filter by Caption (All)</option>
+                                {uniqueTitles.map(t => (
+                                    <option key={t} value={t}>{t}</option>
+                                ))}
+                            </select>
+                            
+                            {searchTerm && (
+                                <button 
+                                    onClick={async () => {
+                                        const newTitle = window.prompt("Enter new name for this category:", searchTerm);
+                                        if (newTitle && newTitle !== searchTerm) {
+                                            if (window.confirm(`Are you sure you want to rename '${searchTerm}' to '${newTitle}'? This will update all ${filteredImages.length} images.`)) {
+                                                try {
+                                                    setLoading(true);
+                                                    const { error } = await supabase
+                                                        .from('gallery')
+                                                        .update({ title: newTitle })
+                                                        .eq('title', searchTerm);
+                                                    
+                                                    if (error) throw error;
+                                                    
+                                                    alert("Category renamed successfully!");
+                                                    setSearchTerm(newTitle);
+                                                    await fetchImages();
+                                                } catch (err) {
+                                                    alert("Rename failed: " + err.message);
+                                                } finally {
+                                                    setLoading(false);
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    style={{ 
+                                        backgroundColor: "#e33129", 
+                                        color: "white", 
+                                        border: "none", 
+                                        padding: "10px 15px", 
+                                        borderRadius: "10px", 
+                                        cursor: "pointer",
+                                        fontSize: "14px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "5px"
+                                    }}
+                                    title="Rename Category"
+                                >
+                                    <i className="fas fa-edit"></i> Edit Name
+                                </button>
+                            )}
+                        </div>
                         <span className="badge" style={{ backgroundColor: "#e3312915", color: "#e33129", padding: "10px 20px", borderRadius: "30px", fontWeight: "700" }}>
                             {filteredImages.length} Images
                         </span>
