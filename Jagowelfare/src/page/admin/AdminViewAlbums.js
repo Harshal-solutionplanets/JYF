@@ -117,6 +117,19 @@ const AdminViewAlbums = () => {
         }
     };
 
+    const handleDeleteAlbum = async (album) => {
+        if (window.confirm(`Are you sure you want to delete the album "${album.name}"? This will not delete the images, only the album entry for reordering.`)) {
+            try {
+                const { error } = await supabase.from('gallery_categories').delete().eq('id', album.id);
+                if (error) throw error;
+                setAlbums(albums.filter(a => a.id !== album.id));
+                alert("Album removed successfully!");
+            } catch (err) {
+                alert("Failed to delete album: " + err.message);
+            }
+        }
+    };
+
     if (loading) return <div className="text-center p-5"><h4>Loading Albums...</h4></div>;
 
     return (
@@ -169,11 +182,12 @@ const AdminViewAlbums = () => {
                                         <div style={{ fontWeight: "700", color: "#333", fontSize: "16px" }}>{album.name}</div>
                                     </td>
                                     <td style={{ border: "none", padding: "20px", textAlign: "center" }}>
-                                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                                        <div style={{ display: "flex", gap: "8px", justifyContent: "center", alignItems: "center" }}>
                                             <button 
                                                 disabled={index === 0}
                                                 onClick={(e) => { e.stopPropagation(); handleMove(index, 'up'); }}
                                                 style={{ padding: "5px 12px", borderRadius: "8px", border: "1px solid #ddd", backgroundColor: index === 0 ? "#f9f9f9" : "#fff", cursor: index === 0 ? "not-allowed" : "pointer" }}
+                                                title="Move Up"
                                             >
                                                 <i className="fas fa-chevron-up" style={{ color: index === 0 ? "#ccc" : "#e33129" }}></i>
                                             </button>
@@ -181,8 +195,16 @@ const AdminViewAlbums = () => {
                                                 disabled={index === albums.length - 1}
                                                 onClick={(e) => { e.stopPropagation(); handleMove(index, 'down'); }}
                                                 style={{ padding: "5px 12px", borderRadius: "8px", border: "1px solid #ddd", backgroundColor: index === albums.length - 1 ? "#f9f9f9" : "#fff", cursor: index === albums.length - 1 ? "not-allowed" : "pointer" }}
+                                                title="Move Down"
                                             >
                                                 <i className="fas fa-chevron-down" style={{ color: index === albums.length - 1 ? "#ccc" : "#e33129" }}></i>
+                                            </button>
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteAlbum(album); }}
+                                                style={{ padding: "5px 12px", borderRadius: "8px", border: "1px solid #fee2e2", backgroundColor: "#fff5f5", cursor: "pointer", marginLeft: "10px" }}
+                                                title="Delete Album Entry"
+                                            >
+                                                <i className="fas fa-trash-alt" style={{ color: "#ef4444" }}></i>
                                             </button>
                                         </div>
                                     </td>
