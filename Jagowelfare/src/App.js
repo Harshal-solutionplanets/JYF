@@ -27,6 +27,7 @@ import FaqsPage from "./page/Faqs";
 import PrivacyPolicy from "./page/PrivacyPolicy";
 import TermsServicePage from "./page/TermsService";
 import ContactPage from "./page/Contact";
+import VolunteerPage from "./page/VolunteerPage";
 import Error from "./page/Error";
 import MyTicketsPage from "./page/MyTickets";
 import RequireStaff from "./page/admin/RequireStaff";
@@ -131,6 +132,7 @@ const App = () => {
         <Route path="/education" element={<EducationPage />} />
         <Route path="/humanitarian-services" element={<HumanitarianServicesPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/volunteer" element={<VolunteerPage />} />
         <Route path="*" element={<Error />} />
       </Routes>
       {!isAdminRoute && (

@@ -31,10 +31,9 @@ const DashboardOverview = () => {
   );
 };
 
-const MasterManagementView = ({ type, title, masters, onAdd, onDelete, categoryInput, setCategoryInput, seatTierInput, setSeatTierInput }) => {
-  const isCat = type === 'event_category';
-  const val = isCat ? categoryInput : seatTierInput;
-  const setVal = isCat ? setCategoryInput : setSeatTierInput;
+const MasterManagementView = ({ type, title, masters, onAdd, onDelete, value, setValue, placeholder }) => {
+  const val = value;
+  const setVal = setValue;
 
   return (
     <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>
@@ -43,7 +42,7 @@ const MasterManagementView = ({ type, title, masters, onAdd, onDelete, categoryI
       <div style={{ display: "flex", gap: "10px", marginBottom: "40px", maxWidth: "400px" }}>
         <input
           type="text"
-          placeholder={`Enter new ${isCat ? 'Category' : 'Seat Type'}...`}
+          placeholder={placeholder || `Enter new ${title}...`}
           style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "12px 15px", width: "100%", fontSize: "15px" }}
           value={val}
           onChange={(e) => setVal(e.target.value)}
@@ -101,6 +100,7 @@ const AdminDashboardPage = () => {
   const [activeView, setActiveView] = useState(isScannerOnly ? "qr_scanner" : "dashboard");
   const [categoryInput, setCategoryInput] = useState("");
   const [seatTierInput, setSeatTierInput] = useState("");
+  const [honoraryInput, setHonoraryInput] = useState("");
   const [masters, setMasters] = useState([]);
   const [openSubMenus, setOpenSubMenus] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -216,6 +216,7 @@ const AdminDashboardPage = () => {
         "view_registrations": "Event Registrations",
         "manage_master_cat": "Event Category Master",
         "manage_master_seat": "Seats Type Master",
+        "manage_honorary": "Honorary Volunteers Master",
         "dashboard_updates": "Global Site Updates",
         "qr_scanner": "QR Entry Scanner"
     };
@@ -255,8 +256,9 @@ const AdminDashboardPage = () => {
       case "edit_supporter": return <AdminAddSupporter supporterData={editingSupporter} onPublish={() => { setEditingSupporter(null); setActiveView("view_supporter"); }} />;
       case "view_supporter": return <AdminViewSupporter onEdit={handleEditSupporter} />;
       case "view_registrations": return <AdminViewRegistrations />;
-      case "manage_master_cat": return <MasterManagementView type="event_category" title="Event Category Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} categoryInput={categoryInput} setCategoryInput={setCategoryInput} />;
-      case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} seatTierInput={seatTierInput} setSeatTierInput={setSeatTierInput} />;
+      case "manage_master_cat": return <MasterManagementView type="event_category" title="Event Category Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} value={categoryInput} setValue={setCategoryInput} placeholder="Enter new Category..." />;
+      case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} value={seatTierInput} setValue={setSeatTierInput} placeholder="Enter new Seat Type..." />;
+      case "manage_honorary": return <MasterManagementView type="honorary_volunteer" title="Honorary Volunteers Management" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} value={honoraryInput} setValue={setHonoraryInput} placeholder="Enter Name..." />;
       case "dashboard_updates": return <AdminDashboardUpdates />;
       default:
         return <DashboardOverview />;
@@ -390,6 +392,12 @@ const AdminDashboardPage = () => {
                           style={{ ...subItemStyle, display: "flex", justifyContent: "space-between", alignItems: "center", color: activeView === "manage_master_seat" ? "#ca1e14" : "#444", fontWeight: "600", borderTop: "1px solid #eee", paddingTop: "10px", marginTop: "5px" }}
                         >
                           <span>Seats Type Master</span>
+                        </div>
+                        <div
+                          onClick={() => setActiveView("manage_honorary")}
+                          style={{ ...subItemStyle, display: "flex", justifyContent: "space-between", alignItems: "center", color: activeView === "manage_honorary" ? "#ca1e14" : "#444", fontWeight: "600", borderTop: "1px solid #eee", paddingTop: "10px", marginTop: "5px" }}
+                        >
+                          <span>Honorary Volunteers</span>
                         </div>
                       </div>
                     ) : item.view ? (

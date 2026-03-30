@@ -20,6 +20,10 @@ export const HeaderData = [
     link: "/gallery",
   },
   {
+    menu: "Volunteer",
+    link: "/volunteer",
+  },
+  {
     menu: "Contact",
     link: "/contact",
   },

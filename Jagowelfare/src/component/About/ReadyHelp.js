@@ -60,28 +60,24 @@ const ReadyHelp = () => {
                     </div>
                     <div className="row justify-content-center">
                         {displayData.map((data, index) => (
-                            <div className="col-lg-3 col-md-4 col-sm-6 col-12" key={index}>
-                                <div className="volunteer_wrapper" style={{ marginBottom: "30px" }}>
-                                    <div className="volunteer_img" style={{ height: "400px", overflow: "hidden" }}>
+                            <div className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4" key={index}>
+                                <div className="volunteer_wrapper" style={{ height: "100%", backgroundColor: "#fff", borderRadius: "15px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", border: "1px solid #f0f0f0", display: "flex", flexDirection: "column" }}>
+                                    <div className="volunteer_img" style={{ height: "350px", overflow: "hidden", flexShrink: 0 }}>
                                         <img 
                                             src={data.image_url || DefaultImg} 
                                             alt="img" 
-                                            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} 
+                                            style={{ 
+                                                width: "100%", 
+                                                height: "100%", 
+                                                objectFit: "cover", 
+                                                objectPosition: "top center" 
+                                            }} 
                                         />
-                                        <div className="volunteer_icon">
-                                            <ul>
-                                                {data.company_url && (
-                                                    <li>
-                                                        <a href={data.company_url} target="_blank" rel="noopener noreferrer" title={data.company_name}><i className="fas fa-link"></i></a>
-                                                    </li>
-                                                )}
-                                            </ul>
-                                        </div>
                                     </div>
 
-                                    <div className="volunteer_text">
-                                        <h3><a href="#!">{data.name}</a></h3>
-                                        <p>{data.role || data.title}</p>
+                                    <div className="volunteer_text" style={{ padding: "20px", textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                                        <h3 style={{ fontSize: "19px", fontWeight: "700", marginBottom: "5px", color: "#222" }}>{data.name}</h3>
+                                        <p style={{ margin: 0, color: "#666", fontSize: "13px", lineHeight: "1.4" }}>{data.role || data.title}</p>
                                     </div>
                                 </div>
                             </div>

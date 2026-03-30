@@ -49,24 +49,23 @@ const TeamArea = () => {
                 ) : (
                     team.map((data, index)=>(
                         <div className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4" key={index}>
-                        <div className="volunteer_wrapper">
-                            <div className="volunteer_img">
-                                <img src={data.image_url || "/default-avatar.png"} alt="img" style={{ height: "300px", objectFit: "cover", width: "100%" }} />
-                                <div className="volunteer_icon">
-                                    <ul>
-                                        <li>
-                                            <a href="https://www.facebook.com/groups/jyf.mulund/" target="_blank"><i className="fab fa-facebook"></i></a>
-                                        </li>
-                                        <li>
-                                            <a href="https://x.com/jyf_india" target="_blank"><i className="fab fa-x-twitter"></i></a>
-                                        </li>
-                                    </ul>
-                                </div>
+                        <div className="volunteer_wrapper" style={{ height: "100%", backgroundColor: "#fff", borderRadius: "15px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", border: "1px solid #f0f0f0", display: "flex", flexDirection: "column" }}>
+                            <div className="volunteer_img" style={{ height: "350px", overflow: "hidden", flexShrink: 0 }}>
+                                <img 
+                                    src={data.image_url || "/default-avatar.png"} 
+                                    alt="img" 
+                                    style={{ 
+                                        height: "100%", 
+                                        objectFit: "cover", 
+                                        width: "100%", 
+                                        objectPosition: "top center" 
+                                    }} 
+                                />
                             </div>
     
-                            <div className="volunteer_text">
-                                <h3><a href="#!">{data.name}</a></h3>
-                                <p>{data.role}</p>
+                            <div className="volunteer_text" style={{ padding: "20px", textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                                <h3 style={{ fontSize: "19px", fontWeight: "700", marginBottom: "5px", color: "#222" }}>{data.name}</h3>
+                                <p style={{ margin: 0, color: "#666", fontSize: "13px", lineHeight: "1.4" }}>{data.role}</p>
                             </div>
                         </div>
                     </div>
