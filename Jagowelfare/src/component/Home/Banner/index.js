@@ -9,21 +9,26 @@ import Element3 from "../../../assets/img/banner/element-3.png"
 import { supabase } from "../../../supabase";
 
 const HomeBanner = () => {
-    const [config, setConfig] = React.useState({
-        title: "Unity in commUNITY",
-        description: "Jain Youth Foundation is dedicated to empowering lives through service and welfare. Join us in making a difference.",
-        image_url: BannerImg,
-    });
+    const [config, setConfig] = React.useState(null);
+    const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         const fetchConfig = async () => {
-            const { data } = await supabase.from('site_config').select('*').eq('key', 'home_hero').single();
-            if (data && data.value) {
-                setConfig(data.value);
+            try {
+                const { data } = await supabase.from('site_config').select('*').eq('key', 'home_hero').single();
+                if (data && data.value) {
+                    setConfig(data.value);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
             }
         };
         fetchConfig();
     }, []);
+
+    if (loading || !config) return <div style={{ height: "400px", backgroundColor: "#f8f9fa" }}></div>;
 
     return (
         <>

@@ -60,9 +60,11 @@ const TrendingCauses = () => {
           </div>
           <div className="row">
             {loading ? (
-              <div className="col-12 text-center"><p>Loading causes...</p></div>
+              <div className="col-12 text-center p-5" style={{ minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                 <div className="spinner-border text-danger" role="status"><span className="sr-only">Loading...</span></div>
+              </div>
             ) : causes.length === 0 ? (
-              <div className="col-12 text-center"><p>No trending causes uploaded yet.</p></div>
+              <div className="col-12 text-center p-5"><p>No trending causes uploaded yet.</p></div>
             ) : (
               causes.map((data) => {
                 const firstImage = (data.image_url || "").split(',')[0];
