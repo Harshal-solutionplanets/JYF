@@ -33,9 +33,8 @@ const VolunteerArea = () => {
             <div className="row">
                 <div className="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
                     <div className="section_heading">
-                        <h3>Our Team & Volunteers</h3>
-                        <h2> We are proud of our
-                            dedicated <span className="color_big_heading">volunteers</span></h2>
+                        <h2> Volunteer
+                            <span className="color_big_heading"> Team</span></h2>
                     </div>
                 </div>
             </div>

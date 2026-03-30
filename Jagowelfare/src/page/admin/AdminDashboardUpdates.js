@@ -38,7 +38,8 @@ const AdminDashboardUpdates = () => {
         about: { heading: "About Us", image_url: "" },
         gallery: { heading: "Gallery", image_url: "" },
         contact: { heading: "Contact Us", image_url: "" },
-        team: { heading: "Volunteering Team", image_url: "" },
+        team: { heading: "Team Members", image_url: "" },
+        volunteer: { heading: "Volunteer Team", image_url: "" },
         testimonials: { heading: "Supporter Feedback", image_url: "" },
         admin_login: { heading: "Admin Login", image_url: "" },
     });
