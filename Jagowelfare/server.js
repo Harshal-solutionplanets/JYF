@@ -19,8 +19,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS
+    user: process.env.GMAIL_USER || 'donotreply@jainyouth.in',
+    pass: process.env.GMAIL_PASS || 'fona izov qhkg uwhy'
   }
 });
 
@@ -62,7 +62,7 @@ app.post('/api/send-ticket', async (req, res) => {
       let pdfData = Buffer.concat(buffers);
 
       const mailOptions = {
-        from: process.env.GMAIL_USER,
+        from: process.env.GMAIL_USER || 'donotreply@jainyouth.in',
         to: recipientEmail,
         subject: `Your Bhakti Sandhya Ticket: ${recipientName}`,
         text: ` ${recipientName}, please find your official ticket for ${eventTitle} attached to this email. \n\nTicket ID: ${ticketId}\nVenue: ${venue}\nDate: ${date}`,

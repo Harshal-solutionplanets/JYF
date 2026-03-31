@@ -73,13 +73,13 @@ export default async function handler(req, res) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
+        user: process.env.GMAIL_USER || 'donotreply@jainyouth.in',
+        pass: process.env.GMAIL_PASS || 'fona izov qhkg uwhy'
       }
     });
 
     await transporter.sendMail({
-      from: `"Jain Youth Foundation" <${process.env.GMAIL_USER}>`,
+      from: `"Jain Youth Foundation" <${process.env.GMAIL_USER || 'donotreply@jainyouth.in'}>`,
       to: recipientEmail,
       subject: `Official Ticket: ${eventTitle}`,
       text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nEvent: ${eventTitle}\nTicket ID: ${ticketId}\n\nThank you,\nJain Youth Foundation`,
