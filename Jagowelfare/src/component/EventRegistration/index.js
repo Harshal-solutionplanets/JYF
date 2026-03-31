@@ -433,7 +433,10 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                                     <GoldenTicket registration={reg} event={event} />
                                                 </div>
                                                 <div className="mt-3">
-                                                    <p className="text-muted small">The official ticket has been sent to <strong>{reg.email}</strong></p>
+                                                    <p className="text-muted small">
+                                                        The official ticket has also been sent to <strong>{reg.email}</strong> which will be scanned at the Venue on the Event Date.<br/>
+                                                        Please check the SPAM/Junk folder of your mailbox also in case you don't find it in your Inbox.
+                                                    </p>
                                                     <button 
                                                         className="btn btn-outline-dark btn-sm" 
                                                         onClick={() => {
