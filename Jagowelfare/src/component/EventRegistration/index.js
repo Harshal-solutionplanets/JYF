@@ -47,14 +47,17 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
         const fetchEvent = async () => {
             try {
                 setLoading(true);
-                // 1. Fetch event from Supabase
-                const { data, error: sbError } = await supabase
-                    .from("events")
-                    .select("*")
-                    .eq("id", eventId)
-                    .single();
+                // Parallelize fetches for better performance
+                const [eventRes, regRes] = await Promise.all([
+                    supabase.from("events").select("*").eq("id", eventId).single(),
+                    supabase.from('event_registrations').select('selected_section').eq('event_id', eventId)
+                ]);
 
-                if (sbError) throw sbError;
+                if (eventRes.error) throw eventRes.error;
+                if (regRes.error) throw regRes.error;
+
+                const data = eventRes.data;
+                const regList = regRes.data;
                 
                 // Safety check: if registration not required, redirect or error
                 if (data.description?.includes("REG_TYPE: not_required")) {
@@ -82,46 +85,38 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                              // legacy support for old object format
                              names = Object.keys(parsed).filter(k => parsed[k].enabled);
                              fullList = Object.keys(parsed).map(k => ({ name: k, seats: parsed[k].seats, enabled: parsed[k].enabled }));
-                        }
-                        
-                        setAvailableSections(names);
-                        setSectionsList(fullList);
-                        if (names.length > 0) setSelectedSection(names[0]);
-                    } catch (e) {
-                        console.error("Failed to parse sections", e);
-                    }
-                }
-
-                // 2. Fetch all registrations for this event safely
-                const { data: regList, error: countError } = await supabase
-                    .from('event_registrations')
-                    .select('selected_section')
-                    .eq('event_id', eventId);
-                
-                if (countError) throw countError;
-                
-                const currentCounts = {};
-                (regList || []).forEach(r => {
-                    const s = r.selected_section || "General";
-                    currentCounts[s] = (currentCounts[s] || 0) + 1;
-                });
-                
-                setSectionBookedCounts(currentCounts);
-                setBookedCount(regList?.length || 0);
-                
-                if (data.seatsAvailable && (regList?.length || 0) >= data.seatsAvailable) {
-                    setIsSoldOut(true);
-                }
-
-            } catch (err) {
-                setError(err?.message || "Failed to load event");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (eventId) fetchEvent();
-    }, [eventId]);
+                         }
+                         
+                         setAvailableSections(names);
+                         setSectionsList(fullList);
+                         if (names.length > 0) setSelectedSection(names[0]);
+                     } catch (e) {
+                         console.error("Failed to parse sections", e);
+                     }
+                 }
+ 
+                 const currentCounts = {};
+                 (regList || []).forEach(r => {
+                     const s = r.selected_section || "General";
+                     currentCounts[s] = (currentCounts[s] || 0) + 1;
+                 });
+                 
+                 setSectionBookedCounts(currentCounts);
+                 setBookedCount(regList?.length || 0);
+                 
+                 if (data.seatsAvailable && (regList?.length || 0) >= data.seatsAvailable) {
+                     setIsSoldOut(true);
+                 }
+ 
+             } catch (err) {
+                 setError(err?.message || "Failed to load event");
+             } finally {
+                 setLoading(false);
+             }
+         };
+ 
+         if (eventId) fetchEvent();
+     }, [eventId]);
 
     useEffect(() => {
         // Only pre-fill if it's NOT a staff member (to allow easy testing/manual entry by staff)
@@ -261,16 +256,29 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                         <h6 style={{ color: "#155724", fontWeight: "700", marginBottom: "15px" }}>⚠️ Important Note:</h6>
                                         <ul style={{ 
                                             margin: 0, 
-                                            paddingLeft: "1.5rem", 
+                                            padding: 0, 
                                             color: "#333", 
                                             fontSize: "15px", 
-                                            lineHeight: "1.6",
-                                            fontWeight: "500"
+                                            lineHeight: "1.8",
+                                            fontWeight: "500",
+                                            listStyle: "none"
                                         }}>
-                                            <li>Kindly register only if you are certain to attend, as seats are limited.</li>
-                                            <li>One registration per mobile number will be considered.</li>
-                                            <li>Entry will be on a first-come, first-served basis — registration does not guarantee a reserved seat.</li>
-                                            <li>Guests are requested to arrive on time to avoid inconvenience.</li>
+                                            <li style={{ marginBottom: "10px", display: "flex", alignItems: "flex-start" }}>
+                                                <span style={{ color: "#e33129", marginRight: "12px", fontSize: "14px", marginTop: "2px" }}>●</span>
+                                                <span>Kindly register only if you are certain to attend, as seats are limited.</span>
+                                            </li>
+                                            <li style={{ marginBottom: "10px", display: "flex", alignItems: "flex-start" }}>
+                                                <span style={{ color: "#e33129", marginRight: "12px", fontSize: "14px", marginTop: "2px" }}>●</span>
+                                                <span>One registration per mobile number will be considered.</span>
+                                            </li>
+                                            <li style={{ marginBottom: "10px", display: "flex", alignItems: "flex-start" }}>
+                                                <span style={{ color: "#e33129", marginRight: "12px", fontSize: "14px", marginTop: "2px" }}>●</span>
+                                                <span>Entry will be on a first-come, first-served basis — registration does not guarantee a reserved seat.</span>
+                                            </li>
+                                            <li style={{ display: "flex", alignItems: "flex-start" }}>
+                                                <span style={{ color: "#e33129", marginRight: "12px", fontSize: "14px", marginTop: "2px" }}>●</span>
+                                                <span>Guests are requested to arrive on time to avoid inconvenience.</span>
+                                            </li>
                                         </ul>
                                     </div>
 
