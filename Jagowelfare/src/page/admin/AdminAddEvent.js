@@ -59,7 +59,7 @@ const AdminAddEvent = ({ onPublish, eventData }) => {
 
     const fetchMasters = async () => {
         try {
-            const { data, error } = await supabase.from('masters').select('*');
+            const { data, error } = await supabase.from('masters').select('*').order('priority', { ascending: false }).order('created_at', { ascending: false });
             if (error) throw error;
             setCategoryMasters(data.filter(m => m.type === 'event_category').map(m => m.value));
             setSeatTierMasters(data.filter(m => m.type === 'seat_tier').map(m => m.value));

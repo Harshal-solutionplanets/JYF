@@ -31,25 +31,73 @@ const DashboardOverview = () => {
   );
 };
 
-const MasterManagementView = ({ type, title, masters, onAdd, onDelete, value, setValue, placeholder }) => {
-  const val = value;
-  const setVal = setValue;
+const MasterManagementView = ({ type, title, masters, onAdd, onDelete, onUpdate, onReorder, value, setValue, placeholder }) => {
+  const [editingId, setEditingId] = useState(null);
+  const [editingValue, setEditingValue] = useState("");
+  const [draggedIndex, setDraggedIndex] = useState(null);
+
+  const startEdit = (m) => {
+    setEditingId(m.id);
+    setEditingValue(m.value);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingValue("");
+  };
+
+  const saveEdit = () => {
+    if (editingValue.trim()) {
+      onUpdate(editingId, editingValue.trim());
+      setEditingId(null);
+      setEditingValue("");
+    }
+  };
+
+  const filteredMasters = masters.filter(m => m.type === type);
+
+  const onDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const onDragOver = (e, index) => {
+    e.preventDefault();
+  };
+
+  const onDrop = async (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === index) return;
+
+    const newMasters = [...filteredMasters];
+    const itemToMove = newMasters.splice(draggedIndex, 1)[0];
+    newMasters.splice(index, 0, itemToMove);
+    
+    // Call reorder handler
+    onReorder(newMasters);
+    setDraggedIndex(null);
+  };
 
   return (
     <div style={{ backgroundColor: "#fff", padding: "40px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>
-      <h3 style={{ marginBottom: "30px", fontWeight: "800", color: "#222" }}>{title}</h3>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
+        <div>
+          <h3 style={{ margin: 0, fontWeight: "800", color: "#222" }}>{title}</h3>
+          <p style={{ margin: 0, fontSize: "12px", color: "#ca1e14", marginTop: "5px" }}>Tip: Drag any row to reorder items</p>
+        </div>
+      </div>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "40px", maxWidth: "400px" }}>
         <input
           type="text"
           placeholder={placeholder || `Enter new ${title}...`}
           style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "12px 15px", width: "100%", fontSize: "15px" }}
-          value={val}
-          onChange={(e) => setVal(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && onAdd(type, val, setVal)}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && onAdd(type, value, setValue)}
         />
         <button
-          onClick={() => onAdd(type, val, setVal)}
+          onClick={() => onAdd(type, value, setValue)}
           className="btn btn_theme"
           style={{ padding: "0 25px", borderRadius: "8px", fontWeight: "700" }}
         >
@@ -61,27 +109,69 @@ const MasterManagementView = ({ type, title, masters, onAdd, onDelete, value, se
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ backgroundColor: "#f4f6f9", borderBottom: "1px solid #eee" }}>
+              <th style={{ padding: "15px 20px", textAlign: "left", color: "#666", textTransform: "uppercase", fontSize: "13px", width: "40px" }}></th>
               <th style={{ padding: "15px 20px", textAlign: "left", color: "#666", textTransform: "uppercase", fontSize: "13px" }}>Types</th>
               <th style={{ padding: "15px 20px", textAlign: "right", color: "#666", textTransform: "uppercase", fontSize: "13px" }}>Action</th>
             </tr>
           </thead>
           <tbody>
-            {masters.filter(m => m.type === type).map((m) => (
-              <tr key={m.id} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "15px 20px", fontWeight: "600", color: "#333" }}>{m.value}</td>
+            {filteredMasters.map((m, index) => (
+              <tr 
+                key={m.id} 
+                draggable
+                onDragStart={(e) => onDragStart(e, index)}
+                onDragOver={(e) => onDragOver(e, index)}
+                onDrop={(e) => onDrop(e, index)}
+                style={{ 
+                  borderBottom: "1px solid #eee",
+                  cursor: "grab",
+                  backgroundColor: draggedIndex === index ? "#f9f9f9" : "transparent"
+                }}
+              >
+                <td style={{ padding: "15px 20px", color: "#ccc" }}>
+                  <i className="fas fa-grip-vertical"></i>
+                </td>
+                <td style={{ padding: "15px 20px", fontWeight: "600", color: "#333" }}>
+                  {editingId === m.id ? (
+                    <input 
+                      type="text" 
+                      value={editingValue} 
+                      onChange={(e) => setEditingValue(e.target.value)} 
+                      style={{ border: "1px solid #ddd", borderRadius: "4px", padding: "5px 10px", width: "100%" }}
+                      autoFocus
+                    />
+                  ) : (
+                    m.value
+                  )}
+                </td>
                 <td style={{ padding: "15px 20px", textAlign: "right" }}>
-                  <button
-                    onClick={() => onDelete(m.id)}
-                    style={{ background: "none", border: "none", color: "#ca1e14", cursor: "pointer", fontSize: "18px" }}
-                  >
-                    <i className="fas fa-trash-alt"></i>
-                  </button>
+                  <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                    {editingId === m.id ? (
+                      <>
+                        <button onClick={saveEdit} style={{ background: "none", border: "none", color: "#28a745", cursor: "pointer", fontSize: "18px" }}>
+                          <i className="fas fa-check"></i>
+                        </button>
+                        <button onClick={cancelEdit} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: "18px" }}>
+                          <i className="fas fa-times"></i>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => startEdit(m)} style={{ background: "none", border: "none", color: "#f39c12", cursor: "pointer", fontSize: "18px" }}>
+                          <i className="fas fa-edit"></i>
+                        </button>
+                        <button onClick={() => onDelete(m.id)} style={{ background: "none", border: "none", color: "#ca1e14", cursor: "pointer", fontSize: "18px" }}>
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
-            {masters.filter(m => m.type === type).length === 0 && (
+            {filteredMasters.length === 0 && (
               <tr>
-                <td colSpan="2" style={{ padding: "30px", textAlign: "center", color: "#999" }}>No items found. Add one above.</td>
+                <td colSpan="3" style={{ padding: "30px", textAlign: "center", color: "#999" }}>No items found. Add one above.</td>
               </tr>
             )}
           </tbody>
@@ -113,9 +203,15 @@ const AdminDashboardPage = () => {
 
   const fetchMasters = async () => {
     try {
-      const { data, error } = await supabase.from('masters').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
-      setMasters(data || []);
+      const { data, error } = await supabase.from('masters').select('*').order('priority', { ascending: false }).order('created_at', { ascending: false });
+      if (error) {
+        console.warn("Priority column might be missing. Using date sorting.", error);
+        const { data: fallback, error: fallbackError } = await supabase.from('masters').select('*').order('created_at', { ascending: false });
+        if (fallbackError) throw fallbackError;
+        setMasters(fallback || []);
+      } else {
+        setMasters(data || []);
+      }
     } catch (e) {
       console.error("Error fetching masters:", e);
     }
@@ -169,14 +265,51 @@ const AdminDashboardPage = () => {
   const handleAddMaster = async (type, value, setInput) => {
     if (!value.trim()) return;
     try {
-      const { error } = await supabase.from('masters').insert([{ type, value: value.trim() }]);
+      const { data: lastItem } = await supabase.from('masters').select('priority').order('priority', { ascending: false }).limit(1);
+      const nextPriority = lastItem && lastItem[0] ? (lastItem[0].priority || 0) + 1 : 1;
+
+      const { error } = await supabase.from('masters').insert([{ type, value: value.trim(), priority: nextPriority }]);
       if (error) throw error;
       alert(`New ${type.replace("_", " ")} added: ${value}`);
       setInput("");
       fetchMasters();
     } catch (e) {
       console.error(e);
-      alert("Error adding master. Make sure the 'masters' table exists in Supabase.");
+      alert("Error adding master.");
+    }
+  };
+
+  const handleUpdateMaster = async (id, newValue) => {
+    try {
+      const { error } = await supabase.from('masters').update({ value: newValue }).eq('id', id);
+      if (error) throw error;
+      fetchMasters();
+    } catch (e) {
+      console.error(e);
+      alert("Error updating master.");
+    }
+  };
+
+  const handleReorderMasters = async (newOrderedList) => {
+    try {
+      // Optimistic update
+      setMasters(prev => {
+        const otherTypes = prev.filter(p => !newOrderedList.find(n => n.id === p.id));
+        const updatedList = [...otherTypes, ...newOrderedList];
+        return updatedList.sort((a,b) => (b.priority || 0) - (a.priority || 0));
+      });
+
+      const updates = newOrderedList.map((m, i) => ({
+        id: m.id,
+        priority: newOrderedList.length - i
+      }));
+
+      for (const update of updates) {
+        await supabase.from('masters').update({ priority: update.priority }).eq('id', update.id);
+      }
+      fetchMasters();
+    } catch (e) {
+      console.error("Master reorder failed", e);
     }
   };
 
@@ -256,9 +389,9 @@ const AdminDashboardPage = () => {
       case "edit_supporter": return <AdminAddSupporter supporterData={editingSupporter} onPublish={() => { setEditingSupporter(null); setActiveView("view_supporter"); }} />;
       case "view_supporter": return <AdminViewSupporter onEdit={handleEditSupporter} />;
       case "view_registrations": return <AdminViewRegistrations />;
-      case "manage_master_cat": return <MasterManagementView type="event_category" title="Event Category Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} value={categoryInput} setValue={setCategoryInput} placeholder="Enter new Category..." />;
-      case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} value={seatTierInput} setValue={setSeatTierInput} placeholder="Enter new Seat Type..." />;
-      case "manage_honorary": return <MasterManagementView type="honorary_volunteer" title="Honorary Volunteers Management" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} value={honoraryInput} setValue={setHonoraryInput} placeholder="Enter Name..." />;
+      case "manage_master_cat": return <MasterManagementView type="event_category" title="Event Category Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} onUpdate={handleUpdateMaster} onReorder={handleReorderMasters} value={categoryInput} setValue={setCategoryInput} placeholder="Enter new Category..." />;
+      case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} onUpdate={handleUpdateMaster} onReorder={handleReorderMasters} value={seatTierInput} setValue={setSeatTierInput} placeholder="Enter new Seat Type..." />;
+      case "manage_honorary": return <MasterManagementView type="honorary_volunteer" title="Honorary Volunteers Management" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} onUpdate={handleUpdateMaster} onReorder={handleReorderMasters} value={honoraryInput} setValue={setHonoraryInput} placeholder="Enter Name..." />;
       case "dashboard_updates": return <AdminDashboardUpdates />;
       default:
         return <DashboardOverview />;

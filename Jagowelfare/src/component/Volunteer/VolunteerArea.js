@@ -12,7 +12,7 @@ const VolunteerArea = () => {
         const { data: teamData, error: teamError } = await supabase.from('team').select('*').order('priority', { ascending: false }).order('created_at', { ascending: false });
         if (!teamError) setTeam(teamData || []);
 
-        const { data: honData, error: honError } = await supabase.from('masters').select('*').eq('type', 'honorary_volunteer').order('created_at', { ascending: true });
+        const { data: honData, error: honError } = await supabase.from('masters').select('*').eq('type', 'honorary_volunteer').order('priority', { ascending: false }).order('created_at', { ascending: false });
         if (!honError) setHonorary(honData || []);
 
       } catch (err) {
