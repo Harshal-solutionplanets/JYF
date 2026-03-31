@@ -300,7 +300,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                                 <div className="col-12 mt-3">
                                                     <div style={{ padding: "10px", backgroundColor: isSoldOut ? "#feecec" : "#e7f4e8", borderRadius: "10px", color: isSoldOut ? "#e33129" : "#28a745", fontWeight: "700" }}>
                                                         {isSoldOut ? (
-                                                            <span>🚫 SOLD OUT - All {event.seatsAvailable} seats are booked!</span>
+                                                            <span>🚫 SOLD OUT - All seats are booked!</span>
                                                         ) : (
                                                             <span>✨ Only {(event.seatsAvailable - bookedCount)} Seats Remaining</span>
                                                         )}
