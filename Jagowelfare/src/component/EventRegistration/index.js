@@ -317,7 +317,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                             recipientName: reg.full_name,
                             eventTitle: event.title,
                             ticketId: reg.id,
-                            section: reg.selected_section,
+                            section: reg.selected_section || selectedSection || (availableSections.length > 0 ? availableSections[0] : ""),
                             description: event.description,
                             venue: event.venue || "TBD",
                             date: formatDate(event.startAt),

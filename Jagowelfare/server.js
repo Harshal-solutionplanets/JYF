@@ -126,21 +126,26 @@ app.post('/api/send-ticket', async (req, res) => {
 
     // Section Button (Rectangular Gold - Matching Frontend)
     let displaySection = section;
-    if ((!displaySection || displaySection.toUpperCase() === "GENERAL") && description && description.startsWith("SECTIONS:")) {
+    // Treat "GENERAL" or empty or any casing of it as a trigger for fallback (fixing old registrations)
+    if ((!displaySection || displaySection.toString().toUpperCase() === "GENERAL") && description && description.startsWith("SECTIONS:")) {
       try {
         const metadataPart = description.split(" | CONTENT: ")[0];
         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
         const parsed = JSON.parse(sectionsString);
         const names = Array.isArray(parsed) ? parsed.map(s => typeof s === 'string' ? s : s.name) : Object.keys(parsed);
         if (names.length > 0) displaySection = names[0];
-      } catch (e) {}
+      } catch (e) {
+        console.error("PDF Fallback Error:", e);
+      }
     }
-    const finalSection = (displaySection && typeof displaySection === 'string') ? displaySection.toUpperCase() : 'GOLD';
+    
+    // Final check: if still empty or General, force it to 'GOLD' for Antarnaad event context
+    const finalSectionName = (displaySection && displaySection.toString().toUpperCase() !== "GENERAL") ? displaySection.toUpperCase() : 'GOLD';
 
     // Rectangular Yellow Box
     doc.rect(doc.page.width / 2 - 75, 610, 150, 40).fill('#FFCC00');
     // Section Text
-    doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSection, 0, 622, { align: 'center' });
+    doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSectionName, 0, 622, { align: 'center' });
 
     // Footer Text
     doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 670, { align: 'center' });
