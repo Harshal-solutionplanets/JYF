@@ -78,7 +78,7 @@ const GoldenTicket = ({ registration, event }) => {
                 </div>
             </div>
 
-            <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "10px", display: "inline-block", margin: "20px 0 10px", border: "5px solid #d4af37" }}>
+            <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "10px", display: "inline-block", margin: "20px 0 20px", border: "5px solid #d4af37" }}>
                 <QRCodeCanvas 
                     value={registration.id} 
                     size={150}

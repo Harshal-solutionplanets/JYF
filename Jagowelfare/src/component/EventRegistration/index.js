@@ -64,7 +64,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
 
                 const data = eventRes.data;
                 const regList = regRes.data;
-                
+
                 // Safety check: if registration not required, redirect or error
                 if (data.description?.includes("REG_TYPE: not_required")) {
                     setError("Online registration is not required for this event. You can attend directly.");
@@ -79,58 +79,55 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 if (desc.startsWith("SECTIONS:")) {
                     try {
                         const parts = desc.split(" | CONTENT: ");
-                        const metadataPart = parts[0]; // "SECTIONS: [...] | REG_TYPE: required"
-                        
-                        // Extract JSON between SECTIONS: and the next |
-                        const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
-                        const parsed = JSON.parse(sectionsString);
-                        
+                        const sectionsJson = parts[0].replace("SECTIONS: ", "");
+                        const parsed = JSON.parse(sectionsJson);
+
                         let names = [];
                         let fullList = [];
                         if (Array.isArray(parsed)) {
                             names = parsed.map(s => s.name);
                             fullList = parsed;
                         } else {
-                             // legacy support for old object format
-                             names = Object.keys(parsed).filter(k => parsed[k].enabled);
-                             fullList = Object.keys(parsed).map(k => ({ name: k, seats: parsed[k].seats, enabled: parsed[k].enabled }));
-                         }
-                         
-                         setAvailableSections(names);
-                         setSectionsList(fullList);
-                         if (names.length > 0) setSelectedSection(names[0]);
-                     } catch (e) {
-                         console.error("Failed to parse sections", e);
-                     }
-                 }
- 
-                 const currentCounts = {};
-                 (regList || []).forEach(r => {
-                     const s = r.selected_section || "General";
-                     currentCounts[s] = (currentCounts[s] || 0) + 1;
-                 });
-                 
-                 setSectionBookedCounts(currentCounts);
-                 setBookedCount(regList?.length || 0);
-                 
-                 if (data.seatsAvailable && (regList?.length || 0) >= data.seatsAvailable) {
-                     setIsSoldOut(true);
-                 }
- 
-             } catch (err) {
-                 setError(err?.message || "Failed to load event");
-             } finally {
-                 setLoading(false);
-             }
-         };
- 
-         if (eventId) fetchEvent();
-     }, [eventId]);
+                            // legacy support for old object format
+                            names = Object.keys(parsed).filter(k => parsed[k].enabled);
+                            fullList = Object.keys(parsed).map(k => ({ name: k, seats: parsed[k].seats, enabled: parsed[k].enabled }));
+                        }
+
+                        setAvailableSections(names);
+                        setSectionsList(fullList);
+                        if (names.length > 0) setSelectedSection(names[0]);
+                    } catch (e) {
+                        console.error("Failed to parse sections", e);
+                    }
+                }
+
+                const currentCounts = {};
+                (regList || []).forEach(r => {
+                    const s = r.selected_section || "General";
+                    currentCounts[s] = (currentCounts[s] || 0) + 1;
+                });
+
+                setSectionBookedCounts(currentCounts);
+                setBookedCount(regList?.length || 0);
+
+                if (data.seatsAvailable && (regList?.length || 0) >= data.seatsAvailable) {
+                    setIsSoldOut(true);
+                }
+
+            } catch (err) {
+                setError(err?.message || "Failed to load event");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (eventId) fetchEvent();
+    }, [eventId]);
 
     useEffect(() => {
         // Only pre-fill if it's NOT a staff member (to allow easy testing/manual entry by staff)
-        const isStaff = user?.email === 'jainyouthfoundation9@gmail.com'; 
-        
+        const isStaff = user?.email === 'jainyouthfoundation9@gmail.com';
+
         if (event && selectedSection && participants[0].section === "") {
             setParticipants([{
                 name: (user && !isStaff) ? (user?.user_metadata?.full_name || "") : "",
@@ -146,7 +143,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
     useEffect(() => {
         return () => {
             if (sessionId && eventId) {
-                supabase.from('ticket_locks').delete().eq('event_id', eventId).eq('locked_by', sessionId).then(() => {});
+                supabase.from('ticket_locks').delete().eq('event_id', eventId).eq('locked_by', sessionId).then(() => { });
             }
         };
     }, [sessionId, eventId]);
@@ -237,7 +234,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 .select('*', { count: 'exact', head: true })
                 .eq('event_id', eventId)
                 .eq('phone_number', p.phoneNo);
-            
+
             if (count > 0) {
                 setFormError(`This phone number is already registered for this event.`);
                 setIsSubmitting(false);
@@ -263,7 +260,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 supabase.from('event_registrations').select('id', { count: 'exact', head: true }).eq('event_id', eventId),
                 supabase.from('ticket_locks').select('*').eq('event_id', eventId).gt('expires_at', new Date().toISOString())
             ]);
-            
+
             const currentRegs = regRes.count || 0;
             // Count locks from OTHERS that haven't expired
             const otherActiveLocks = (lockRes.data || []).filter(l => l.locked_by !== sessionId);
@@ -368,18 +365,18 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                     </div>
 
                                     {/* Important Note Section */}
-                                    <div className="important_note_section mb-4 p-4" style={{ 
-                                        backgroundColor: "#f9fcf9", 
-                                        border: "1px solid #d4edda", 
+                                    <div className="important_note_section mb-4 p-4" style={{
+                                        backgroundColor: "#f9fcf9",
+                                        border: "1px solid #d4edda",
                                         borderRadius: "15px",
-                                        textAlign: "left" 
+                                        textAlign: "left"
                                     }}>
                                         <h6 style={{ color: "#155724", fontWeight: "700", marginBottom: "15px" }}>⚠️ Important Note:</h6>
-                                        <ul style={{ 
-                                            margin: 0, 
-                                            padding: 0, 
-                                            color: "#333", 
-                                            fontSize: "15px", 
+                                        <ul style={{
+                                            margin: 0,
+                                            padding: 0,
+                                            color: "#333",
+                                            fontSize: "15px",
                                             lineHeight: "1.8",
                                             fontWeight: "500",
                                             listStyle: "none"
@@ -431,59 +428,11 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                         </div>
                                     </div>
 
-                                    {availableSections.length > 0 && (
-                                        <div className="section_selection_box mb-5 p-4" style={{ 
-                                            background: "#fff5f5", 
-                                            borderRadius: "15px", 
-                                            border: "2px solid #e33129",
-                                            textAlign: "left"
-                                        }}>
-                                            <label style={{ 
-                                                fontWeight: "800", 
-                                                color: "#333", 
-                                                display: "block", 
-                                                marginBottom: "15px",
-                                                fontSize: "16px",
-                                                textTransform: "uppercase"
-                                            }}>
-                                                🎟️ Choose Your Section:
-                                            </label>
-                                            <select 
-                                                className="form-control"
-                                                value={selectedSection}
-                                                onChange={(e) => {
-                                                    setSelectedSection(e.target.value);
-                                                    const up = [...participants];
-                                                    up[0].section = e.target.value;
-                                                    setParticipants(up);
-                                                }}
-                                                style={{ 
-                                                    height: "60px", 
-                                                    fontSize: "18px", 
-                                                    fontWeight: "700",
-                                                    color: "#e33129",
-                                                    border: "1px solid #e33129",
-                                                    borderRadius: "12px",
-                                                    cursor: "pointer",
-                                                    backgroundColor: "#fff"
-                                                }}
-                                            >
-                                                {availableSections.map(name => (
-                                                    <option key={name} value={name}>
-                                                        {name.toUpperCase()} {sectionBookedCounts[name] >= (sectionsList.find(s=>s.name===name)?.seats || 9999) ? "(SOLD OUT)" : ""}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <p className="mt-3 mb-0 text-muted small">
-                                                * Please select your preferred section before continuing.
-                                            </p>
-                                        </div>
-                                    )}
 
                                     {!isSoldOut && (
                                         <div className="text-center mt-5">
-                                            <button 
-                                                className="btn btn_theme btn_md" 
+                                            <button
+                                                className="btn btn_theme btn_md"
                                                 style={{ padding: "15px 50px", fontSize: "18px" }}
                                                 onClick={startRegistrationFlow}
                                             >
@@ -513,9 +462,9 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                                 )}
                                             </div>
                                             <div className="progress" style={{ height: "10px", borderRadius: "5px" }}>
-                                                <div 
-                                                    className={`progress-bar progress-bar-striped progress-bar-animated ${lockRemainingTime <= 5 ? "bg-danger" : "bg-success"}`} 
-                                                    role="progressbar" 
+                                                <div
+                                                    className={`progress-bar progress-bar-striped progress-bar-animated ${lockRemainingTime <= 5 ? "bg-danger" : "bg-success"}`}
+                                                    role="progressbar"
                                                     style={{ width: `${(lockRemainingTime / 15) * 100}%`, transition: "width 1s linear" }}
                                                 ></div>
                                             </div>
@@ -526,7 +475,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                         <h3 style={{ fontWeight: "800", color: "#333" }}>{event.title}</h3>
                                         <p className="text-muted">Enter your details below to secure your ticket</p>
                                     </div>
-                                    
+
                                     <div className="participant_block mb-4 p-4" style={{ backgroundColor: "#fff", borderRadius: "15px", border: "1px solid #eee", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
                                         {/* Row 1: Name & Email */}
                                         <div className="row g-3 mb-3">
@@ -604,16 +553,16 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                     {formError && <div className="alert alert-danger mt-3">{formError}</div>}
 
                                     <div className="text-center d-flex justify-content-center gap-3 mt-4">
-                                        <button 
-                                            className="btn btn-outline-dark btn_md" 
+                                        <button
+                                            className="btn btn-outline-dark btn_md"
                                             style={{ width: "200px", borderRadius: "10px" }}
                                             onClick={() => setPageStatus('landing')}
                                         >
                                             Back
                                         </button>
-                                        <button 
-                                            className={`btn btn_theme btn_md ${(lockRemainingTime > 0 && lockRemainingTime <= 5) ? 'pulse_btn' : ''}`} 
-                                            style={{ width: "200px" }} 
+                                        <button
+                                            className={`btn btn_theme btn_md ${(lockRemainingTime > 0 && lockRemainingTime <= 5) ? 'pulse_btn' : ''}`}
+                                            style={{ width: "200px" }}
                                             onClick={handleValidationAndSubmit}
                                             disabled={isSubmitting}
                                         >
@@ -630,7 +579,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                     </div>
                                     <h2 style={{ fontWeight: "800", color: "#333", marginBottom: "30px" }}>Thank You!</h2>
                                     <p style={{ fontSize: "18px", color: "#666", marginBottom: "40px" }}>{successMsg}</p>
-                                    
+
                                     <div className="tickets_container d-flex flex-column gap-5">
                                         {registeredParticipants.map((reg) => (
                                             <div key={reg.id}>
@@ -639,11 +588,11 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                                 </div>
                                                 <div className="mt-3">
                                                     <p className="text-muted small">
-                                                        The official ticket has also been sent to <strong>{reg.email}</strong> which will be scanned at the Venue on the Event Date.<br/>
+                                                        The official ticket has also been sent to <strong>{reg.email}</strong> which will be scanned at the Venue on the Event Date.<br />
                                                         Please check the SPAM/Junk folder of your mailbox also in case you don't find it in your Inbox.
                                                     </p>
-                                                    <button 
-                                                        className="btn btn-outline-dark btn-sm" 
+                                                    <button
+                                                        className="btn btn-outline-dark btn-sm"
                                                         onClick={() => {
                                                             const area = document.getElementById(`ticket-area-${reg.id}`);
                                                             import('html2canvas').then(html2canvas => {
