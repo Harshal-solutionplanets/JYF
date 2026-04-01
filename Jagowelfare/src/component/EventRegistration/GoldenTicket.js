@@ -31,34 +31,34 @@ const GoldenTicket = ({ registration, event }) => {
             <div style={{ position: "absolute", bottom: "10px", right: "10px", opacity: 0.2 }}>✨</div>
 
             <div style={{ marginBottom: "15px" }}>
-                <img 
-                    src={logo} 
-                    alt="Logo" 
-                    style={{ 
-                        height: "100px", 
+                <img
+                    src={logo}
+                    alt="Logo"
+                    style={{
+                        height: "100px",
                         marginBottom: "5px",
                         filter: "drop-shadow(0 0 10px rgba(212, 175, 55, 0.3))"
-                    }} 
+                    }}
                 />
-                <p style={{ 
-                    color: "gold", 
-                    fontSize: "14px", 
-                    fontWeight: "600", 
+                <p style={{
+                    color: "gold",
+                    fontSize: "14px",
+                    fontWeight: "600",
                     margin: "0 0 15px 0",
                     textTransform: "uppercase",
                     letterSpacing: "1px"
                 }}>
                     Jain Youth Foundation presents
                 </p>
-                <h1 style={{ 
-                    fontFamily: "'Playfair Display', serif", 
-                    fontSize: "30px", 
-                    fontWeight: "900", 
-                    color: "gold", 
-                    textTransform: "uppercase", 
+                <h1 style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "30px",
+                    fontWeight: "900",
+                    color: "gold",
+                    textTransform: "uppercase",
                     letterSpacing: "1px",
                     lineHeight: "1.2",
-                    margin: "0" 
+                    margin: "0"
                 }}>
                     {event.title}
                 </h1>
@@ -79,8 +79,8 @@ const GoldenTicket = ({ registration, event }) => {
             </div>
 
             <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "10px", display: "inline-block", margin: "20px 0 20px", border: "5px solid #d4af37" }}>
-                <QRCodeCanvas 
-                    value={registration.id} 
+                <QRCodeCanvas
+                    value={registration.id}
                     size={150}
                     fgColor="#000"
                 />
@@ -89,7 +89,8 @@ const GoldenTicket = ({ registration, event }) => {
             {/* Added fallback to parse default section from event description if registration.section is null */}
             {(() => {
                 let displaySection = registration.section || registration.selected_section;
-                if (!displaySection && event.description && event.description.startsWith("SECTIONS:")) {
+                // If it is NULL or "GENERAL", use the first section from the event description
+                if ((!displaySection || displaySection.toUpperCase() === "GENERAL") && event.description && event.description.startsWith("SECTIONS:")) {
                     try {
                         const metadataPart = event.description.split(" | CONTENT: ")[0];
                         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];

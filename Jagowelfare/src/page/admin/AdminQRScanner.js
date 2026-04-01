@@ -32,7 +32,7 @@ const AdminQRScanner = () => {
                 (decodedText) => {
                     setScanResult(decodedText);
                     fetchUserData(decodedText);
-                    scanner.clear(); 
+                    scanner.clear();
                 },
                 (err) => {
                     // noise
@@ -42,7 +42,7 @@ const AdminQRScanner = () => {
             return () => {
                 try {
                     scanner.clear();
-                } catch (e) {}
+                } catch (e) { }
             };
         }, 100);
 
@@ -58,7 +58,7 @@ const AdminQRScanner = () => {
                 .select('*')
                 .eq('id', regId)
                 .single();
-            
+
             if (error) throw error;
             setUserData(data);
 
@@ -107,20 +107,20 @@ const AdminQRScanner = () => {
         <div style={{ backgroundColor: "#f4f4f4", padding: isMobile ? "20px 10px" : "60px 20px", minHeight: "90vh" }}>
             <div style={{ backgroundColor: "#fff", padding: isMobile ? "20px" : "40px", borderRadius: isMobile ? "15px" : "30px", boxShadow: "0 15px 50px rgba(0,0,0,0.1)", maxWidth: "800px", margin: "0 auto" }}>
                 <h3 style={{ marginBottom: isMobile ? "20px" : "35px", fontWeight: "900", textAlign: "center", color: "#333", fontSize: isMobile ? "24px" : "32px", letterSpacing: "-1px" }}>Entry Pass Scanner</h3>
-                
+
                 {!scanResult ? (
                     <div id="reader" key={scannerKey} style={{ borderRadius: "20px", overflow: "hidden", border: "1px solid #ddd" }}></div>
                 ) : (
-                    <div className="p-5" style={{ 
-                        background: "linear-gradient(135deg, #000 0%, #1a1a1a 100%)", 
-                        color: "#d4af37", 
-                        borderRadius: "25px", 
-                        boxShadow: "0 25px 60px rgba(0,0,0,0.4)", 
+                    <div className="p-5" style={{
+                        background: "linear-gradient(135deg, #000 0%, #1a1a1a 100%)",
+                        color: "#d4af37",
+                        borderRadius: "25px",
+                        boxShadow: "0 25px 60px rgba(0,0,0,0.4)",
                         position: "relative",
                         minHeight: "500px",
                         border: "3px solid #d4af37"
                     }}>
-                        
+
                         {/* Status Circle Plate (Top Right) */}
                         {userData && !loading && (
                             <div style={{
@@ -153,9 +153,9 @@ const AdminQRScanner = () => {
                             </div>
                         ) : userData ? (
                             <div style={{ textAlign: "center" }}>
-                                <div style={{ 
-                                    marginBottom: "35px", 
-                                    borderBottom: "1px solid rgba(212, 175, 55, 0.3)", 
+                                <div style={{
+                                    marginBottom: "35px",
+                                    borderBottom: "1px solid rgba(212, 175, 55, 0.3)",
                                     paddingBottom: "25px",
                                     marginTop: isMobile ? "50px" : "0"
                                 }}>
@@ -175,10 +175,11 @@ const AdminQRScanner = () => {
                                         </tr>
                                         <tr>
                                             <td style={{ color: "#d4af37", fontWeight: "900" }}>SECTION:</td>
-                                            <td style={{ color: "#fff", fontWeight: "900", textTransform: "uppercase", fontSize: isMobile ? "18px" : "22px" }}>
+                                            <td style={{ color: "#fff", fontWeight: "#900", textTransform: "uppercase", fontSize: isMobile ? "18px" : "22px" }}>
                                                 {(() => {
                                                     let displaySection = userData.selected_section;
-                                                    if (!displaySection && eventData?.description?.startsWith("SECTIONS:")) {
+                                                    // Trigger fallback if value is empty OR "GENERAL"
+                                                    if ((!displaySection || displaySection.toUpperCase() === "GENERAL") && eventData?.description?.startsWith("SECTIONS:")) {
                                                         try {
                                                             const metadataPart = eventData.description.split(" | CONTENT: ")[0];
                                                             const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
@@ -195,18 +196,18 @@ const AdminQRScanner = () => {
                                 </table>
 
                                 {msg.text && (
-                                    <div style={{ 
-                                        backgroundColor: msg.type === "danger" ? "rgba(231, 76, 60, 0.2)" : "rgba(40, 167, 69, 0.2)", 
-                                        color: "#fff", 
-                                        padding: "15px", 
-                                        borderRadius: "12px", 
-                                        border: msg.type === "danger" ? "1px solid #e74c3c" : "1px solid #28a745", 
-                                        marginTop: "25px", 
-                                        maxWidth: "600px", 
-                                        margin: "25px auto 0", 
-                                        textAlign: "center", 
-                                        fontWeight: "bold", 
-                                        fontSize: "18px" 
+                                    <div style={{
+                                        backgroundColor: msg.type === "danger" ? "rgba(231, 76, 60, 0.2)" : "rgba(40, 167, 69, 0.2)",
+                                        color: "#fff",
+                                        padding: "15px",
+                                        borderRadius: "12px",
+                                        border: msg.type === "danger" ? "1px solid #e74c3c" : "1px solid #28a745",
+                                        marginTop: "25px",
+                                        maxWidth: "600px",
+                                        margin: "25px auto 0",
+                                        textAlign: "center",
+                                        fontWeight: "bold",
+                                        fontSize: "18px"
                                     }}>
                                         {msg.text}
                                     </div>
@@ -220,8 +221,8 @@ const AdminQRScanner = () => {
                                     width: "100%",
                                     gap: isMobile ? "15px" : "30px"
                                 }}>
-                                    <button 
-                                        onClick={resetScanner} 
+                                    <button
+                                        onClick={resetScanner}
                                         style={{
                                             backgroundColor: "transparent",
                                             color: "#d4af37",
@@ -237,8 +238,8 @@ const AdminQRScanner = () => {
                                         Scan Another
                                     </button>
                                     {userData && !userData.is_checked_in && (
-                                        <button 
-                                            onClick={handleAccept} 
+                                        <button
+                                            onClick={handleAccept}
                                             style={{
                                                 backgroundColor: "#e33129",
                                                 color: "#fff",

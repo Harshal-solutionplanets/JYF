@@ -127,7 +127,8 @@ app.post('/api/send-ticket', async (req, res) => {
     doc.rect(doc.page.width / 2 - 65, 595, 130, 35).fill('#FFCC00');
     
     let displaySection = section;
-    if (!displaySection && description && description.startsWith("SECTIONS:")) {
+    // Treat "GENERAL" or empty as a trigger for the fallback (fixing old registrations)
+    if ((!displaySection || displaySection.toUpperCase() === "GENERAL") && description && description.startsWith("SECTIONS:")) {
       try {
         const metadataPart = description.split(" | CONTENT: ")[0];
         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
