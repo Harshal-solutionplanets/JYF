@@ -84,50 +84,48 @@ app.post('/api/send-ticket', async (req, res) => {
       }
     });
 
-    // --- Redesigned PDF Content ---
-    // Dark Background
+    // --- Redesigned PDF Content (Matching Frontend GoldenTicket) ---
+    // Dark Background for the whole card
     doc.rect(0, 0, doc.page.width, doc.page.height).fill('#050505');
+
+    // Outer Gold Border (frontend style)
+    doc.rect(5, 5, doc.page.width - 10, doc.page.height - 10).lineWidth(3).stroke('#D4AF37');
 
     // Logo (Centered Top)
     const logoPath = path.join(__dirname, 'src/assets/img/jyf_logo.jpg');
     try {
-      doc.image(logoPath, doc.page.width / 2 - 45, 15, { width: 90 });
+      doc.image(logoPath, doc.page.width / 2 - 50, 25, { width: 100 });
     } catch (e) { console.error("Logo missing:", logoPath); }
 
     // Presents text
-    doc.fillColor('#D4AF37').fontSize(10).text('JAIN YOUTH FOUNDATION PRESENTS', 0, 125, { align: 'center' });
+    doc.fillColor('#D4AF37').fontSize(11).font('Helvetica-Bold').text('JAIN YOUTH FOUNDATION PRESENTS', 0, 140, { align: 'center' });
 
-    // Dynamic Title (Gold)
-    doc.fillColor('#FFEE00').fontSize(18).font('Helvetica-Bold').text(eventTitle.toUpperCase(), 0, 155, { align: 'center' });
-
-    // Separator Line
-    doc.lineWidth(0.5).strokeColor('#333').moveTo(40, 225).lineTo(doc.page.width - 40, 225).stroke();
-
-    // User Name (White)
-    doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text(recipientName, 0, 260, { align: 'center' });
-
-    // Date & Venue Labels
-    doc.fontSize(10).fillColor('#888').text('DATE:', 40, 310).text('VENUE:', doc.page.width / 2 + 20, 310);
-
-    // Date & Venue Details (White)
-    doc.fontSize(11).fillColor('#FFFFFF').text(date || '12/04/2026', 40, 330, { width: 120 });
-    doc.text(venue || 'Kalidas Auditorium\nMulund West, Mumbai', doc.page.width / 2 + 20, 330, { width: 150 });
+    // Dynamic Title (Gold/Yellow)
+    doc.fillColor('#FFEE00').fontSize(22).font('Helvetica-Bold').text(eventTitle.toUpperCase(), 0, 175, { align: 'center', width: doc.page.width - 40, x: 20 });
 
     // Separator Line
-    doc.lineWidth(0.5).strokeColor('#333').moveTo(40, 385).lineTo(doc.page.width - 40, 385).stroke();
+    doc.lineWidth(0.5).strokeColor('rgba(212, 175, 55, 0.3)').moveTo(40, 245).lineTo(doc.page.width - 40, 245).stroke();
+
+    // User Name (White, Centered, Large)
+    doc.fillColor('#FFFFFF').fontSize(28).font('Helvetica-Bold').text(recipientName, 0, 280, { align: 'center' });
+
+    // Date & Venue Section (Matching Grid Layout)
+    doc.fontSize(10).fillColor('#888').text('DATE:', 60, 340).text('VENUE:', doc.page.width / 2 + 20, 340);
+    doc.fontSize(12).fillColor('#FFFFFF').font('Helvetica-Bold').text(date || '12/04/2026', 60, 355, { width: 120 });
+    doc.text(venue || 'Kalidas Auditorium\nMulund West, Mumbai', doc.page.width / 2 + 20, 355, { width: 150 });
+
+    // Separator Line
+    doc.lineWidth(0.5).strokeColor('rgba(212, 175, 55, 0.3)').moveTo(40, 410).lineTo(doc.page.width - 40, 410).stroke();
 
     // QR Code Section
-    // White Box for QR
-    doc.rect(doc.page.width / 2 - 75, 415, 150, 150).fillAndStroke('#D4AF37', '#D4AF37');
-    doc.rect(doc.page.width / 2 - 70, 420, 140, 140).fill('#FFFFFF');
+    // Yellow/White Frame for QR
+    doc.rect(doc.page.width / 2 - 75, 440, 150, 150).fillAndStroke('#D4AF37', '#D4AF37');
+    doc.rect(doc.page.width / 2 - 70, 445, 140, 140).fill('#FFFFFF');
     // Actual QR Image
-    doc.image(qrDataUrl, doc.page.width / 2 - 65, 425, { width: 130 });
+    doc.image(qrDataUrl, doc.page.width / 2 - 65, 450, { width: 130 });
 
-    // Section Button (Rectangular Gold)
-    doc.rect(doc.page.width / 2 - 65, 595, 130, 35).fill('#FFCC00');
-    
+    // Section Button (Rectangular Gold - Matching Frontend)
     let displaySection = section;
-    // Treat "GENERAL" or empty as a trigger for the fallback (fixing old registrations)
     if ((!displaySection || displaySection.toUpperCase() === "GENERAL") && description && description.startsWith("SECTIONS:")) {
       try {
         const metadataPart = description.split(" | CONTENT: ")[0];
@@ -137,13 +135,15 @@ app.post('/api/send-ticket', async (req, res) => {
         if (names.length > 0) displaySection = names[0];
       } catch (e) {}
     }
-    
     const finalSection = (displaySection && typeof displaySection === 'string') ? displaySection.toUpperCase() : 'GOLD';
-    doc.fillColor('#000000').fontSize(15).font('Helvetica-Bold').text(finalSection, 0, 606, { align: 'center' });
+
+    // Rectangular Yellow Box
+    doc.rect(doc.page.width / 2 - 75, 610, 150, 40).fill('#FFCC00');
+    // Section Text
+    doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSection, 0, 622, { align: 'center' });
 
     // Footer Text
-    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 655, { align: 'center' });
-    doc.fillColor('#D4AF37').fontSize(12).font('Helvetica-Bold').text('Jain Youth Foundation', 0, 675, { align: 'center' });
+    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 670, { align: 'center' });
 
     doc.end();
 
