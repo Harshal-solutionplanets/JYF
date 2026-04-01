@@ -480,7 +480,7 @@ const AdminDashboardPage = () => {
 
 
   return (
-    <div style={{ display: "flex", flexWrap: isMobile ? "wrap" : "nowrap", minHeight: "100vh", backgroundColor: "#f4f6f9" }}>
+    <div style={{ display: "flex", flexWrap: isMobile ? "wrap" : "nowrap", height: isMobile ? "auto" : "100vh", backgroundColor: "#f4f6f9", overflow: isMobile ? "visible" : "hidden" }}>
       {(!isScannerOnly || !isMobile) && (
         <aside style={{ 
           width: isMobile ? "100%" : "280px", 

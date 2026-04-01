@@ -135,18 +135,20 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
 
 
     const handleValidationAndSubmit = async () => {
+        setIsSubmitting(true);
         setFormError("");
         const p = participants[0];
 
-        if (!p.name.trim()) { setFormError("Name is required"); return; }
-        if (!p.email.trim()) { setFormError("Email is required"); return; }
+        if (!p.name.trim()) { setFormError("Name is required"); setIsSubmitting(false); return; }
+        if (!p.email.trim()) { setFormError("Email is required"); setIsSubmitting(false); return; }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(p.email.trim())) {
             setFormError("Please enter a valid email address (e.g., user@example.com)");
+            setIsSubmitting(false);
             return;
         }
-        if (!/^\d{10}$/.test(p.phoneNo)) { setFormError("Valid 10-digit phone number required"); return; }
-        if (!p.location.trim()) { setFormError("Location is required"); return; }
+        if (!/^\d{10}$/.test(p.phoneNo)) { setFormError("Valid 10-digit phone number required"); setIsSubmitting(false); return; }
+        if (!p.location.trim()) { setFormError("Location is required"); setIsSubmitting(false); return; }
 
         // DB check for duplicate registration
         try {
@@ -158,10 +160,12 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
             
             if (count > 0) {
                 setFormError(`This phone number (${p.phoneNo}) is already registered for this event.`);
+                setIsSubmitting(false);
                 return;
             }
         } catch (e) {
             console.error("DB check error", e);
+            setIsSubmitting(false);
         }
 
         handleSubmit(participants);
@@ -171,6 +175,37 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
         setIsSubmitting(true);
         setError("");
         try {
+            // 1. Final seat count check
+            const { data: eventData, error: eventErr } = await supabase.from("events").select("seatsAvailable").eq("id", eventId).single();
+            if (eventErr) throw eventErr;
+
+            const { count: currentRegs, error: countErr } = await supabase
+                .from('event_registrations')
+                .select('*', { count: 'exact', head: true })
+                .eq('event_id', eventId);
+            
+            if (countErr) throw countErr;
+
+            if (eventData.seatsAvailable && currentRegs >= eventData.seatsAvailable) {
+                setFormError("Sorry, the event just sold out! No more seats available.");
+                setIsSoldOut(true);
+                setIsSubmitting(false);
+                return;
+            }
+
+            // 2. Final duplicate check (Phone Only) to prevent double submissions
+            const { count: dupCount } = await supabase
+                .from('event_registrations')
+                .select('*', { count: 'exact', head: true })
+                .eq('event_id', eventId)
+                .eq('phone_number', finalParticipants[0].phoneNo);
+
+            if (dupCount > 0) {
+                setFormError("This mobile number is already registered for this event.");
+                setIsSubmitting(false);
+                return;
+            }
+
             const inserts = finalParticipants.map(v => ({
                 event_id: eventId,
                 full_name: v.name,

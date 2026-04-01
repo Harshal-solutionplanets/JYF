@@ -8,6 +8,7 @@ const AdminViewRegistrations = () => {
     const [events, setEvents] = useState({});
     const [eventsList, setEventsList] = useState([]);
     const [selectedEventId, setSelectedEventId] = useState("all");
+    const [viewMode, setViewMode] = useState("all");
 
     useEffect(() => {
         fetchData();
@@ -44,15 +45,55 @@ const AdminViewRegistrations = () => {
         }
     };
 
+    const getRepeatedRegistrations = () => {
+        const counts = {};
+        const filtered = registrations.filter(r => selectedEventId === "all" || String(r.event_id) === String(selectedEventId));
+        filtered.forEach(r => {
+            const key = r.phone_number;
+            counts[key] = (counts[key] || 0) + 1;
+        });
+        return filtered.filter(r => {
+            const key = r.phone_number;
+            return counts[key] > 1;
+        });
+    };
+
+    const downloadCSV = () => {
+        const filtered = registrations.filter(r => selectedEventId === "all" || String(r.event_id) === String(selectedEventId));
+        const headers = ["User Name", "Email", "Phone", "Location", "Event", "Status", "Date"];
+        const rows = filtered.map(r => [
+            r.full_name,
+            r.email,
+            r.phone_number,
+            r.location || "N/A",
+            events[r.event_id] || "Unknown",
+            r.is_checked_in ? "Checked-In" : "Pending",
+            formatDate(r.created_at)
+        ]);
+
+        const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `registrations-${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     if (loading) return <div className="text-center p-5"><h4>Loading registrations...</h4></div>;
 
+    const displayedRegistrations = viewMode === "repeated" ? getRepeatedRegistrations() : registrations.filter(r => selectedEventId === "all" || String(r.event_id) === String(selectedEventId));
+
     return (
-        <div style={{ backgroundColor: "#f4f6f9", padding: "30px", borderRadius: "15px" }}>
+        <div style={{ backgroundColor: "#f4f6f9", padding: "0", borderRadius: "15px" }}>
             <div style={{ backgroundColor: "#fff", padding: "30px", borderRadius: "20px", boxShadow: "0 10px 40px rgba(0,0,0,0.05)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px", flexWrap: "wrap", gap: "20px" }}>
                     <div>
                         <h3 style={{ margin: 0, fontWeight: "800", color: "#222" }}>User Registration Data</h3>
-                        <div style={{ marginTop: "15px" }}>
+                        <div style={{ marginTop: "15px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
                             <select 
                                 value={selectedEventId} 
                                 onChange={(e) => setSelectedEventId(e.target.value)}
@@ -63,14 +104,30 @@ const AdminViewRegistrations = () => {
                                     <option key={ev.id} value={ev.id}>{ev.title}</option>
                                 ))}
                             </select>
+
+                            <select 
+                                value={viewMode} 
+                                onChange={(e) => setViewMode(e.target.value)}
+                                style={{ padding: "10px 15px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "14px", minWidth: "180px", outline: "none", backgroundColor: viewMode === "repeated" ? "#ffebeb" : "#f9f9f9", color: viewMode === "repeated" ? "#e33129" : "#333", fontWeight: "600" }}
+                            >
+                                <option value="all">Show All Entries</option>
+                                <option value="repeated">🔥 Repeated Details Only</option>
+                            </select>
+
+                            <button
+                                onClick={downloadCSV}
+                                style={{ padding: "10px 20px", borderRadius: "10px", border: "none", backgroundColor: "#333", color: "#fff", fontSize: "14px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                            >
+                                <i className="fas fa-file-csv"></i> Export CSV File
+                            </button>
                         </div>
                     </div>
                     <div style={{ display: "flex", gap: "10px" }}>
                         <span className="badge" style={{ backgroundColor: "#28a74515", color: "#28a745", padding: "10px 20px", borderRadius: "30px", fontWeight: "700" }}>
-                            {registrations.filter(r => (selectedEventId === "all" || String(r.event_id) === String(selectedEventId))).filter(r => r.is_checked_in).length} Checked-in
+                            {displayedRegistrations.filter(r => r.is_checked_in).length} Checked-in
                         </span>
                         <span className="badge" style={{ backgroundColor: "#e3312915", color: "#e33129", padding: "10px 20px", borderRadius: "30px", fontWeight: "700" }}>
-                            {registrations.filter(r => (selectedEventId === "all" || String(r.event_id) === String(selectedEventId))).length} Total
+                            {displayedRegistrations.length} {viewMode === "repeated" ? "Repeated" : "Total"}
                         </span>
                     </div>
                 </div>
@@ -78,19 +135,17 @@ const AdminViewRegistrations = () => {
                 <div className="table-responsive">
                     <table className="table" style={{ borderCollapse: "separate", borderSpacing: "0 12px", marginTop: "-12px" }}>
                         <thead>
-                            <tr style={{ backgroundColor: "#fdfdfd" }}>
-                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px" }}>User Name</th>
-                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px" }}>Contact Details</th>
-                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px" }}>Registered For</th>
-                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px" }}>Status</th>
-                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px" }}>Date</th>
-                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", textAlign: "right" }}>Actions</th>
+                            <tr style={{ backgroundColor: "#fdfdfd", position: "sticky", top: 0, zIndex: 1, boxShadow: "0 1px 0 #eee" }}>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>User Name</th>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Contact Details</th>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Registered For</th>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Status</th>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Date</th>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", textAlign: "right", backgroundColor: "#fff" }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {registrations
-                                .filter(r => selectedEventId === "all" || String(r.event_id) === String(selectedEventId))
-                                .map((r) => (
+                            {displayedRegistrations.map((r) => (
                                 <tr key={r.id} style={{ backgroundColor: "#fff", boxShadow: "0 4px 10px rgba(0,0,0,0.01)", borderRadius: "12px", verticalAlign: "middle" }}>
                                     <td style={{ border: "none", padding: "15px", borderTopLeftRadius: "15px", borderBottomLeftRadius: "15px" }}>
                                         <div style={{ fontWeight: "800", color: "#222", fontSize: "15px" }}>{r.full_name}</div>
@@ -120,6 +175,13 @@ const AdminViewRegistrations = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {displayedRegistrations.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: "center", padding: "50px", color: "#999" }}>
+                                        {viewMode === "repeated" ? "No repeated registrations found. Good job!" : "No registrations found for this event."}
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
