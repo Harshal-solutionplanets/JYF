@@ -79,8 +79,11 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 if (desc.startsWith("SECTIONS:")) {
                     try {
                         const parts = desc.split(" | CONTENT: ");
-                        const sectionsJson = parts[0].replace("SECTIONS: ", "");
-                        const parsed = JSON.parse(sectionsJson);
+                        const metadataPart = parts[0]; // "SECTIONS: [...] | REG_TYPE: required"
+                        
+                        // Extract JSON between SECTIONS: and the next |
+                        const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
+                        const parsed = JSON.parse(sectionsString);
                         
                         let names = [];
                         let fullList = [];
