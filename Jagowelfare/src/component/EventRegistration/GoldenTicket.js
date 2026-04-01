@@ -46,21 +46,17 @@ const GoldenTicket = ({ registration, event }) => {
                 
                 return (
                     <div style={{ 
-                        margin: "10px auto 20px", 
-                        backgroundColor: "gold", 
+                        margin: "30px auto 10px", 
+                        backgroundColor: "#FFC107", 
                         display: "block", 
-                        padding: "10px 30px", 
-                        borderRadius: "50px",
-                        maxWidth: "200px",
-                        boxShadow: "0 4px 15px rgba(212, 175, 55, 0.3)",
-                        position: "absolute",
-                        bottom: "-25px",
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        zIndex: 10
+                        padding: "12px 20px", 
+                        borderRadius: "4px", // Matches the rectangular look in screenshot
+                        maxWidth: "180px",
+                        textAlign: "center",
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.2)"
                     }}>
                         <span style={{ 
-                            fontSize: "14px", 
+                            fontSize: "18px", 
                             fontWeight: "900", 
                             color: "#000", 
                             textTransform: "uppercase",
