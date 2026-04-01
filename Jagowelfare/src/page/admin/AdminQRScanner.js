@@ -66,7 +66,7 @@ const AdminQRScanner = () => {
                 setMsg({ text: "ENTRY REJECTED: ALREADY SCANNED! ❌", type: "danger" });
             }
 
-            const { data: ev } = await supabase.from('events').select('title').eq('id', data.event_id).single();
+            const { data: ev } = await supabase.from('events').select('title, description').eq('id', data.event_id).single();
             setEventData(ev);
 
         } catch (err) {
@@ -175,7 +175,21 @@ const AdminQRScanner = () => {
                                         </tr>
                                         <tr>
                                             <td style={{ color: "#d4af37", fontWeight: "900" }}>SECTION:</td>
-                                            <td style={{ color: "#fff", fontWeight: "900", textTransform: "uppercase", fontSize: isMobile ? "18px" : "22px" }}>{userData.selected_section || "General"}</td>
+                                            <td style={{ color: "#fff", fontWeight: "900", textTransform: "uppercase", fontSize: isMobile ? "18px" : "22px" }}>
+                                                {(() => {
+                                                    let displaySection = userData.selected_section;
+                                                    if (!displaySection && eventData?.description?.startsWith("SECTIONS:")) {
+                                                        try {
+                                                            const metadataPart = eventData.description.split(" | CONTENT: ")[0];
+                                                            const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
+                                                            const parsed = JSON.parse(sectionsString);
+                                                            const names = (Array.isArray(parsed) ? parsed : Object.keys(parsed)).map(s => typeof s === 'string' ? s : s.name);
+                                                            if (names.length > 0) displaySection = names[0];
+                                                        } catch (e) {}
+                                                    }
+                                                    return displaySection || "GENERAL";
+                                                })()}
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>

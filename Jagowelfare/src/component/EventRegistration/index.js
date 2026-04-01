@@ -318,6 +318,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                             eventTitle: event.title,
                             ticketId: reg.id,
                             section: reg.selected_section,
+                            description: event.description,
                             venue: event.venue || "TBD",
                             date: formatDate(event.startAt),
                             time: formatTime(event.startAt)

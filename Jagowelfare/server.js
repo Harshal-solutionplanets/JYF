@@ -34,7 +34,7 @@ transporter.verify((error, success) => {
 });
 
 app.post('/api/send-ticket', async (req, res) => {
-  const { recipientEmail, recipientName, eventTitle, ticketId, section, venue, date, time } = req.body;
+  const { recipientEmail, recipientName, eventTitle, ticketId, section, description, venue, date, time } = req.body;
 
   console.log(`[${new Date().toISOString()}] Incoming request to send ticket to: ${recipientEmail}`);
 
@@ -123,10 +123,22 @@ app.post('/api/send-ticket', async (req, res) => {
     // Actual QR Image
     doc.image(qrDataUrl, doc.page.width / 2 - 65, 425, { width: 130 });
 
-    // Section Button (SILVER)
-    doc.roundedRect(doc.page.width / 2 - 65, 595, 130, 35, 17.5).fill('#FFCC00');
-    const displaySection = (section && typeof section === 'string') ? section.toUpperCase() : 'SILVER';
-    doc.fillColor('#000000').fontSize(15).font('Helvetica-Bold').text(displaySection, 0, 606, { align: 'center' });
+    // Section Button (Rectangular Gold)
+    doc.rect(doc.page.width / 2 - 65, 595, 130, 35).fill('#FFCC00');
+    
+    let displaySection = section;
+    if (!displaySection && description && description.startsWith("SECTIONS:")) {
+      try {
+        const metadataPart = description.split(" | CONTENT: ")[0];
+        const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
+        const parsed = JSON.parse(sectionsString);
+        const names = Array.isArray(parsed) ? parsed.map(s => typeof s === 'string' ? s : s.name) : Object.keys(parsed);
+        if (names.length > 0) displaySection = names[0];
+      } catch (e) {}
+    }
+    
+    const finalSection = (displaySection && typeof displaySection === 'string') ? displaySection.toUpperCase() : 'GOLD';
+    doc.fillColor('#000000').fontSize(15).font('Helvetica-Bold').text(finalSection, 0, 606, { align: 'center' });
 
     // Footer Text
     doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 655, { align: 'center' });
