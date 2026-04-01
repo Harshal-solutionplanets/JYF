@@ -27,47 +27,6 @@ const GoldenTicket = ({ registration, event }) => {
             position: "relative",
             textAlign: "center"
         }}>
-            {/* Added fallback to parse default section from event description if registration.section is null */}
-            {(() => {
-                let displaySection = registration.section || registration.selected_section;
-                if (!displaySection && event.description && event.description.startsWith("SECTIONS:")) {
-                    try {
-                        const metadataPart = event.description.split(" | CONTENT: ")[0];
-                        const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
-                        const parsed = JSON.parse(sectionsString);
-                        const names = (Array.isArray(parsed) ? parsed : Object.keys(parsed)).map(s => typeof s === 'string' ? s : s.name);
-                        if (names.length > 0) displaySection = names[0];
-                    } catch (e) {
-                        displaySection = "GENERAL";
-                    }
-                }
-                
-                if (!displaySection) return null;
-                
-                return (
-                    <div style={{ 
-                        margin: "30px auto 10px", 
-                        backgroundColor: "#FFC107", 
-                        display: "block", 
-                        padding: "12px 20px", 
-                        borderRadius: "4px", // Matches the rectangular look in screenshot
-                        maxWidth: "180px",
-                        textAlign: "center",
-                        boxShadow: "0 4px 10px rgba(0,0,0,0.2)"
-                    }}>
-                        <span style={{ 
-                            fontSize: "18px", 
-                            fontWeight: "900", 
-                            color: "#000", 
-                            textTransform: "uppercase",
-                            letterSpacing: "1px"
-                        }}>
-                            {displaySection}
-                        </span>
-                    </div>
-                );
-            })()}
-
             <div style={{ position: "absolute", top: "10px", left: "10px", opacity: 0.2 }}>✨</div>
             <div style={{ position: "absolute", bottom: "10px", right: "10px", opacity: 0.2 }}>✨</div>
 
@@ -126,6 +85,47 @@ const GoldenTicket = ({ registration, event }) => {
                     fgColor="#000"
                 />
             </div>
+
+            {/* Added fallback to parse default section from event description if registration.section is null */}
+            {(() => {
+                let displaySection = registration.section || registration.selected_section;
+                if (!displaySection && event.description && event.description.startsWith("SECTIONS:")) {
+                    try {
+                        const metadataPart = event.description.split(" | CONTENT: ")[0];
+                        const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
+                        const parsed = JSON.parse(sectionsString);
+                        const names = (Array.isArray(parsed) ? parsed : Object.keys(parsed)).map(s => typeof s === 'string' ? s : s.name);
+                        if (names.length > 0) displaySection = names[0];
+                    } catch (e) {
+                        displaySection = "GENERAL";
+                    }
+                }
+                
+                if (!displaySection) return null;
+                
+                return (
+                    <div style={{ 
+                        margin: "10px auto 20px", 
+                        backgroundColor: "#FFC107", 
+                        display: "block", 
+                        padding: "12px 20px", 
+                        borderRadius: "4px", 
+                        maxWidth: "180px",
+                        textAlign: "center",
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.2)"
+                    }}>
+                        <span style={{ 
+                            fontSize: "18px", 
+                            fontWeight: "900", 
+                            color: "#000", 
+                            textTransform: "uppercase",
+                            letterSpacing: "1px"
+                        }}>
+                            {displaySection}
+                        </span>
+                    </div>
+                );
+            })()}
 
             <p style={{ marginTop: "20px", color: "#888", fontSize: "11px" }}>
                 Scan this at the entrance • Entry on First come basis • jainyouthfoundation.org
