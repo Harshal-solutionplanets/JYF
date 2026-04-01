@@ -86,7 +86,7 @@ const GoldenTicket = ({ registration, event }) => {
                 />
             </div>
 
-            {registration.section && (
+            {(registration.section || registration.selected_section) && (
                 <div style={{ 
                     margin: "10px auto 20px", 
                     backgroundColor: "gold", 
@@ -103,7 +103,7 @@ const GoldenTicket = ({ registration, event }) => {
                         textTransform: "uppercase",
                         letterSpacing: "1px"
                     }}>
-                        {registration.section}
+                        {registration.section || registration.selected_section}
                     </span>
                 </div>
             )}

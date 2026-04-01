@@ -236,7 +236,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 .eq('phone_number', p.phoneNo);
             
             if (count > 0) {
-                setFormError(`This phone number (${p.phoneNo}) is already registered for this event.`);
+                setFormError(`This phone number is already registered for this event.`);
                 setIsSubmitting(false);
                 return;
             }
@@ -280,7 +280,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 .eq('phone_number', finalParticipants[0].phoneNo);
 
             if (dupCount > 0) {
-                setFormError("This mobile number is already registered for this event.");
+                setFormError("This phone number is already registered for this event.");
                 setIsSubmitting(false);
                 return;
             }
@@ -427,6 +427,55 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                             )}
                                         </div>
                                     </div>
+
+                                    {availableSections.length > 0 && (
+                                        <div className="section_selection_box mb-5 p-4" style={{ 
+                                            background: "#fff5f5", 
+                                            borderRadius: "15px", 
+                                            border: "2px solid #e33129",
+                                            textAlign: "left"
+                                        }}>
+                                            <label style={{ 
+                                                fontWeight: "800", 
+                                                color: "#333", 
+                                                display: "block", 
+                                                marginBottom: "15px",
+                                                fontSize: "16px",
+                                                textTransform: "uppercase"
+                                            }}>
+                                                🎟️ Choose Your Section:
+                                            </label>
+                                            <select 
+                                                className="form-control"
+                                                value={selectedSection}
+                                                onChange={(e) => {
+                                                    setSelectedSection(e.target.value);
+                                                    const up = [...participants];
+                                                    up[0].section = e.target.value;
+                                                    setParticipants(up);
+                                                }}
+                                                style={{ 
+                                                    height: "60px", 
+                                                    fontSize: "18px", 
+                                                    fontWeight: "700",
+                                                    color: "#e33129",
+                                                    border: "1px solid #e33129",
+                                                    borderRadius: "12px",
+                                                    cursor: "pointer",
+                                                    backgroundColor: "#fff"
+                                                }}
+                                            >
+                                                {availableSections.map(name => (
+                                                    <option key={name} value={name}>
+                                                        {name.toUpperCase()} {sectionBookedCounts[name] >= (sectionsList.find(s=>s.name===name)?.seats || 9999) ? "(SOLD OUT)" : ""}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <p className="mt-3 mb-0 text-muted small">
+                                                * Please select your preferred section before continuing.
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {!isSoldOut && (
                                         <div className="text-center mt-5">

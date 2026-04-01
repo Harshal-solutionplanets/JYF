@@ -125,7 +125,8 @@ app.post('/api/send-ticket', async (req, res) => {
 
     // Section Button (SILVER)
     doc.roundedRect(doc.page.width / 2 - 65, 595, 130, 35, 17.5).fill('#FFCC00');
-    doc.fillColor('#000000').fontSize(15).font('Helvetica-Bold').text(section.toUpperCase() || 'SILVER', 0, 606, { align: 'center' });
+    const displaySection = (section && typeof section === 'string') ? section.toUpperCase() : 'SILVER';
+    doc.fillColor('#000000').fontSize(15).font('Helvetica-Bold').text(displaySection, 0, 606, { align: 'center' });
 
     // Footer Text
     doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 655, { align: 'center' });
