@@ -43,6 +43,12 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
     const [registeredParticipants, setRegisteredParticipants] = useState([]);
     const [formError, setFormError] = useState("");
 
+    // Reservation Lock states
+    const [sessionId] = useState(() => user?.email || `anon_${Math.random().toString(36).substr(2, 9)}`);
+    const [lockRemainingTime, setLockRemainingTime] = useState(0);
+    const [isPriorityUser, setIsPriorityUser] = useState(false);
+    const [lockInterval, setLockInterval] = useState(null);
+
     useEffect(() => {
         const fetchEvent = async () => {
             try {
@@ -133,6 +139,77 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
         }
     }, [event, selectedSection, user]);
 
+    // Release lock on unmount
+    useEffect(() => {
+        return () => {
+            if (sessionId && eventId) {
+                supabase.from('ticket_locks').delete().eq('event_id', eventId).eq('locked_by', sessionId).then(() => {});
+            }
+        };
+    }, [sessionId, eventId]);
+
+    // Timer logic
+    useEffect(() => {
+        if (lockRemainingTime > 0) {
+            const timer = setInterval(() => {
+                setLockRemainingTime(prev => {
+                    if (prev <= 1) {
+                        clearInterval(timer);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+            return () => clearInterval(timer);
+        }
+    }, [lockRemainingTime]);
+
+    // Ticket Lock Logic
+    const startRegistrationFlow = async () => {
+        try {
+            setLoading(true);
+            setFormError("");
+
+            // 1. Fetch current status
+            const [regRes, lockRes] = await Promise.all([
+                supabase.from('event_registrations').select('id', { count: 'exact', head: true }).eq('event_id', eventId),
+                supabase.from('ticket_locks').select('*').eq('event_id', eventId).gt('expires_at', new Date().toISOString())
+            ]);
+
+            const currentRegs = regRes.count || 0;
+            const activeLocks = (lockRes.data || []).filter(l => l.locked_by !== sessionId);
+
+            if (event.seatsAvailable && (currentRegs + activeLocks.length) >= event.seatsAvailable) {
+                // No priority available, but per user request "register open hoga", 
+                // we still go to form but warn them.
+                setIsPriorityUser(false);
+                setFormError("⚠️ All seats are currently being filled by others. You can try filling the form, but a seat might not be available when you submit.");
+            } else {
+                // Try to acquire priority lock
+                const expiresAt = new Date(Date.now() + 16000).toISOString(); // 15s + 1s buffer
+                const { error: lockErr } = await supabase
+                    .from('ticket_locks')
+                    .insert([{
+                        event_id: eventId,
+                        locked_by: sessionId,
+                        expires_at: expiresAt
+                    }]);
+
+                if (!lockErr) {
+                    setIsPriorityUser(true);
+                    setLockRemainingTime(15);
+                }
+            }
+
+            setPageStatus('form');
+        } catch (err) {
+            console.error("Lock error", err);
+            setPageStatus('form'); // Fail safe to form
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const handleValidationAndSubmit = async () => {
         setIsSubmitting(true);
@@ -175,18 +252,20 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
         setIsSubmitting(true);
         setError("");
         try {
-            // 1. Final seat count check
+            // 1. Final seat count check (Respecting locks)
             const { data: eventData, error: eventErr } = await supabase.from("events").select("seatsAvailable").eq("id", eventId).single();
             if (eventErr) throw eventErr;
 
-            const { count: currentRegs, error: countErr } = await supabase
-                .from('event_registrations')
-                .select('*', { count: 'exact', head: true })
-                .eq('event_id', eventId);
+            const [regRes, lockRes] = await Promise.all([
+                supabase.from('event_registrations').select('id', { count: 'exact', head: true }).eq('event_id', eventId),
+                supabase.from('ticket_locks').select('*').eq('event_id', eventId).gt('expires_at', new Date().toISOString())
+            ]);
             
-            if (countErr) throw countErr;
+            const currentRegs = regRes.count || 0;
+            // Count locks from OTHERS that haven't expired
+            const otherActiveLocks = (lockRes.data || []).filter(l => l.locked_by !== sessionId);
 
-            if (eventData.seatsAvailable && currentRegs >= eventData.seatsAvailable) {
+            if (eventData.seatsAvailable && (currentRegs + otherActiveLocks.length) >= eventData.seatsAvailable) {
                 setFormError("Sorry, the event just sold out! No more seats available.");
                 setIsSoldOut(true);
                 setIsSubmitting(false);
@@ -249,6 +328,10 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 console.error("Email sending background error:", emailErr);
             }
 
+            // Cleanup lock on success
+            await supabase.from('ticket_locks').delete().eq('event_id', eventId).eq('locked_by', sessionId);
+            setLockRemainingTime(0);
+
             setRegisteredParticipants(enrichedData || []);
             setPageStatus('success');
             setSuccessMsg("Your registration is successful! Official Tickets have been sent to your email.");
@@ -281,7 +364,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                         <h2 style={{ fontWeight: "800", color: "#333" }}>{event.title}</h2>
                                     </div>
 
-                                    {/* Important Note Added */}
+                                    {/* Important Note Section */}
                                     <div className="important_note_section mb-4 p-4" style={{ 
                                         backgroundColor: "#f9fcf9", 
                                         border: "1px solid #d4edda", 
@@ -346,102 +429,14 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                     </div>
 
                                     {!isSoldOut && (
-                                        <div className="registration_form_step mt-5">
-                                            <h3 className="text-center mb-4" style={{ fontWeight: "700", color: "#e33129" }}>Complete Your Registration</h3>
-                                            
-                                            <div className="participant_block mb-4 p-4" style={{ backgroundColor: "#fff", borderRadius: "15px", border: "1px solid #eee", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
-                                                {/* Row 1: Name & Email */}
-                                                <div className="row g-3 mb-3">
-                                                    <div className="col-md-6 text-start">
-                                                        <label className="mb-2 small fw-bold">Full Name <span style={{ color: 'red' }}>*</span></label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            style={{ borderRadius: "10px", padding: "12px", border: (formError && !participants[0].name.trim()) ? "1px solid red" : "1px solid #ced4da" }}
-                                                            placeholder="Enter Name"
-                                                            value={participants[0].name}
-                                                            onChange={(e) => {
-                                                                const up = [...participants];
-                                                                up[0].name = e.target.value.replace(/[^a-zA-Z\s]/g, '');
-                                                                setParticipants(up);
-                                                            }}
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-6 text-start">
-                                                        <label className="mb-2 small fw-bold">Email Address <span style={{ color: 'red' }}>*</span></label>
-                                                        <input
-                                                            type="email"
-                                                            className="form-control"
-                                                            style={{ borderRadius: "10px", padding: "12px", border: (formError && !participants[0].email.trim()) ? "1px solid red" : "1px solid #ced4da" }}
-                                                            placeholder="Enter Email"
-                                                            value={participants[0].email}
-                                                            onChange={(e) => {
-                                                                const up = [...participants];
-                                                                up[0].email = e.target.value;
-                                                                setParticipants(up);
-                                                            }}
-                                                            required
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                {/* Row 2: Phone & Location */}
-                                                <div className="row g-3">
-                                                    <div className="col-md-6 text-start">
-                                                        <label className="mb-2 small fw-bold">Phone Number <span style={{ color: 'red' }}>*</span></label>
-                                                        <input
-                                                            type="tel"
-                                                            className="form-control"
-                                                            style={{ borderRadius: "10px", padding: "12px", border: (formError && !/^\d{10}$/.test(participants[0].phoneNo)) ? "1px solid red" : "1px solid #ced4da" }}
-                                                            placeholder="10 digit number"
-                                                            value={participants[0].phoneNo}
-                                                            onChange={(e) => {
-                                                                const up = [...participants];
-                                                                up[0].phoneNo = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                                                setParticipants(up);
-                                                            }}
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-6 text-start">
-                                                        <label className="mb-2 small fw-bold">Location <span style={{ color: 'red' }}>*</span></label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            style={{ borderRadius: "10px", padding: "12px", border: (formError && !participants[0].location.trim()) ? "1px solid red" : "1px solid #ced4da" }}
-                                                            placeholder="e.g. Mulund West"
-                                                            value={participants[0].location}
-                                                            onChange={(e) => {
-                                                                const up = [...participants];
-                                                                up[0].location = e.target.value.replace(/[^a-zA-Z\s]/g, '');
-                                                                setParticipants(up);
-                                                            }}
-                                                            required
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {formError && <div className="alert alert-danger mt-3">{formError}</div>}
-
-                                            <div className="text-center d-flex justify-content-center gap-3 mt-4">
-                                                <button 
-                                                    className="btn btn-outline-dark btn_md" 
-                                                    style={{ width: "200px", borderRadius: "10px" }}
-                                                    onClick={() => navigate(-1)}
-                                                >
-                                                    Back
-                                                </button>
-                                                <button 
-                                                    className="btn btn_theme btn_md" 
-                                                    style={{ width: "200px" }} 
-                                                    onClick={handleValidationAndSubmit}
-                                                    disabled={isSubmitting}
-                                                >
-                                                    {isSubmitting ? "Processing..." : "Register Now"}
-                                                </button>
-                                            </div>
+                                        <div className="text-center mt-5">
+                                            <button 
+                                                className="btn btn_theme btn_md" 
+                                                style={{ padding: "15px 50px", fontSize: "18px" }}
+                                                onClick={startRegistrationFlow}
+                                            >
+                                                Register Now
+                                            </button>
                                         </div>
                                     )}
 
@@ -450,6 +445,129 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                             <button className="btn btn-outline-dark btn_md" onClick={() => navigate(-1)}>Back to Events</button>
                                         </div>
                                     )}
+                                </div>
+                            )}
+
+                            {pageStatus === 'form' && (
+                                <div className="event_form_step p-4">
+                                    {/* Timer Bar */}
+                                    {isPriorityUser && (
+                                        <div className="timer_container mb-4 text-center">
+                                            <div style={{ fontSize: "14px", fontWeight: "700", color: lockRemainingTime <= 5 ? "#e33129" : "#666", marginBottom: "8px" }}>
+                                                {lockRemainingTime > 0 ? (
+                                                    <span>⏱️ Reservation expires in: {lockRemainingTime}s</span>
+                                                ) : (
+                                                    <span style={{ color: "#e33129" }}>⚠️ Reservation expired! Seats may be taken.</span>
+                                                )}
+                                            </div>
+                                            <div className="progress" style={{ height: "10px", borderRadius: "5px" }}>
+                                                <div 
+                                                    className={`progress-bar progress-bar-striped progress-bar-animated ${lockRemainingTime <= 5 ? "bg-danger" : "bg-success"}`} 
+                                                    role="progressbar" 
+                                                    style={{ width: `${(lockRemainingTime / 15) * 100}%`, transition: "width 1s linear" }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="text-center mb-4">
+                                        <h3 style={{ fontWeight: "800", color: "#333" }}>{event.title}</h3>
+                                        <p className="text-muted">Enter your details below to secure your ticket</p>
+                                    </div>
+                                    
+                                    <div className="participant_block mb-4 p-4" style={{ backgroundColor: "#fff", borderRadius: "15px", border: "1px solid #eee", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
+                                        {/* Row 1: Name & Email */}
+                                        <div className="row g-3 mb-3">
+                                            <div className="col-md-6 text-start">
+                                                <label className="mb-2 small fw-bold">Full Name <span style={{ color: 'red' }}>*</span></label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    style={{ borderRadius: "10px", padding: "12px", border: (formError && !participants[0].name.trim()) ? "1px solid red" : "1px solid #ced4da" }}
+                                                    placeholder="Enter Name"
+                                                    value={participants[0].name}
+                                                    onChange={(e) => {
+                                                        const up = [...participants];
+                                                        up[0].name = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                                                        setParticipants(up);
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="col-md-6 text-start">
+                                                <label className="mb-2 small fw-bold">Email Address <span style={{ color: 'red' }}>*</span></label>
+                                                <input
+                                                    type="email"
+                                                    className="form-control"
+                                                    style={{ borderRadius: "10px", padding: "12px", border: (formError && !participants[0].email.trim()) ? "1px solid red" : "1px solid #ced4da" }}
+                                                    placeholder="Enter Email"
+                                                    value={participants[0].email}
+                                                    onChange={(e) => {
+                                                        const up = [...participants];
+                                                        up[0].email = e.target.value;
+                                                        setParticipants(up);
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Row 2: Phone & Location */}
+                                        <div className="row g-3">
+                                            <div className="col-md-6 text-start">
+                                                <label className="mb-2 small fw-bold">Phone Number <span style={{ color: 'red' }}>*</span></label>
+                                                <input
+                                                    type="tel"
+                                                    className="form-control"
+                                                    style={{ borderRadius: "10px", padding: "12px", border: (formError && !/^\d{10}$/.test(participants[0].phoneNo)) ? "1px solid red" : "1px solid #ced4da" }}
+                                                    placeholder="10 digit number"
+                                                    value={participants[0].phoneNo}
+                                                    onChange={(e) => {
+                                                        const up = [...participants];
+                                                        up[0].phoneNo = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                        setParticipants(up);
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="col-md-6 text-start">
+                                                <label className="mb-2 small fw-bold">Location <span style={{ color: 'red' }}>*</span></label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    style={{ borderRadius: "10px", padding: "12px", border: (formError && !participants[0].location.trim()) ? "1px solid red" : "1px solid #ced4da" }}
+                                                    placeholder="e.g. Mulund West"
+                                                    value={participants[0].location}
+                                                    onChange={(e) => {
+                                                        const up = [...participants];
+                                                        up[0].location = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                                                        setParticipants(up);
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {formError && <div className="alert alert-danger mt-3">{formError}</div>}
+
+                                    <div className="text-center d-flex justify-content-center gap-3 mt-4">
+                                        <button 
+                                            className="btn btn-outline-dark btn_md" 
+                                            style={{ width: "200px", borderRadius: "10px" }}
+                                            onClick={() => setPageStatus('landing')}
+                                        >
+                                            Back
+                                        </button>
+                                        <button 
+                                            className={`btn btn_theme btn_md ${(lockRemainingTime > 0 && lockRemainingTime <= 5) ? 'pulse_btn' : ''}`} 
+                                            style={{ width: "200px" }} 
+                                            onClick={handleValidationAndSubmit}
+                                            disabled={isSubmitting}
+                                        >
+                                            {isSubmitting ? "Processing..." : "Submit Registration"}
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
@@ -535,6 +653,15 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                     box-shadow: 0 5px 15px rgba(227, 49, 41, 0.3);
                 }
                 .badge { border-radius: 20px; }
+                .pulse_btn {
+                    animation: pulse 1.5s infinite;
+                    background: #e33129 !important;
+                }
+                @keyframes pulse {
+                    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 49, 41, 0.7); }
+                    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(227, 49, 41, 0); }
+                    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 49, 41, 0); }
+                }
             `}</style>
         </section>
     );
