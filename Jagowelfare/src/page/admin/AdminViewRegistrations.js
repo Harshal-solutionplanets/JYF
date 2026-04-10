@@ -7,8 +7,10 @@ const AdminViewRegistrations = () => {
     const [loading, setLoading] = useState(true);
     const [events, setEvents] = useState({});
     const [eventsList, setEventsList] = useState([]);
+    const [eventsFullList, setEventsFullList] = useState([]);
     const [selectedEventId, setSelectedEventId] = useState("all");
     const [viewMode, setViewMode] = useState("all");
+    const [resendingId, setResendingId] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -17,8 +19,9 @@ const AdminViewRegistrations = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const { data: eventsData } = await supabase.from('events').select('id, title');
+            const { data: eventsData } = await supabase.from('events').select('*');
             setEventsList(eventsData || []);
+            setEventsFullList(eventsData || []);
             const eventMap = {};
             eventsData?.forEach(e => eventMap[e.id] = e.title);
             setEvents(eventMap);
@@ -30,6 +33,42 @@ const AdminViewRegistrations = () => {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleResendEmail = async (reg) => {
+        const ev = eventsFullList.find(e => e.id === reg.event_id);
+        if (!ev) {
+            alert("Event details not found!");
+            return;
+        }
+
+        setResendingId(reg.id);
+        try {
+            const response = await fetch('/api/send-ticket', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    recipientEmail: reg.email,
+                    recipientName: reg.full_name,
+                    eventTitle: ev.title,
+                    ticketId: reg.id,
+                    section: reg.selected_section || "GOLD",
+                    venue: ev.venue || "Kalidas Auditorium, Mulund West, Mumbai",
+                    date: formatDate(ev.startAt || ev.start_at),
+                    time: "07:00 PM" // Can be made dynamic if added to DB
+                })
+            });
+
+            if (response.ok) {
+                alert(`Official Ticket successfully resent to ${reg.full_name}`);
+            } else {
+                throw new Error("Failed to send email. Please check server logs.");
+            }
+        } catch (err) {
+            alert("Error: " + err.message);
+        } finally {
+            setResendingId(null);
         }
     };
 
@@ -169,6 +208,19 @@ const AdminViewRegistrations = () => {
                                         {formatDate(r.created_at)}
                                     </td>
                                     <td style={{ border: "none", padding: "15px", borderTopRightRadius: "15px", borderBottomRightRadius: "15px", textAlign: "right" }}>
+                                        <button 
+                                            onClick={() => handleResendEmail(r)} 
+                                            className="btn btn-light mr-2" 
+                                            style={{ width: "35px", height: "35px", borderRadius: "10px", color: "#28a745", border: "1px solid #e7f4e8" }}
+                                            title="Resend Ticket Email"
+                                            disabled={resendingId === r.id}
+                                        >
+                                            {resendingId === r.id ? (
+                                                <i className="fas fa-spinner fa-spin"></i>
+                                            ) : (
+                                                <i className="fas fa-envelope"></i>
+                                            )}
+                                        </button>
                                         <button onClick={() => handleDelete(r.id)} className="btn btn-light" style={{ width: "35px", height: "35px", borderRadius: "10px", color: "#e33129" }}>
                                             <i className="fas fa-trash"></i>
                                         </button>
