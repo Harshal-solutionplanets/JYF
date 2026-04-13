@@ -334,36 +334,32 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 section: selectedSection
             }));
 
-            // TRIGGER ACTUAL EMAIL SENDING via server.js
-            try {
-                for (const reg of enrichedData) {
-                    await fetch('/api/send-ticket', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            recipientEmail: reg.email,
-                            recipientName: reg.full_name,
-                            eventTitle: event.title,
-                            ticketId: reg.id,
-                            section: reg.selected_section || selectedSection || (availableSections.length > 0 ? availableSections[0] : ""),
-                            description: event.description,
-                            venue: event.venue || "TBD",
-                            date: formatDate(event.startAt),
-                            time: formatTime(event.startAt)
-                        })
-                    });
-                }
-            } catch (emailErr) {
-                console.error("Email sending background error:", emailErr);
-            }
-
-            // Cleanup lock on success
-            await supabase.from('ticket_locks').delete().eq('event_id', eventId).eq('locked_by', sessionId);
-            setLockRemainingTime(0);
-
             setRegisteredParticipants(enrichedData || []);
             setPageStatus('success');
             setSuccessMsg("Your registration is successful! Official Tickets have been sent to your email.");
+
+            // TRIGGER EMAIL SENDING in background (non-blocking)
+            enrichedData.forEach(reg => {
+                fetch('/api/send-ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recipientEmail: reg.email,
+                        recipientName: reg.full_name,
+                        eventTitle: event.title,
+                        ticketId: reg.id,
+                        section: reg.selected_section || selectedSection || (availableSections.length > 0 ? availableSections[0] : ""),
+                        description: event.description,
+                        venue: event.venue || "TBD",
+                        date: formatDate(event.startAt),
+                        time: formatTime(event.startAt)
+                    })
+                }).catch(emailErr => console.error("Background email error:", emailErr));
+            });
+
+            // Cleanup lock
+            supabase.from('ticket_locks').delete().eq('event_id', eventId).eq('locked_by', sessionId).then(() => {});
+            setLockRemainingTime(0);
         } catch (err) {
             setError(err?.message || "Registration failed.");
         } finally {
