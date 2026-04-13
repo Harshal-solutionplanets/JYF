@@ -12,6 +12,13 @@ export default async function handler(req, res) {
 
   const { recipientEmail, recipientName, eventTitle, ticketId, section, description, venue, date, time } = req.body;
 
+  const SENDER_EMAIL = process.env.GMAIL_USER || 'donotreply@jainyouth.in';
+  const SENDER_PASS = process.env.GMAIL_PASS || 'fona izov qhkg uwhy';
+
+  console.log("-----------------------------------------");
+  console.log("API ACTIVE EMAIL SENDER:", SENDER_EMAIL);
+  console.log("-----------------------------------------");
+
   if (!recipientEmail || !recipientName || !eventTitle || !ticketId) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -92,9 +99,9 @@ export default async function handler(req, res) {
     // Section Text
     doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSectionName, 0, 622, { align: 'center' });
 
-    // Footer Text with Website Link
-    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis • ', 0, 670, { align: 'center', continued: true });
-    doc.fillColor('#D4AF37').text('jainyouthfoundation.org', { link: 'https://jainyouthfoundation.org' });
+    // Footer Text with Website Link (Split into two lines to avoid overlap)
+    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 670, { align: 'center' });
+    doc.fillColor('#D4AF37').text('jainyouthfoundation.org', 0, 682, { align: 'center', link: 'https://jainyouthfoundation.org' });
 
 
     doc.end();
@@ -105,13 +112,13 @@ export default async function handler(req, res) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
+        user: SENDER_EMAIL,
+        pass: SENDER_PASS
       }
     });
 
     await transporter.sendMail({
-      from: `"Jain Youth Foundation (No-Reply)" <${process.env.GMAIL_USER}>`,
+      from: `"Jain Youth Foundation (No-Reply)" <${SENDER_EMAIL}>`,
       to: recipientEmail,
       subject: `Official Ticket: ${eventTitle}`,
       text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nEvent: ${eventTitle}\nTicket ID: ${ticketId}\n\nThank you,\nJain Youth Foundation`,

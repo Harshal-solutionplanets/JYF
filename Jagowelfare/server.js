@@ -12,6 +12,9 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+const SENDER_EMAIL = process.env.GMAIL_USER || 'donotreply@jainyouth.in';
+const SENDER_PASS = process.env.GMAIL_PASS || 'fona izov qhkg uwhy';
+
 // Configure Nodemailer with Gmail credentials
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -19,10 +22,14 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS
+    user: SENDER_EMAIL,
+    pass: SENDER_PASS
   }
 });
+
+console.log("-----------------------------------------");
+console.log("ACTIVE EMAIL SENDER:", SENDER_EMAIL);
+console.log("-----------------------------------------");
 
 // Verify connection configuration
 transporter.verify((error, success) => {
@@ -62,7 +69,7 @@ app.post('/api/send-ticket', async (req, res) => {
       let pdfData = Buffer.concat(buffers);
 
       const mailOptions = {
-        from: `"Jain Youth Foundation (No-Reply)" <${process.env.GMAIL_USER}>`,
+        from: `"Jain Youth Foundation (No-Reply)" <${SENDER_EMAIL}>`,
         to: recipientEmail,
         subject: `Your Bhakti Sandhya Ticket: ${recipientName}`,
         text: ` ${recipientName}, please find your official ticket for ${eventTitle} attached to this email. \n\nTicket ID: ${ticketId}\nVenue: ${venue}\nDate: ${date}`,
@@ -147,9 +154,9 @@ app.post('/api/send-ticket', async (req, res) => {
     // Section Text
     doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSectionName, 0, 622, { align: 'center' });
 
-    // Footer Text with Website Link
-    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis • ', 0, 670, { align: 'center', continued: true });
-    doc.fillColor('#D4AF37').text('jainyouthfoundation.org', { link: 'https://jainyouthfoundation.org' });
+    // Footer Text with Website Link (Split into two lines to avoid overlap)
+    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 670, { align: 'center' });
+    doc.fillColor('#D4AF37').text('jainyouthfoundation.org', 0, 682, { align: 'center', link: 'https://jainyouthfoundation.org' });
 
     doc.end();
 
