@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
 const QRCode = require('qrcode');
@@ -43,8 +43,8 @@ export default async function handler(req, res) {
     // Outer Gold Border
     doc.rect(5, 5, doc.page.width - 10, doc.page.height - 10).lineWidth(3).stroke('#D4AF37');
 
-    // Logo (Centered Top)
-    const logoPath = path.join(__dirname, 'jyf_logo.jpg');
+    // Logo (Centered Top) - Using new .png version
+    const logoPath = path.join(__dirname, 'jyf_logo.png');
     try {
       doc.image(logoPath, doc.page.width / 2 - 50, 25, { width: 100 });
     } catch (e) { console.error("Logo missing:", logoPath); }
@@ -92,7 +92,9 @@ export default async function handler(req, res) {
     // Section Text
     doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSectionName, 0, 622, { align: 'center' });
 
-    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 670, { align: 'center' });
+    // Footer Text with Website Link
+    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis • ', 0, 670, { align: 'center', continued: true });
+    doc.fillColor('#D4AF37').text('jainyouthfoundation.org', { link: 'https://jainyouthfoundation.org' });
 
 
     doc.end();

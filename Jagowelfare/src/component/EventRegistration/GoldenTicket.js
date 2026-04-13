@@ -134,7 +134,7 @@ const GoldenTicket = ({ registration, event }) => {
             })()}
 
             <p style={{ marginTop: "20px", color: "#888", fontSize: "11px" }}>
-                Scan this at the entrance • Entry on First come basis • jainyouthfoundation.org
+                Scan this at the entrance • Entry on First come basis • <a href="https://jainyouthfoundation.org" target="_blank" rel="noopener noreferrer" style={{ color: "#D4AF37", textDecoration: "none" }}>jainyouthfoundation.org</a>
             </p>
         </div>
     );

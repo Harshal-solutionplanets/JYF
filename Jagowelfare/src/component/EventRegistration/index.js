@@ -95,11 +95,25 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
 
                         setAvailableSections(names);
                         setSectionsList(fullList);
-                        if (names.length > 0) setSelectedSection(names[0]);
-                    } catch (e) {
-                        console.error("Failed to parse sections", e);
-                    }
-                }
+                        
+                        // Smart Default: Find the first section that still has seats available
+                        const currentCounts = {};
+                        (regList || []).forEach(r => {
+                            const s = r.selected_section || "General";
+                            currentCounts[s] = (currentCounts[s] || 0) + 1;
+                        });
+
+                        const firstAvailable = fullList.find(s => {
+                            const capacity = parseInt(s.seats) || 0;
+                            const booked = currentCounts[s.name] || 0;
+                            return capacity > booked;
+                        });
+
+                        if (firstAvailable) {
+                            setSelectedSection(firstAvailable.name);
+                        } else if (names.length > 0) {
+                            setSelectedSection(names[0]);
+                        }
 
                 const currentCounts = {};
                 (regList || []).forEach(r => {
