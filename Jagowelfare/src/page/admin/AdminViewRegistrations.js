@@ -53,10 +53,11 @@ const AdminViewRegistrations = () => {
                     recipientName: reg.full_name,
                     eventTitle: ev.title,
                     ticketId: reg.id,
-                    section: reg.selected_section || "GOLD",
+                    section: reg.selected_section,
+                    description: ev.description,
                     venue: ev.venue || "Kalidas Auditorium, Mulund West, Mumbai",
                     date: formatDate(ev.startAt || ev.start_at),
-                    time: "07:00 PM" // Can be made dynamic if added to DB
+                    time: "07:00 PM" 
                 })
             });
 

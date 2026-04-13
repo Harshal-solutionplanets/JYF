@@ -183,7 +183,7 @@ const MasterManagementView = ({ type, title, masters, onAdd, onDelete, onUpdate,
 
 const AdminDashboardPage = () => {
   const { user } = useAuth();
-  const isScannerOnly = user?.email === 'jainyouthfoundation9@gmail.com';
+  const isScannerOnly = user?.email === 'donotreply@jainyouth.in';
 
   const navigate = useNavigate();
   const [openMenus, setOpenMenus] = useState({});

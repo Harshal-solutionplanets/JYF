@@ -126,7 +126,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
 
     useEffect(() => {
         // Only pre-fill if it's NOT a staff member (to allow easy testing/manual entry by staff)
-        const isStaff = user?.email === 'jainyouthfoundation9@gmail.com';
+        const isStaff = user?.email === 'donotreply@jainyouth.in';
 
         if (event && selectedSection && participants[0].section === "") {
             setParticipants([{

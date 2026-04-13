@@ -1,3 +1,4 @@
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
 const QRCode = require('qrcode');
@@ -9,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { recipientEmail, recipientName, eventTitle, ticketId, section, venue, date, time } = req.body;
+  const { recipientEmail, recipientName, eventTitle, ticketId, section, description, venue, date, time } = req.body;
 
   if (!recipientEmail || !recipientName || !eventTitle || !ticketId) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -35,35 +36,64 @@ export default async function handler(req, res) {
       });
     });
 
-    // --- PDF Content (Rich Design from server.js) ---
+    // --- Redesigned PDF Content (Matching server.js/Resend Design) ---
+    // Dark Background for the whole card
     doc.rect(0, 0, doc.page.width, doc.page.height).fill('#050505');
 
-    // Logo (Using __dirname for Vercel path mapping since it's now in the api folder)
+    // Outer Gold Border
+    doc.rect(5, 5, doc.page.width - 10, doc.page.height - 10).lineWidth(3).stroke('#D4AF37');
+
+    // Logo (Centered Top)
     const logoPath = path.join(__dirname, 'jyf_logo.jpg');
     try {
-      doc.image(logoPath, doc.page.width / 2 - 45, 15, { width: 90 });
-    } catch (e) { console.error("Logo missing in Vercel environment:", logoPath); }
+      doc.image(logoPath, doc.page.width / 2 - 50, 25, { width: 100 });
+    } catch (e) { console.error("Logo missing:", logoPath); }
 
-    doc.fillColor('#D4AF37').fontSize(10).text('JAIN YOUTH FOUNDATION PRESENTS', 0, 125, { align: 'center' });
-    doc.fillColor('#FFEE00').fontSize(18).font('Helvetica-Bold').text(eventTitle.toUpperCase(), 0, 155, { align: 'center' });
-    doc.lineWidth(0.5).strokeColor('#333').moveTo(40, 225).lineTo(doc.page.width - 40, 225).stroke();
-    doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text(recipientName, 0, 260, { align: 'center' });
-    doc.fontSize(10).fillColor('#888').text('DATE:', 40, 310).text('VENUE:', doc.page.width / 2 + 20, 310);
-    doc.fontSize(11).fillColor('#FFFFFF').text(date || '---', 40, 330, { width: 120 });
-    doc.text(venue || 'Kalidas Auditorium\nMulund West, Mumbai', doc.page.width / 2 + 20, 330, { width: 150 });
-    doc.lineWidth(0.5).strokeColor('#333').moveTo(40, 385).lineTo(doc.page.width - 40, 385).stroke();
+    // Presents text
+    doc.fillColor('#D4AF37').fontSize(11).font('Helvetica-Bold').text('JAIN YOUTH FOUNDATION PRESENTS', 0, 140, { align: 'center' });
+
+    // Dynamic Title (Gold/Yellow)
+    doc.fillColor('#FFEE00').fontSize(22).font('Helvetica-Bold').text(eventTitle.toUpperCase(), 0, 175, { align: 'center', width: doc.page.width - 40, x: 20 });
+
+    // Separator Line
+    doc.lineWidth(0.5).strokeColor('rgba(212, 175, 55, 0.3)').moveTo(40, 245).lineTo(doc.page.width - 40, 245).stroke();
+
+    // User Name (White, Centered, Large)
+    doc.fillColor('#FFFFFF').fontSize(28).font('Helvetica-Bold').text(recipientName, 0, 280, { align: 'center' });
+
+    // Date & Venue Section
+    doc.fontSize(10).fillColor('#888').text('DATE:', 60, 340).text('VENUE:', doc.page.width / 2 + 20, 340);
+    doc.fontSize(12).fillColor('#FFFFFF').font('Helvetica-Bold').text(date || '---', 60, 355, { width: 120 });
+    doc.text(venue || 'Kalidas Auditorium\nMulund West, Mumbai', doc.page.width / 2 + 20, 355, { width: 150 });
+
+    // Separator Line
+    doc.lineWidth(0.5).strokeColor('rgba(212, 175, 55, 0.3)').moveTo(40, 410).lineTo(doc.page.width - 40, 410).stroke();
 
     // QR Code Section
-    doc.rect(doc.page.width / 2 - 75, 415, 150, 150).fillAndStroke('#D4AF37', '#D4AF37');
-    doc.rect(doc.page.width / 2 - 70, 420, 140, 140).fill('#FFFFFF');
-    doc.image(qrDataUrl, doc.page.width / 2 - 65, 425, { width: 130 });
+    doc.rect(doc.page.width / 2 - 75, 440, 150, 150).fillAndStroke('#D4AF37', '#D4AF37');
+    doc.rect(doc.page.width / 2 - 70, 445, 140, 140).fill('#FFFFFF');
+    doc.image(qrDataUrl, doc.page.width / 2 - 65, 450, { width: 130 });
 
-    // Section Button
-    doc.rect(doc.page.width / 2 - 65, 595, 130, 35).fill('#FFCC00'); // Changed from roundedRect to rect as PDFKit older versions/environments can be picky
-    doc.fillColor('#000000').fontSize(15).font('Helvetica-Bold').text(section?.toUpperCase() || 'GENERAL', 0, 606, { align: 'center' });
+    // Section Button (Rectangular Gold - Matching Resend Logic)
+    let displaySection = section;
+    if ((!displaySection || displaySection.toString().toUpperCase() === "GENERAL") && description && description.startsWith("SECTIONS:")) {
+      try {
+        const metadataPart = description.split(" | CONTENT: ")[0];
+        const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
+        const parsed = JSON.parse(sectionsString);
+        const names = Array.isArray(parsed) ? parsed.map(s => typeof s === 'string' ? s : s.name) : Object.keys(parsed);
+        if (names.length > 0) displaySection = names[0];
+      } catch (e) { console.error("PDF Fallback Error:", e); }
+    }
+    const finalSectionName = displaySection ? displaySection.toUpperCase() : 'GENERAL';
 
-    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 655, { align: 'center' });
-    doc.fillColor('#D4AF37').fontSize(12).font('Helvetica-Bold').text('Jain Youth Foundation', 0, 675, { align: 'center' });
+    // Rectangular Yellow Box
+    doc.rect(doc.page.width / 2 - 75, 610, 150, 40).fill('#FFCC00');
+    // Section Text
+    doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSectionName, 0, 622, { align: 'center' });
+
+    doc.fillColor('#888').fontSize(9).font('Helvetica').text('Scan this at the entrance • Entry on First come basis', 0, 670, { align: 'center' });
+
 
     doc.end();
 
@@ -79,7 +109,7 @@ export default async function handler(req, res) {
     });
 
     await transporter.sendMail({
-      from: `"Jain Youth Foundation" <${process.env.GMAIL_USER}>`,
+      from: `"Jain Youth Foundation (No-Reply)" <${process.env.GMAIL_USER}>`,
       to: recipientEmail,
       subject: `Official Ticket: ${eventTitle}`,
       text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nEvent: ${eventTitle}\nTicket ID: ${ticketId}\n\nThank you,\nJain Youth Foundation`,

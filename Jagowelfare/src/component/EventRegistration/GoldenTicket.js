@@ -102,15 +102,20 @@ const GoldenTicket = ({ registration, event }) => {
                     }
                 }
                 
+                // Final consistency check
+                if (!displaySection) {
+                    displaySection = "GENERAL";
+                }
+                
                 if (!displaySection) return null;
                 
                 return (
                     <div style={{ 
                         margin: "10px auto 20px", 
-                        backgroundColor: "#FFC107", 
+                        backgroundColor: "#FFCC00", 
                         display: "block", 
                         padding: "12px 20px", 
-                        borderRadius: "4px", 
+                        borderRadius: "0", 
                         maxWidth: "180px",
                         textAlign: "center",
                         boxShadow: "0 4px 10px rgba(0,0,0,0.2)"

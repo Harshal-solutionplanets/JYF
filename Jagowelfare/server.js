@@ -62,7 +62,7 @@ app.post('/api/send-ticket', async (req, res) => {
       let pdfData = Buffer.concat(buffers);
 
       const mailOptions = {
-        from: process.env.GMAIL_USER,
+        from: `"Jain Youth Foundation (No-Reply)" <${process.env.GMAIL_USER}>`,
         to: recipientEmail,
         subject: `Your Bhakti Sandhya Ticket: ${recipientName}`,
         text: ` ${recipientName}, please find your official ticket for ${eventTitle} attached to this email. \n\nTicket ID: ${ticketId}\nVenue: ${venue}\nDate: ${date}`,
@@ -140,7 +140,7 @@ app.post('/api/send-ticket', async (req, res) => {
     }
     
     // Final check: if still empty or General, force it to 'GOLD' for Antarnaad event context
-    const finalSectionName = (displaySection && displaySection.toString().toUpperCase() !== "GENERAL") ? displaySection.toUpperCase() : 'GOLD';
+    const finalSectionName = displaySection ? displaySection.toUpperCase() : 'GENERAL';
 
     // Rectangular Yellow Box
     doc.rect(doc.page.width / 2 - 75, 610, 150, 40).fill('#FFCC00');
