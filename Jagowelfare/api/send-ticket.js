@@ -83,7 +83,7 @@ export default async function handler(req, res) {
 
     // Section Button (Rectangular Gold - Matching Resend Logic)
     let displaySection = section;
-    if ((!displaySection || displaySection.toString().toUpperCase() === "GENERAL") && description && description.startsWith("SECTIONS:")) {
+    if ((!displaySection || (displaySection && displaySection.toString().toUpperCase() === "GENERAL")) && description && description.startsWith("SECTIONS:")) {
       try {
         const metadataPart = description.split(" | CONTENT: ")[0];
         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
         if (names.length > 0) displaySection = names[0];
       } catch (e) { console.error("PDF Fallback Error:", e); }
     }
-    const finalSectionName = displaySection ? displaySection.toUpperCase() : 'GENERAL';
+    const finalSectionName = (displaySection || "GENERAL").toString().toUpperCase().trim();
 
     // Rectangular Yellow Box
     doc.rect(doc.page.width / 2 - 75, 610, 150, 40).fill('#FFCC00');
@@ -118,9 +118,9 @@ export default async function handler(req, res) {
     });
 
     await transporter.sendMail({
-      from: `"Jain Youth Foundation (No-Reply)" <${SENDER_EMAIL}>`,
+      from: `"Jain Youth Foundation" <${SENDER_EMAIL}>`,
       to: recipientEmail,
-      subject: `Official Ticket: ${eventTitle}`,
+      subject: `Your Official Ticket: ${eventTitle} - ${recipientName}`,
       text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nEvent: ${eventTitle}\nTicket ID: ${ticketId}\n\nThank you,\nJain Youth Foundation`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">

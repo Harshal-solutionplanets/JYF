@@ -44,6 +44,7 @@ app.post('/api/send-ticket', async (req, res) => {
   const { recipientEmail, recipientName, eventTitle, ticketId, section, description, venue, date, time } = req.body;
 
   console.log(`[${new Date().toISOString()}] Incoming request to send ticket to: ${recipientEmail}`);
+  console.log(`Targeting Section: ${section}`);
 
   if (!recipientEmail || !recipientName || !eventTitle || !ticketId) {
     console.error('Missing required fields:', req.body);
@@ -69,10 +70,10 @@ app.post('/api/send-ticket', async (req, res) => {
       let pdfData = Buffer.concat(buffers);
 
       const mailOptions = {
-        from: `"Jain Youth Foundation (No-Reply)" <${SENDER_EMAIL}>`,
+        from: `"Jain Youth Foundation" <${SENDER_EMAIL}>`,
         to: recipientEmail,
-        subject: `Your Bhakti Sandhya Ticket: ${recipientName}`,
-        text: ` ${recipientName}, please find your official ticket for ${eventTitle} attached to this email. \n\nTicket ID: ${ticketId}\nVenue: ${venue}\nDate: ${date}`,
+        subject: `Your Official Ticket: ${eventTitle} - ${recipientName}`,
+        text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nTicket ID: ${ticketId}\nVenue: ${venue}\nDate: ${date}\nSection: ${finalSectionName}`,
         attachments: [
           {
             filename: `${recipientName.replace(/\s+/g, '_')}_Ticket.pdf`,
@@ -133,21 +134,16 @@ app.post('/api/send-ticket', async (req, res) => {
 
     // Section Button (Rectangular Gold - Matching Frontend)
     let displaySection = section;
-    // Treat "GENERAL" or empty or any casing of it as a trigger for fallback (fixing old registrations)
-    if ((!displaySection || displaySection.toString().toUpperCase() === "GENERAL") && description && description.startsWith("SECTIONS:")) {
+    if ((!displaySection || (displaySection && displaySection.toString().toUpperCase() === "GENERAL")) && description && description.startsWith("SECTIONS:")) {
       try {
         const metadataPart = description.split(" | CONTENT: ")[0];
         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
         const parsed = JSON.parse(sectionsString);
         const names = Array.isArray(parsed) ? parsed.map(s => typeof s === 'string' ? s : s.name) : Object.keys(parsed);
         if (names.length > 0) displaySection = names[0];
-      } catch (e) {
-        console.error("PDF Fallback Error:", e);
-      }
+      } catch (e) { console.error("PDF Fallback Error:", e); }
     }
-    
-    // Final check: if still empty or General, force it to 'GOLD' for Antarnaad event context
-    const finalSectionName = displaySection ? displaySection.toUpperCase() : 'GENERAL';
+    const finalSectionName = (displaySection || "GENERAL").toString().toUpperCase().trim();
 
     // Rectangular Yellow Box
     doc.rect(doc.page.width / 2 - 75, 610, 150, 40).fill('#FFCC00');

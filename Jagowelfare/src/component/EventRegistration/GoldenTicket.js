@@ -88,9 +88,9 @@ const GoldenTicket = ({ registration, event }) => {
 
             {/* Added fallback to parse default section from event description if registration.section is null */}
             {(() => {
-                let displaySection = registration.section || registration.selected_section;
+                let displaySection = registration.selected_section || registration.section;
                 // If it is NULL or "GENERAL", use the first section from the event description
-                if ((!displaySection || displaySection.toUpperCase() === "GENERAL") && event.description && event.description.startsWith("SECTIONS:")) {
+                if ((!displaySection || (displaySection && displaySection.toString().toUpperCase() === "GENERAL")) && event.description && event.description.startsWith("SECTIONS:")) {
                     try {
                         const metadataPart = event.description.split(" | CONTENT: ")[0];
                         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];

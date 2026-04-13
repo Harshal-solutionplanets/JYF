@@ -99,16 +99,16 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                         // Smart Default: Find the first section that still has seats available
                         const currentCounts = {};
                         (regList || []).forEach(r => {
-                            const sec = (r.selected_section || "General").trim();
+                            const sec = (r.selected_section || "General").trim().toUpperCase();
                             currentCounts[sec] = (currentCounts[sec] || 0) + 1;
                         });
 
-                        console.log("Current Registrations per Section:", currentCounts);
+                        console.log("Current Registrations per Section (Normalized):", currentCounts);
 
                         const firstAvailable = fullList.find(s => {
                             const capacity = parseInt(s.seats) || 0;
-                            // Match case-insensitively or exactly
-                            const booked = currentCounts[s.name] || 0;
+                            const sectionName = s.name.toUpperCase();
+                            const booked = currentCounts[sectionName] || 0;
                             const hasSpace = capacity > booked;
                             console.log(`Section: ${s.name} | Booked: ${booked}/${capacity} | Available: ${hasSpace}`);
                             return hasSpace;
@@ -152,14 +152,18 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
         // Only pre-fill if it's NOT a staff member (to allow easy testing/manual entry by staff)
         const isStaff = user?.email === 'donotreply@jainyouth.in';
 
-        if (event && selectedSection && participants[0].section === "") {
-            setParticipants([{
-                name: (user && !isStaff) ? (user?.user_metadata?.full_name || "") : "",
-                email: (user && !isStaff) ? (user?.email || "") : "",
-                phoneNo: (user && !isStaff) ? (user?.user_metadata?.phone || "") : "",
-                location: "",
-                section: selectedSection
-            }]);
+        if (event && selectedSection) {
+            setParticipants(prev => {
+                const updated = [...prev];
+                updated[0] = {
+                    ...updated[0],
+                    name: updated[0].name || ((user && !isStaff) ? (user?.user_metadata?.full_name || "") : ""),
+                    email: updated[0].email || ((user && !isStaff) ? (user?.email || "") : ""),
+                    phoneNo: updated[0].phoneNo || ((user && !isStaff) ? (user?.user_metadata?.phone || "") : ""),
+                    section: selectedSection
+                };
+                return updated;
+            });
         }
     }, [event, selectedSection, user]);
 
