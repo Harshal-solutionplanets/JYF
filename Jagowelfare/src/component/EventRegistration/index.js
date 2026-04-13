@@ -99,17 +99,23 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                         // Smart Default: Find the first section that still has seats available
                         const currentCounts = {};
                         (regList || []).forEach(r => {
-                            const s = r.selected_section || "General";
-                            currentCounts[s] = (currentCounts[s] || 0) + 1;
+                            const sec = (r.selected_section || "General").trim();
+                            currentCounts[sec] = (currentCounts[sec] || 0) + 1;
                         });
+
+                        console.log("Current Registrations per Section:", currentCounts);
 
                         const firstAvailable = fullList.find(s => {
                             const capacity = parseInt(s.seats) || 0;
+                            // Match case-insensitively or exactly
                             const booked = currentCounts[s.name] || 0;
-                            return capacity > booked;
+                            const hasSpace = capacity > booked;
+                            console.log(`Section: ${s.name} | Booked: ${booked}/${capacity} | Available: ${hasSpace}`);
+                            return hasSpace;
                         });
 
                         if (firstAvailable) {
+                            console.log("Auto-selecting next available section:", firstAvailable.name);
                             setSelectedSection(firstAvailable.name);
                         } else if (names.length > 0) {
                             setSelectedSection(names[0]);
