@@ -71,9 +71,10 @@ app.post('/api/send-ticket', async (req, res) => {
 
       const mailOptions = {
         from: `"Jain Youth Foundation" <${SENDER_EMAIL}>`,
+        replyTo: SENDER_EMAIL,
         to: recipientEmail,
         subject: `Your Official Ticket: ${eventTitle} - ${recipientName}`,
-        text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nTicket ID: ${ticketId}\nVenue: ${venue}\nDate: ${date}\nSection: ${finalSectionName}`,
+        text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nTicket ID: ${ticketId}\nVenue: ${venue}\nDate: ${date}\nSection: ${finalSectionName}\n\nNOTE: This is an automated email. Please do not reply.`,
         attachments: [
           {
             filename: `${recipientName.replace(/\s+/g, '_')}_Ticket.pdf`,

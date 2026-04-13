@@ -119,9 +119,10 @@ export default async function handler(req, res) {
 
     await transporter.sendMail({
       from: `"Jain Youth Foundation" <${SENDER_EMAIL}>`,
+      replyTo: SENDER_EMAIL,
       to: recipientEmail,
       subject: `Your Official Ticket: ${eventTitle} - ${recipientName}`,
-      text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nEvent: ${eventTitle}\nTicket ID: ${ticketId}\n\nThank you,\nJain Youth Foundation`,
+      text: `Pranam ${recipientName},\n\nPlease find your official ticket for ${eventTitle} attached.\n\nEvent: ${eventTitle}\nTicket ID: ${ticketId}\n\nThank you,\nJain Youth Foundation\n\nNOTE: This is an automated email. Please do not reply.`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #D4AF37;">Pranam ${recipientName},</h2>
@@ -134,7 +135,8 @@ export default async function handler(req, res) {
           </div>
           <p>Please find your ticket PDF attached to this email. You will need to scan it at the entrance.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="font-size: 12px; color: #888;">This is an automated message from Jain Youth Foundation.</p>
+          <p style="font-size: 12px; color: #888; text-align: center;"><strong>Note:</strong> This is an automated message. Please do not reply to this email.</p>
+          <p style="font-size: 12px; color: #888; text-align: center;">Jain Youth Foundation</p>
         </div>
       `,
       attachments: [
