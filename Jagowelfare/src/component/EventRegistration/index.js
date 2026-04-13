@@ -448,7 +448,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                     </div>
 
 
-                                    {!isSoldOut && (
+                                    {!(isSoldOut || (event.seatsAvailable && (event.seatsAvailable - bookedCount) <= 0)) && (
                                         <div className="text-center mt-5">
                                             <button
                                                 className="btn btn_theme btn_md"
@@ -460,7 +460,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                         </div>
                                     )}
 
-                                    {isSoldOut && (
+                                    {(isSoldOut || (event.seatsAvailable && (event.seatsAvailable - bookedCount) <= 0)) && (
                                         <div className="text-center mt-4">
                                             <button className="btn btn-outline-dark btn_md" onClick={() => navigate(-1)}>Back to Events</button>
                                         </div>
