@@ -313,13 +313,45 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                 return;
             }
 
+            // 3. Just-in-Time Section Calculation (Preventing overbooking of tiers)
+            let finalAssignedSection = "General";
+            const desc = event.description || "";
+            if (desc.startsWith("SECTIONS:")) {
+                try {
+                    // Fetch latest counts specifically to avoid race conditions
+                    const { data: latestRegs } = await supabase.from('event_registrations').select('selected_section').eq('event_id', eventId);
+                    const currentCounts = {};
+                    (latestRegs || []).forEach(r => {
+                        const sec = (r.selected_section || "General").trim().toUpperCase();
+                        currentCounts[sec] = (currentCounts[sec] || 0) + 1;
+                    });
+
+                    const parts = desc.split(" | CONTENT: ");
+                    const sectionsJson = parts[0].replace("SECTIONS: ", "").split(" | ")[0];
+                    const parsed = JSON.parse(sectionsJson);
+                    const fullList = Array.isArray(parsed) ? parsed : Object.keys(parsed).map(k => ({ name: k, seats: parsed[k].seats, enabled: parsed[k].enabled }));
+
+                    const nextAvailable = fullList.find(s => {
+                        const capacity = parseInt(s.seats) || 0;
+                        const sectionName = s.name.toUpperCase();
+                        const booked = currentCounts[sectionName] || 0;
+                        return capacity > booked;
+                    });
+
+                    if (nextAvailable) {
+                        finalAssignedSection = nextAvailable.name;
+                        setSelectedSection(nextAvailable.name); // Update UI state
+                    }
+                } catch (e) { console.error("JIT Section Calc Error:", e); }
+            }
+
             const inserts = finalParticipants.map(v => ({
                 event_id: eventId,
                 full_name: v.name,
                 email: v.email,
                 phone_number: v.phoneNo,
                 location: v.location,
-                selected_section: selectedSection, // Use real column
+                selected_section: finalAssignedSection,
             }));
 
             const { data, error: sbError } = await supabase
@@ -348,7 +380,7 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                         recipientName: reg.full_name,
                         eventTitle: event.title,
                         ticketId: reg.id,
-                        section: reg.selected_section || selectedSection || (availableSections.length > 0 ? availableSections[0] : ""),
+                        section: reg.selected_section || finalAssignedSection,
                         description: event.description,
                         venue: event.venue || "TBD",
                         date: formatDate(event.startAt),

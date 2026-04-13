@@ -81,20 +81,39 @@ export default async function handler(req, res) {
     doc.rect(doc.page.width / 2 - 70, 445, 140, 140).fill('#FFFFFF');
     doc.image(qrDataUrl, doc.page.width / 2 - 65, 450, { width: 130 });
 
-    // Section Button (Rectangular Gold - Matching Resend Logic)
-    let displaySection = section;
-    if ((!displaySection || (displaySection && displaySection.toString().toUpperCase() === "GENERAL")) && description && description.startsWith("SECTIONS:")) {
+    // --- STRONG SECTION LOGIC ---
+    let finalSectionName = (section || "GENERAL").toString().trim().toUpperCase();
+    
+    // If the event has defined sections, try to find a better match or fallback intelligently
+    if (description && description.startsWith("SECTIONS:")) {
       try {
         const metadataPart = description.split(" | CONTENT: ")[0];
         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
         const parsed = JSON.parse(sectionsString);
-        const names = Array.isArray(parsed) ? parsed.map(s => typeof s === 'string' ? s : s.name) : Object.keys(parsed);
-        if (names.length > 0) displaySection = names[0];
-      } catch (e) { console.error("PDF Fallback Error:", e); }
-    }
-    const finalSectionName = (displaySection || "GENERAL").toString().toUpperCase().trim();
+        
+        // Extract names: supports both ["Name1", "Name2"] and [{"name":"Tier1", seats:10}, ...]
+        const availableSections = (Array.isArray(parsed) ? parsed : Object.keys(parsed))
+          .map(s => (typeof s === 'string' ? s : s.name).toUpperCase());
 
-    // Rectangular Yellow Box
+        // Logic A: If the passed section exactly matches one of the available sections (case-insensitive), we TRUST it.
+        const match = availableSections.find(s => s === finalSectionName);
+        
+        if (match) {
+          // It's a valid specific section, keep it.
+          finalSectionName = match;
+        } else if (finalSectionName === "GENERAL" || finalSectionName === "" || !availableSections.includes(finalSectionName)) {
+          // Logic B: If it's "GENERAL" or empty, but the event HAS sections, we pick the FIRST one as the default "Tier 1"
+          if (availableSections.length > 0) {
+            finalSectionName = availableSections[0];
+          }
+        }
+      } catch (e) { 
+        console.error("Strong Section Logic Error:", e);
+        // On error, we stick with the normalized input or "GENERAL"
+      }
+    }
+
+    // Rectangular Yellow Box for Section Name
     doc.rect(doc.page.width / 2 - 75, 610, 150, 40).fill('#FFCC00');
     // Section Text
     doc.fillColor('#000000').fontSize(18).font('Helvetica-Bold').text(finalSectionName, 0, 622, { align: 'center' });
@@ -141,7 +160,7 @@ export default async function handler(req, res) {
       `,
       attachments: [
         {
-          filename: `${recipientName.replace(/\s+/g, '_')}_Ticket.pdf`,
+          filename: `${recipientName.replace(/\s+/g, '_')}_${finalSectionName}_Ticket.pdf`,
           content: pdfData
         }
       ]

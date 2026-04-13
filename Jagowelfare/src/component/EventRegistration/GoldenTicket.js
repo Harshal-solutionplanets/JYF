@@ -86,23 +86,29 @@ const GoldenTicket = ({ registration, event }) => {
                 />
             </div>
 
-            {/* Added fallback to parse default section from event description if registration.section is null */}
             {(() => {
-                let displaySection = registration.selected_section || registration.section;
-                // If it is NULL or "GENERAL", use the first section from the event description
-                if ((!displaySection || (displaySection && displaySection.toString().toUpperCase() === "GENERAL")) && event.description && event.description.startsWith("SECTIONS:")) {
+                let displaySection = (registration.selected_section || registration.section || "GENERAL").toString().trim().toUpperCase();
+                
+                if (event.description && event.description.startsWith("SECTIONS:")) {
                     try {
                         const metadataPart = event.description.split(" | CONTENT: ")[0];
                         const sectionsString = metadataPart.split("SECTIONS: ")[1].split(" | ")[0];
                         const parsed = JSON.parse(sectionsString);
-                        const names = (Array.isArray(parsed) ? parsed : Object.keys(parsed)).map(s => typeof s === 'string' ? s : s.name);
-                        if (names.length > 0) displaySection = names[0];
-                    } catch (e) {
-                        displaySection = "GENERAL";
-                    }
+                        
+                        const availableSections = (Array.isArray(parsed) ? parsed : Object.keys(parsed))
+                            .map(s => (typeof s === 'string' ? s : s.name).toUpperCase());
+
+                        const match = availableSections.find(s => s === displaySection);
+                        if (match) {
+                            displaySection = match;
+                        } else if (displaySection === "GENERAL" || displaySection === "" || !availableSections.includes(displaySection)) {
+                            if (availableSections.length > 0) {
+                                displaySection = availableSections[0];
+                            }
+                        }
+                    } catch (e) { console.error("GoldenTicket Strong Logic Error:", e); }
                 }
                 
-                // Final consistency check
                 if (!displaySection) {
                     displaySection = "GENERAL";
                 }

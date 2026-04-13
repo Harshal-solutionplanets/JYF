@@ -100,13 +100,14 @@ const AdminViewRegistrations = () => {
 
     const downloadCSV = () => {
         const filtered = registrations.filter(r => selectedEventId === "all" || String(r.event_id) === String(selectedEventId));
-        const headers = ["User Name", "Email", "Phone", "Location", "Event", "Status", "Date"];
+        const headers = ["User Name", "Email", "Phone", "Location", "Event", "Section", "Status", "Date"];
         const rows = filtered.map(r => [
             r.full_name,
             r.email,
             r.phone_number,
             r.location || "N/A",
             events[r.event_id] || "Unknown",
+            r.selected_section || "General",
             r.is_checked_in ? "Checked-In" : "Pending",
             formatDate(r.created_at)
         ]);
@@ -179,6 +180,7 @@ const AdminViewRegistrations = () => {
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>User Name</th>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Contact Details</th>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Registered For</th>
+                                <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff", fontWeight: "900", color: "#e33129" }}>Tier / Section</th>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Status</th>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", backgroundColor: "#fff" }}>Date</th>
                                 <th style={{ border: "none", padding: "15px", color: "#777", textTransform: "uppercase", fontSize: "11px", textAlign: "right", backgroundColor: "#fff" }}>Actions</th>
@@ -197,6 +199,24 @@ const AdminViewRegistrations = () => {
                                     </td>
                                     <td style={{ border: "none", padding: "15px" }}>
                                         <div style={{ fontWeight: "700", color: "#e33129", fontSize: "14px" }}>{events[r.event_id] || "Unknown Event"}</div>
+                                    </td>
+                                    <td style={{ border: "none", padding: "15px" }}>
+                                        {(r.selected_section || r.section) ? (
+                                            <div style={{ 
+                                                fontWeight: "800", 
+                                                color: "#333", 
+                                                fontSize: "14px",
+                                                textTransform: "uppercase",
+                                                padding: "5px 12px",
+                                                backgroundColor: "#fff3cd",
+                                                borderRadius: "6px",
+                                                display: "inline-block"
+                                            }}>
+                                                {r.selected_section || r.section}
+                                            </div>
+                                        ) : (
+                                            <span style={{color: '#ddd', fontSize: '12px'}}>—</span>
+                                        )}
                                     </td>
                                     <td style={{ border: "none", padding: "15px" }}>
                                         {r.is_checked_in ? (
