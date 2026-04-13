@@ -435,8 +435,8 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                                             </div>
                                             {event.seatsAvailable && (
                                                 <div className="col-12 mt-3">
-                                                    <div style={{ padding: "10px", backgroundColor: isSoldOut ? "#feecec" : "#e7f4e8", borderRadius: "10px", color: isSoldOut ? "#e33129" : "#28a745", fontWeight: "700" }}>
-                                                        {isSoldOut ? (
+                                                    <div style={{ padding: "10px", backgroundColor: (isSoldOut || (event.seatsAvailable && (event.seatsAvailable - bookedCount) <= 0)) ? "#feecec" : "#e7f4e8", borderRadius: "10px", color: (isSoldOut || (event.seatsAvailable && (event.seatsAvailable - bookedCount) <= 0)) ? "#e33129" : "#28a745", fontWeight: "700" }}>
+                                                        {(isSoldOut || (event.seatsAvailable && (event.seatsAvailable - bookedCount) <= 0)) ? (
                                                             <span>🚫 SOLD OUT - All seats are booked!</span>
                                                         ) : (
                                                             <span>✨ Only {(event.seatsAvailable - bookedCount)} Seats Remaining</span>
