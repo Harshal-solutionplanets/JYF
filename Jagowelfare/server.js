@@ -12,8 +12,8 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-const SENDER_EMAIL = process.env.GMAIL_USER || 'donotreply@jainyouth.in';
-const SENDER_PASS = process.env.GMAIL_PASS || 'fona izov qhkg uwhy';
+const SENDER_EMAIL = process.env.GMAIL_USER;
+const SENDER_PASS = process.env.GMAIL_PASS;
 
 // Configure Nodemailer with Gmail credentials
 const transporter = nodemailer.createTransport({

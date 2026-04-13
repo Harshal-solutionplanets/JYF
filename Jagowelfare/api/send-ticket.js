@@ -12,8 +12,8 @@ export default async function handler(req, res) {
 
   const { recipientEmail, recipientName, eventTitle, ticketId, section, description, venue, date, time } = req.body;
 
-  const SENDER_EMAIL = process.env.GMAIL_USER || 'donotreply@jainyouth.in';
-  const SENDER_PASS = process.env.GMAIL_PASS || 'fona izov qhkg uwhy';
+  const SENDER_EMAIL = process.env.GMAIL_USER;
+  const SENDER_PASS = process.env.GMAIL_PASS;
 
   console.log("-----------------------------------------");
   console.log("API ACTIVE EMAIL SENDER:", SENDER_EMAIL);
