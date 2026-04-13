@@ -114,19 +114,23 @@ const EventRegistrationArea = ({ onTitleFetch }) => {
                         } else if (names.length > 0) {
                             setSelectedSection(names[0]);
                         }
+                        
+                        setSectionBookedCounts(currentCounts);
 
-                const currentCounts = {};
-                (regList || []).forEach(r => {
-                    const s = r.selected_section || "General";
-                    currentCounts[s] = (currentCounts[s] || 0) + 1;
-                });
+                        // Define Sold Out: Total seats reached OR all categories are full
+                        const totalLimitReached = data.seatsAvailable && (regList?.length || 0) >= data.seatsAvailable;
+                        const allCategoriesFull = (fullList.length > 0) && !firstAvailable;
 
-                setSectionBookedCounts(currentCounts);
-                setBookedCount(regList?.length || 0);
+                        if (totalLimitReached || allCategoriesFull) {
+                            setIsSoldOut(true);
+                        }
 
-                if (data.seatsAvailable && (regList?.length || 0) >= data.seatsAvailable) {
-                    setIsSoldOut(true);
+                    } catch (e) {
+                        console.error("Failed to parse sections", e);
+                    }
                 }
+
+                setBookedCount(regList?.length || 0);
 
             } catch (err) {
                 setError(err?.message || "Failed to load event");
