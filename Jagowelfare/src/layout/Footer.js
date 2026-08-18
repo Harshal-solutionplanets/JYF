@@ -48,6 +48,7 @@ const Footer = () => {
                                     <li style={{ marginBottom: "8px" }}><Link to="/contact" style={{ color: "#666", fontSize: "15px" }}>Contact Us</Link></li>
                                     <li style={{ marginBottom: "8px" }}><Link to="/terms-service" style={{ color: "#666", fontSize: "15px" }}>Terms of Service</Link></li>
                                     <li style={{ marginBottom: "8px" }}><Link to="/privacy-policy" style={{ color: "#666", fontSize: "15px" }}>Privacy Policy</Link></li>
+                                    <li style={{ marginBottom: "8px" }}><Link to="/cancellation-refund-policy" style={{ color: "#666", fontSize: "15px" }}>Cancellation & Refund Policy</Link></li>
                                 </ul>
                             </div>
                         </div>

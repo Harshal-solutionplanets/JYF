@@ -27,6 +27,7 @@ import FaqsPage from "./page/Faqs";
 import PrivacyPolicy from "./page/PrivacyPolicy";
 import TermsServicePage from "./page/TermsService";
 import ContactPage from "./page/Contact";
+import CancellationRefundPolicy from "./page/CancellationRefundPolicy";
 import VolunteerPage from "./page/VolunteerPage";
 import Error from "./page/Error";
 import MyTicketsPage from "./page/MyTickets";
@@ -127,6 +128,7 @@ const App = () => {
         <Route path="/faqs" element={<FaqsPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-service" element={<TermsServicePage />} />
+        <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
         <Route path="/healthcare" element={<HealthcarePage />} />
         <Route path="/food-support" element={<FoodSupportPage />} />
         <Route path="/education" element={<EducationPage />} />
