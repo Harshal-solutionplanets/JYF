@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "../../supabase";
-import { QRCodeCanvas } from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
+import html2canvas from "html2canvas";
 import logo from "../../assets/img/logo.png";
 
 const AdminViewSadhuMedical = ({ onEdit }) => {
@@ -58,6 +59,15 @@ const AdminViewSadhuMedical = ({ onEdit }) => {
         printWindow.document.close();
         printWindow.focus();
         setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+    };
+
+    const handleDownloadQR = () => {
+        html2canvas(printRef.current).then((canvas) => {
+            const link = document.createElement("a");
+            link.download = `QR_${qrData.name}_${qrData.person_id}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
     };
 
     if (loading) return <div className="text-center py-5">Loading records...</div>;
@@ -163,7 +173,7 @@ const AdminViewSadhuMedical = ({ onEdit }) => {
                         <div ref={printRef}>
                             <img src={logo} alt="Logo" style={{ maxWidth: "150px", marginBottom: "20px" }} />
                             <div>
-                                <QRCodeCanvas value={`${window.location.origin}/admin/sadhu-medical/view/${qrData.id}`} size={200} />
+                                <QRCodeSVG value={`${window.location.origin}/admin/sadhu-medical/view/${qrData.id}`} size={200} />
                             </div>
                             <div style={{ marginTop: "20px" }}>
                                 <h3 style={{ margin: "0", fontSize: "20px" }}>{qrData.name}</h3>
@@ -171,7 +181,10 @@ const AdminViewSadhuMedical = ({ onEdit }) => {
                             </div>
                         </div>
 
-                        <button onClick={handlePrintQR} className="btn btn_theme btn_md" style={{ marginTop: "30px", padding: "8px 20px" }}>Print / Save QR</button>
+                        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "30px" }}>
+                            <button onClick={handlePrintQR} className="btn btn_theme btn_md" style={{ padding: "8px 20px" }}>Print QR</button>
+                            <button onClick={handleDownloadQR} className="btn btn_theme btn_md" style={{ padding: "8px 20px", backgroundColor: "#333", border: "none" }}>Download QR</button>
+                        </div>
                     </div>
                 </div>
             )}
