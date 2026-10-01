@@ -71,6 +71,10 @@ const AdminAddSadhuMedical = ({ onPublish, sadhuData }) => {
         setLoading(true);
 
         try {
+            if (formImages.length === 0) return alert("Please upload at least one Form image.");
+            if (reportImages.length === 0) return alert("Please upload at least one Report image.");
+            if (prescriptionImages.length === 0) return alert("Please upload at least one Prescription image.");
+
             const formUrls = await uploadFiles(formImages, 'forms');
             const reportUrls = await uploadFiles(reportImages, 'reports');
             const prescriptionUrls = await uploadFiles(prescriptionImages, 'prescriptions');
@@ -140,19 +144,19 @@ const AdminAddSadhuMedical = ({ onPublish, sadhuData }) => {
                     </div>
                     <div>
                         <label style={labelStyle}>Age</label>
-                        <input type="number" style={inputStyle} value={age} onChange={(e) => setAge(e.target.value)} />
+                        <input type="number" style={inputStyle} value={age} onChange={(e) => setAge(e.target.value)} required />
                     </div>
                     <div>
                         <label style={labelStyle}>Samuday Name</label>
-                        <input type="text" style={inputStyle} value={samudayName} onChange={(e) => setSamudayName(e.target.value)} />
+                        <input type="text" style={inputStyle} value={samudayName} onChange={(e) => setSamudayName(e.target.value)} required />
                     </div>
                     <div>
                         <label style={labelStyle}>Date</label>
-                        <input type="date" style={inputStyle} value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
+                        <input type="date" style={inputStyle} value={entryDate} onChange={(e) => setEntryDate(e.target.value)} required />
                     </div>
                     <div>
                         <label style={labelStyle}>Sevak / Mumukshu Contact Number</label>
-                        <input type="text" style={inputStyle} value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />
+                        <input type="text" style={inputStyle} value={contactNumber} onChange={(e) => setContactNumber(e.target.value.replace(/\D/g, ''))} maxLength="10" pattern="\d{10}" title="Please enter a valid 10-digit number" placeholder="10-digit mobile number" />
                     </div>
                 </div>
 
