@@ -44,6 +44,7 @@ import EventRegistrationPage from "./page/EventRegistration";
 import QRScannerPage from "./page/QRScannerPage";
 import AdminViewRegistrations from "./page/admin/AdminViewRegistrations";
 import AdminViewGallery from "./page/admin/AdminViewGallery";
+import AdminSadhuDetailStandalone from "./page/admin/AdminSadhuDetailStandalone";
 import ScrollToTop from "./utils/ScrollToTop";
 
 const App = () => {
@@ -122,6 +123,14 @@ const App = () => {
           element={
             <RequireStaff>
               <AdminViewGallery />
+            </RequireStaff>
+          }
+        />
+        <Route
+          path="/admin/sadhu-medical/view/:id"
+          element={
+            <RequireStaff>
+              <AdminSadhuDetailStandalone />
             </RequireStaff>
           }
         />

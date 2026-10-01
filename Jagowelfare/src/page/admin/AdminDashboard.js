@@ -22,6 +22,8 @@ import AdminViewSupporter from "./AdminViewSupporter";
 import AdminViewTeam from "./AdminViewTeam";
 import AdminViewTestimonials from "./AdminViewTestimonials";
 import { useAuth } from "../../auth/AuthProvider";
+import AdminAddSadhuMedical from "./AdminAddSadhuMedical";
+import AdminViewSadhuMedical from "./AdminViewSadhuMedical";
 
 const DashboardOverview = () => {
   return (
@@ -262,6 +264,12 @@ const AdminDashboardPage = () => {
     setActiveView("edit_testimonial");
   };
 
+  const [editingSadhu, setEditingSadhu] = useState(null);
+  const handleEditSadhu = (sadhu) => {
+    setEditingSadhu(sadhu);
+    setActiveView("edit_sadhu");
+  };
+
   const handleAddMaster = async (type, value, setInput) => {
     if (!value.trim()) return;
     try {
@@ -351,7 +359,10 @@ const AdminDashboardPage = () => {
         "manage_master_seat": "Seats Type Master",
         "manage_honorary": "Honorary Volunteers Master",
         "dashboard_updates": "Global Site Updates",
-        "qr_scanner": "QR Entry Scanner"
+        "qr_scanner": "QR Entry Scanner",
+        "add_sadhu": "Add Sadhu / Sadhviji Details",
+        "view_sadhu": "View Sadhu / Sadhviji Details",
+        "edit_sadhu": "Edit Sadhu / Sadhviji Details"
     };
     return titles[activeView] || activeView.replace("_", " ").toUpperCase();
   };
@@ -393,6 +404,9 @@ const AdminDashboardPage = () => {
       case "manage_master_seat": return <MasterManagementView type="seat_tier" title="Seats Type Master" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} onUpdate={handleUpdateMaster} onReorder={handleReorderMasters} value={seatTierInput} setValue={setSeatTierInput} placeholder="Enter new Seat Type..." />;
       case "manage_honorary": return <MasterManagementView type="honorary_volunteer" title="Honorary Volunteers Management" masters={masters} onAdd={handleAddMaster} onDelete={handleDeleteMaster} onUpdate={handleUpdateMaster} onReorder={handleReorderMasters} value={honoraryInput} setValue={setHonoraryInput} placeholder="Enter Name..." />;
       case "dashboard_updates": return <AdminDashboardUpdates />;
+      case "add_sadhu": return <AdminAddSadhuMedical onPublish={() => setActiveView("dashboard")} />;
+      case "edit_sadhu": return <AdminAddSadhuMedical sadhuData={editingSadhu} onPublish={() => { setEditingSadhu(null); setActiveView("view_sadhu"); }} />;
+      case "view_sadhu": return <AdminViewSadhuMedical onEdit={handleEditSadhu} />;
       default:
         return <DashboardOverview />;
     }
@@ -472,6 +486,13 @@ const AdminDashboardPage = () => {
       subs: [
         { label: "Add Testimonial", view: "add_testimonials" },
         { label: "View Testimonial List", view: "view_testimonials" }
+      ]
+    },
+    {
+      title: "Sadhu / Sadhviji Details", icon: "fas fa-user-md", key: "sadhu",
+      subs: [
+        { label: "Add Details", view: "add_sadhu" },
+        { label: "View Details List", view: "view_sadhu" }
       ]
     },
     { title: "Dashboard Updates", icon: "fas fa-edit", key: "dashboard_updates", view: "dashboard_updates" },
